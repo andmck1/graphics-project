@@ -1,6 +1,4 @@
-#ifndef APP_H
-#define APP_H
-
+#pragma once
 #include <windows.h>
 #include <windowsx.h>
 
@@ -21,5 +19,3 @@ class AppState
     bool InitInputDevices();
     bool InitWindow(HINSTANCE hInstance, int width, int height);
 };
-
-#endif

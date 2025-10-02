@@ -1,5 +1,4 @@
-#ifndef GAME_H
-#define GAME_H
+#pragma once
 
 #include "../vertices/vertices.h"
 #include "../camera/camera.h"
@@ -25,4 +24,3 @@ class GameState
     void moveCameraAndUpdate(XMVECTOR moveCoordinates);
     void rotateCameraAndUpdate(const float mouseDx, const float mouseDy);
 };
-#endif

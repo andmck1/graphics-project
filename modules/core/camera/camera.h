@@ -1,6 +1,4 @@
-#ifndef CAMERA_H
-#define CAMERA_H
-
+#pragma once
 #include <directxmath.h>
 
 using namespace DirectX;
@@ -21,5 +19,3 @@ class Camera
     float yaw = 0.f;
     float pitch = 0.f;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef INPUT_H
-#define INPUT_H
+#pragma once
 
 #include <unordered_map>
 
@@ -29,4 +28,3 @@ class Input
 
 void inputEvent(int keyCode);
 void inputEvent(const double mouseDx, const double mouseDy);
-#endif
