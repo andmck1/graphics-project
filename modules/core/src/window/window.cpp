@@ -1,36 +1,33 @@
-#include <any>
 #include <memory>
-#include <iostream>
+#include "spdlog/spdlog.h"
 #include "window.h"
 
-std::unique_ptr<IEventSystem> g_eventSystem;
+std::unique_ptr<WindowEventHandler> g_windowEventHandler;
 
 Window::Window(WindowSpec spec)
 {
-    this->spec = spec;
+    spec = spec;
+    InitWindow();
 }
 
-void Window::Run()
+bool Window::Frame()
 {
-    if (!this->InitWindow())
-    {
-        return;
-    }
-
-    MSG msg = {};
-    while (msg.message != WM_QUIT)
+    if (msg.message != WM_QUIT)
     {
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
+        return 1;
     }
+    return 0;
 }
 
 bool Window::InitWindow()
 {
-    g_eventSystem = std::make_unique<WindowsEvents>();
+    spdlog::debug("Initialising window");
+
     WNDCLASS wc = {};
     wc.lpfnWndProc = Window::WndProc;
     wc.hInstance = this->spec.hInstance;
@@ -42,7 +39,7 @@ bool Window::InitWindow()
     AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
 
     this->spec.hwnd = CreateWindowExA(
-        0, wc.lpszClassName, "DownTauntStudios", WS_OVERLAPPEDWINDOW,
+        0, wc.lpszClassName, this->spec.windowName.c_str(), WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left,
         rect.bottom - rect.top, nullptr, nullptr, this->spec.hInstance, nullptr
     );
@@ -54,63 +51,28 @@ bool Window::InitWindow()
     return true;
 }
 
-int WindowsEvents::DestroyEvent(WPARAM wParam, LPARAM lParam)
+bool WindowEventHandler::DestroyEvent(WPARAM wParam, LPARAM lParam)
 {
     PostQuitMessage(0);
     return 1;
 }
 
-int WindowsEvents::InputEvent(WPARAM wParam, LPARAM lParam)
+bool WindowEventHandler::MouseMoveEvent(WPARAM wParam, LPARAM lParam)
 {
-    UINT size = 0;
-    // First call – get required buffer size
-    GetRawInputData(
-        reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, nullptr, &size,
-        sizeof(RAWINPUTHEADER)
-    );
-
-    if (size == 0)
-        return 0; // should never happen
-
-    // Stack buffer for small packets, heap for > sizeof(tmp)
-    BYTE tmp[sizeof(RAWINPUT) * 2];
-    std::unique_ptr<BYTE[]> heap;
-    BYTE *buffer = size <= sizeof(tmp)
-                       ? tmp
-                       : (heap = std::make_unique<BYTE[]>(size)).get();
-
-    // Second call – fetch the data
-    if (GetRawInputData(
-            reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, buffer, &size,
-            sizeof(RAWINPUTHEADER)
-        ) != size)
-        return 0; // malformed packet
-
-    auto *raw = reinterpret_cast<RAWINPUT *>(buffer);
-    if (raw->header.dwType == RIM_TYPEMOUSE)
-    {
-        // const float dx = static_cast<float>(raw->data.mouse.lLastX);
-        // const float dy = static_cast<float>(raw->data.mouse.lLastY);
-    }
     return 1;
 }
 
-int WindowsEvents::CharacterInputEvent(WPARAM wParam, LPARAM lParam)
+bool WindowEventHandler::CharacterInputEvent(WPARAM wParam, LPARAM lParam)
 {
-    std::cout << "OIOIOI";
     return 1;
 }
 
-int WindowsEvents::Poll(const Event &event)
+bool WindowEventHandler::Poll(const WindowEvent &event)
 {
-    const WindowsEventInputData &windowsEventData =
-        std::any_cast<const WindowsEventInputData &>(event.data);
-    auto mapPair = eventMap.find(windowsEventData.msg);
+    auto mapPair = eventMap.find(event.msg);
     if (mapPair != eventMap.end())
     {
-        return mapPair->second(
-            windowsEventData.wParam, windowsEventData.lParam
-        );
+        return mapPair->second(event.wParam, event.lParam);
     }
     return 0;
 }
@@ -118,8 +80,8 @@ int WindowsEvents::Poll(const Event &event)
 LRESULT CALLBACK
 Window::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    const Event &event = Event{WindowsEventInputData{msg, wParam, lParam}};
-    if (g_eventSystem->Poll(event))
+    const WindowEvent &event = WindowEvent{msg, wParam, lParam};
+    if (g_windowEventHandler->Poll(event))
     {
         return 0;
     }
