@@ -1,4 +1,5 @@
 // Heavy inspiration from Paul Robertson's (University of Abertay) code
+#pragma once
 
 #include <d3d11.h>
 #include <directxmath.h>

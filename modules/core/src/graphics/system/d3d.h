@@ -18,8 +18,6 @@ struct DeviceManager
     ComPtr<ID3D11DeviceContext> context;
     ComPtr<IDXGISwapChain> swapChain;
 
-    static DeviceManager &Get();
-
     bool CreateDeviceAndSwapChain(HWND hwnd, int screenWidth, int screenHeight);
 };
 
@@ -72,10 +70,10 @@ class D3DApp
     public:
     void sendData();
     bool Init(HWND hwnd, int screenWidth, int screenHeight);
+    DeviceManager deviceManager;
 
     private:
     HWND hwnd = nullptr;
-    DeviceManager deviceManager;
     ShaderManager shaderManager;
     Renderer renderer;
     TextRenderer textRenderer;

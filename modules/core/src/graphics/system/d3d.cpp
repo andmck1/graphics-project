@@ -38,7 +38,6 @@ bool Renderer::CreateRenderTarget()
     HRESULT getBufferHR;
     HRESULT createRenderTargetViewHR;
     ComPtr<ID3D11Texture2D> backBuffer;
-    DeviceManager &deviceManager = DeviceManager::Get();
 
     getBufferHR = deviceManager.swapChain->GetBuffer(
         0, __uuidof(ID3D11Texture2D),

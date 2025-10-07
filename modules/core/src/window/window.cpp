@@ -38,16 +38,16 @@ bool Window::InitWindow()
     RECT rect = {0, 0, this->spec.width, this->spec.height};
     AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
 
-    this->spec.hwnd = CreateWindowExA(
+    this->hwnd = CreateWindowExA(
         0, wc.lpszClassName, this->spec.windowName.c_str(), WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left,
         rect.bottom - rect.top, nullptr, nullptr, this->spec.hInstance, nullptr
     );
 
-    if (!(this->spec.hwnd))
+    if (!(this->hwnd))
         return false;
 
-    ShowWindow(this->spec.hwnd, SW_SHOW);
+    ShowWindow(this->hwnd, SW_SHOW);
     return true;
 }
 
