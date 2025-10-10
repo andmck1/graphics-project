@@ -18,14 +18,15 @@ int main()
     Window window = Window(windowSpec);
 
     D3DApp graphicsApp = D3DApp();
-    graphicsApp.Init(window.hwnd, window.spec.width, window.spec.height);
+    graphicsApp.Init(window.hwnd, windowSpec.width, windowSpec.height);
 
     DefaultScene scene = DefaultScene(
-        graphicsApp.deviceManager.device, graphicsApp.deviceManager.context
+        graphicsApp.deviceManager.device,
+        graphicsApp.deviceManager.deviceContext
     );
     GameManager gameManager = GameManager(
-        graphicsApp.deviceManager.device, graphicsApp.deviceManager.context,
-        scene
+        graphicsApp.deviceManager.device,
+        graphicsApp.deviceManager.deviceContext, scene
     );
 
     while (window.Frame())
