@@ -2,14 +2,44 @@
 
 #include <wrl.h>
 #include <d3d11.h>
+#include <directxmath.h>
+#include <window/window.h>
 
 using namespace Microsoft::WRL;
+using namespace DirectX;
 
 class D3D
 {
+    public:
+    Window *window;
     ComPtr<ID3D11Device> device;
     ComPtr<ID3D11DeviceContext> deviceContext;
     ComPtr<IDXGISwapChain> swapChain;
+    ComPtr<ID3D11RenderTargetView> renderTargetView;
+    XMMATRIX projectionMatrix;
+    D3D11_VIEWPORT viewport = {};
+    ComPtr<ID3D11RasterizerState> rasterizerState;
+    D3D11_RASTERIZER_DESC rasterizerDesc = {};
+    ComPtr<ID3DBlob> vsBlob, psBlob, errorBlob;
+    // TODO - make this a vector of shaders?
+    ComPtr<ID3D11VertexShader> vertexShader;
+    ComPtr<ID3D11PixelShader> pixelShader;
+    ComPtr<ID3D11InputLayout> inputLayout;
+    ComPtr<ID3D11Buffer> matrixBuffer;
 
-    bool CreateDeviceAndSwapChain(int width, int height);
+    D3D(Window *window);
+
+    bool init();
+    bool updateMatrixBuffer(XMMATRIX worldMatrix, XMMATRIX viewMatrix);
+
+    private:
+    bool createDeviceAndSwapChain();
+    bool initProjectionMatrix();
+    bool setRenderTargetView();
+    bool setRasterizerState();
+    bool setViewport();
+    bool compileShaders();
+    bool createShaders();
+    bool createInputLayout();
+    bool createMatrixBuffer();
 };

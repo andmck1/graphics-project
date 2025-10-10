@@ -12,7 +12,6 @@ struct WindowSpec
     int height;
     int width;
     std::string windowName;
-    HINSTANCE hInstance;
 };
 
 struct WindowEvent
@@ -41,15 +40,16 @@ class Window
 {
     public:
     Window(WindowSpec spec);
-    bool Frame();
+    bool frame();
     WindowEventHandler getEventHandler();
-    HWND hwnd = nullptr;
     WindowSpec spec;
+    HWND hwnd = nullptr;
+    HINSTANCE hInstance;
 
     private:
     MSG msg = {};
     WindowEventHandler eventHandler = WindowEventHandler();
-    bool InitWindow();
+    bool initWindow();
     static LRESULT CALLBACK
     WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 };

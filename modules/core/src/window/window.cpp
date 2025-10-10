@@ -6,11 +6,11 @@ std::unique_ptr<WindowEventHandler> g_windowEventHandler;
 
 Window::Window(WindowSpec spec)
 {
-    spec = spec;
-    InitWindow();
+    this->spec = spec;
+    initWindow();
 }
 
-bool Window::Frame()
+bool Window::frame()
 {
     if (msg.message != WM_QUIT)
     {
@@ -24,13 +24,13 @@ bool Window::Frame()
     return 0;
 }
 
-bool Window::InitWindow()
+bool Window::initWindow()
 {
     spdlog::debug("Initialising window");
 
     WNDCLASS wc = {};
     wc.lpfnWndProc = Window::WndProc;
-    wc.hInstance = this->spec.hInstance;
+    wc.hInstance = this->hInstance;
     wc.lpszClassName = "DX11WindowClass";
 
     RegisterClass(&wc);
@@ -41,7 +41,7 @@ bool Window::InitWindow()
     this->hwnd = CreateWindowExA(
         0, wc.lpszClassName, this->spec.windowName.c_str(), WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left,
-        rect.bottom - rect.top, nullptr, nullptr, this->spec.hInstance, nullptr
+        rect.bottom - rect.top, nullptr, nullptr, this->hInstance, nullptr
     );
 
     if (!(this->hwnd))
