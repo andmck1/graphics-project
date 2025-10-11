@@ -21,6 +21,19 @@ struct WindowEvent
     LPARAM lParam;
 };
 
+enum class Key
+{
+    ESC
+};
+
+struct Events
+{
+    std::unordered_map<UINT, Key> WindowsKeyMapping = {
+        {VK_ESCAPE, Key::ESC}
+    };
+};
+
+
 class WindowEventHandler
 {
     public:
@@ -41,7 +54,6 @@ class Window
     public:
     Window(WindowSpec spec);
     bool frame();
-    WindowEventHandler getEventHandler();
     WindowSpec spec;
     HWND hwnd = nullptr;
     HINSTANCE hInstance;
