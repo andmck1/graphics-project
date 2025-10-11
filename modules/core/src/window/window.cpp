@@ -1,13 +1,12 @@
-#include <memory>
 #include "spdlog/spdlog.h"
 #include "window.h"
 
-std::unique_ptr<WindowEventHandler> g_windowEventHandler;
+
 
 Window::Window(WindowSpec spec)
 {
     this->spec = spec;
-    initWindow();
+    init();
 }
 
 bool Window::frame()
@@ -19,12 +18,12 @@ bool Window::frame()
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 
-bool Window::initWindow()
+bool Window::init()
 {
     spdlog::debug("Initialising window");
 
@@ -51,39 +50,15 @@ bool Window::initWindow()
     return true;
 }
 
-bool WindowEventHandler::DestroyEvent(WPARAM wParam, LPARAM lParam)
+bool Window::exit()
 {
     PostQuitMessage(0);
-    return 1;
-}
-
-bool WindowEventHandler::MouseMoveEvent(WPARAM wParam, LPARAM lParam)
-{
-    return 1;
-}
-
-bool WindowEventHandler::CharacterInputEvent(WPARAM wParam, LPARAM lParam)
-{
-    return 1;
-}
-
-bool WindowEventHandler::Poll(const WindowEvent &event)
-{
-    auto mapPair = eventMap.find(event.msg);
-    if (mapPair != eventMap.end())
-    {
-        return mapPair->second(event.wParam, event.lParam);
-    }
-    return 0;
+    return false;
 }
 
 LRESULT CALLBACK
 Window::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    const WindowEvent &event = WindowEvent{msg, wParam, lParam};
-    if (g_windowEventHandler->Poll(event))
-    {
-        return 0;
-    }
+
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
