@@ -21,7 +21,6 @@ int main()
     graphicsManager.init();
     
     TriangleMesh mesh = TriangleMesh(&graphicsManager);
-    mesh.init();
     Camera camera = Camera();
     Scene scene = Scene(&graphicsManager);
     scene.mesh = &mesh;

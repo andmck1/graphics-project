@@ -217,6 +217,8 @@ bool D3D::init()
         return false;
     if (!this->compileShaders())
         return false;
+    if (!this->createShaders())
+        return false;
     if (!this->createInputLayout())
         return false;
     if (!this->createMatrixBuffer())

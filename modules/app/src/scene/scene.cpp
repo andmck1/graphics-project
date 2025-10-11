@@ -1,17 +1,33 @@
 #include "../graphics/utils.h"
 #include "scene.h"
 
-int Mesh::getVertexCount()
+TriangleMesh::TriangleMesh(D3D *graphicsManager)
+{
+    this->init();
+    this->createBuffers(graphicsManager);
+}
+
+int TriangleMesh::getVertexCount()
 {
     return this->vertexCoordinates.size();
 }
 
-int Mesh::getVertexIndexCount()
+int TriangleMesh::getVertexIndexCount()
 {
     return this->vertexIndices.size();
 }
 
-bool Mesh::createBuffers(D3D *graphicsManager)
+void TriangleMesh::init()
+{
+    this->vertexCoordinates.push_back({0.0f, 1.0f, 0.0f});
+    this->vertexIndices.push_back(0);
+    this->vertexCoordinates.push_back({-1.0f, 0.0f, 0.0f});
+    this->vertexIndices.push_back(1);
+    this->vertexCoordinates.push_back({1.0f, 0.0f, 0.0f});
+    this->vertexIndices.push_back(2);
+}
+
+bool TriangleMesh::createBuffers(D3D *graphicsManager)
 {
     HRESULT createBufferHR;
     D3D11_BUFFER_DESC vertexBufferDesc = {};
@@ -22,11 +38,13 @@ bool Mesh::createBuffers(D3D *graphicsManager)
     vertexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
     vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     vertexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    vertexBufferDesc.ByteWidth = sizeof(float) * this->getVertexCount();
+    vertexBufferDesc.ByteWidth = sizeof(XMFLOAT3) * this->getVertexCount();
 
     vertexBufferData.pSysMem = this->vertexCoordinates.data();
     vertexBufferData.SysMemPitch = 0;
     vertexBufferData.SysMemSlicePitch = 0;
+    vertexBufferDesc.MiscFlags = 0;
+    vertexBufferDesc.StructureByteStride = 0;
 
     createBufferHR = graphicsManager->device->CreateBuffer(
         &vertexBufferDesc, &vertexBufferData, this->vertexBuffer.GetAddressOf()
@@ -41,6 +59,8 @@ bool Mesh::createBuffers(D3D *graphicsManager)
     indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
     indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
     indexBufferDesc.CPUAccessFlags = 0;
+    indexBufferDesc.MiscFlags = 0;
+    indexBufferDesc.StructureByteStride = 0;
 
     indexBufferData.pSysMem = this->vertexIndices.data();
     indexBufferData.SysMemPitch = 0;
@@ -56,22 +76,6 @@ bool Mesh::createBuffers(D3D *graphicsManager)
     }
 
     return true;
-}
-
-TriangleMesh::TriangleMesh(D3D *graphicsManager)
-{
-    this->init();
-    this->createBuffers(graphicsManager);
-}
-
-void TriangleMesh::init()
-{
-    this->vertexCoordinates.push_back({0.0f, 0.0f, 1.0f});
-    this->vertexIndices.push_back(0);
-    this->vertexCoordinates.push_back({-1.0f, 0.0f, -1.0f});
-    this->vertexIndices.push_back(1);
-    this->vertexCoordinates.push_back({1.0f, 0.0f, -1.0f});
-    this->vertexIndices.push_back(2);
 }
 
 Camera::Camera()
@@ -121,7 +125,7 @@ bool Scene::drawScreen()
         this->meshWorldMatrix, this->camera->viewMatrix
     );
 
-    UINT stride = 3 * sizeof(float);
+    UINT stride = sizeof(XMFLOAT3);
     UINT offset = 0;
 
     this->graphicsManager->deviceContext->OMSetRenderTargets(
@@ -148,7 +152,9 @@ bool Scene::drawScreen()
     this->graphicsManager->deviceContext->PSSetShader(
         this->graphicsManager->pixelShader.Get(), nullptr, 0
     );
-    this->graphicsManager->deviceContext->Draw(36, 0);
+    this->graphicsManager->deviceContext->DrawIndexed(
+        this->mesh->getVertexIndexCount(), 0, 0
+    );
 
     return true;
 }

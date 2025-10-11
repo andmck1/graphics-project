@@ -10,9 +10,11 @@
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
-class Mesh
+class TriangleMesh
 {
     public:
+    TriangleMesh(D3D *graphicsManager);
+
     std::vector<XMFLOAT3> vertexCoordinates;
     std::vector<unsigned int> vertexIndices;
 
@@ -22,12 +24,6 @@ class Mesh
     int getVertexCount();
     int getVertexIndexCount();
     bool createBuffers(D3D *graphicsManager);
-};
-
-class TriangleMesh : public Mesh
-{
-    public:
-    TriangleMesh(D3D *graphicsManager);
 
     void init();
 };
@@ -37,7 +33,7 @@ class Camera
     public:
     Camera();
     XMMATRIX viewMatrix;
-    XMVECTOR eyePosition = XMVectorSet(0.f, 0.f, -10.f, 1.0f);
+    XMVECTOR eyePosition = XMVectorSet(0.f, 0.f, -10.0f, 1.0f);
     // TODO - convert these to a single XMVECTOR
     float yaw = 0.0f;
     float pitch = 0.0f;
