@@ -1,8 +1,8 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include <windows.h>
-#include <windowsx.h>
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -20,10 +20,31 @@ struct WindowEvent
     LPARAM lParam;
 };
 
-enum class Key
+namespace Input
 {
-    ESC
-};
+    enum class Key
+    {
+        Escape,
+        W,
+        A,
+        S,
+        D,
+        Q,
+        E
+    };
+
+    enum class KeyState
+    {
+        PRESSED,
+        RELEASED,
+        NOT_IMPLEMENTED
+    };
+
+    static std::unordered_map<Key, int> keyToVKeyMapping = {
+        {Key::W, 0x57}, {Key::A, 0x41}, {Key::S, 0x53},          {Key::D, 0x44},
+        {Key::Q, 0x51}, {Key::E, 0x45}, {Key::Escape, VK_ESCAPE}
+    };
+} // namespace Input
 
 class Window
 {
@@ -35,11 +56,12 @@ class Window
     HINSTANCE hInstance;
 
     bool frame();
-    bool exit();
+    Input::KeyState getKeyState(Input::Key key);
+    static bool exit();
 
     private:
     bool init();
-    static MSG msg;
+    MSG msg = {};
     static LRESULT CALLBACK
     WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 };

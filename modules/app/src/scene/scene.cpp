@@ -1,5 +1,8 @@
 #include "../graphics/utils.h"
+#include <algorithm>
 #include "scene.h"
+
+constexpr float gPITCH_LIMIT = XM_PIDIV2 - 0.01f;
 
 TriangleMesh::TriangleMesh(D3D *graphicsManager)
 {
@@ -80,6 +83,19 @@ bool TriangleMesh::createBuffers(D3D *graphicsManager)
 
 Camera::Camera()
 {
+    this->update();
+}
+
+XMMATRIX Camera::getCameraRotation()
+{
+    XMMATRIX yawMatrix = XMMatrixRotationY(yaw);
+    XMMATRIX pitchMatrix = XMMatrixRotationX(pitch);
+    XMMATRIX cameraRotation = pitchMatrix * yawMatrix;
+    return cameraRotation;
+}
+
+void Camera::update()
+{
     XMMATRIX cameraRotation = getCameraRotation();
     XMVECTOR forward =
         XMVector3TransformNormal(XMVectorSet(0, 0, 1, 0), cameraRotation);
@@ -90,12 +106,20 @@ Camera::Camera()
     this->viewMatrix = XMMatrixLookAtLH(this->eyePosition, at, up);
 }
 
-XMMATRIX Camera::getCameraRotation()
+void Camera::move(float dx, float dy, float dz)
 {
-    XMMATRIX yawMatrix = XMMatrixRotationY(yaw);
-    XMMATRIX pitchMatrix = XMMatrixRotationX(pitch);
-    XMMATRIX cameraRotation = pitchMatrix * yawMatrix;
-    return cameraRotation;
+    XMVECTOR moveAmount = {dx, dy, dz};
+    XMMATRIX cameraRotation = this->getCameraRotation();
+    XMVECTOR worldMoveAmount =
+        XMVector3TransformNormal(moveAmount, cameraRotation);
+    this->eyePosition = XMVectorAdd(this->eyePosition, worldMoveAmount);
+}
+
+void Camera::rotate(float dYaw, float dPitch)
+{
+    this->yaw = this->yaw + dYaw;
+    this->pitch = this->pitch + dPitch;
+    this->pitch = std::clamp(pitch, -gPITCH_LIMIT, gPITCH_LIMIT);
 }
 
 Scene::Scene(D3D *graphicsManager)

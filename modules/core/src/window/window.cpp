@@ -1,8 +1,6 @@
 #include "spdlog/spdlog.h"
 #include "window.h"
 
-
-
 Window::Window(WindowSpec spec)
 {
     this->spec = spec;
@@ -11,14 +9,18 @@ Window::Window(WindowSpec spec)
 
 bool Window::frame()
 {
-    if (msg.message != WM_QUIT)
+    if (this->msg.message != WM_QUIT)
     {
-        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        if (PeekMessage(&this->msg, nullptr, 0, 0, PM_REMOVE))
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            TranslateMessage(&this->msg);
+            DispatchMessage(&this->msg);
         }
         return true;
+    }
+    else
+    {
+        this->exit();
     }
     return false;
 }
@@ -52,13 +54,34 @@ bool Window::init()
 
 bool Window::exit()
 {
+    spdlog::debug("Closing window");
     PostQuitMessage(0);
     return false;
+}
+
+Input::KeyState Window::getKeyState(Input::Key key)
+{
+    if (Input::keyToVKeyMapping.find(key) != Input::keyToVKeyMapping.end())
+    {
+        int vkey = Input::keyToVKeyMapping[key];
+        SHORT keyState = GetAsyncKeyState(vkey);
+        if (keyState & 0x8000) // MSB tells us if key is currently pressed
+        {
+            return Input::KeyState::PRESSED;
+        }
+        return Input::KeyState::RELEASED;
+    }
+    return Input::KeyState::NOT_IMPLEMENTED;
 }
 
 LRESULT CALLBACK
 Window::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-
-    return DefWindowProc(hwnd, msg, wParam, lParam);
+    switch (msg)
+    {
+    case WM_DESTROY:
+        Window::exit();
+    default:
+        return DefWindowProc(hwnd, msg, wParam, lParam);
+    }
 }

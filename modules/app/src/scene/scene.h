@@ -39,6 +39,9 @@ class Camera
     float pitch = 0.0f;
 
     XMMATRIX getCameraRotation();
+    void move(float dx, float dy, float dz);
+    void rotate(float dYaw, float dPitch);
+    void update();
 };
 
 class Scene
