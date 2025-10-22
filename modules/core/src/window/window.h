@@ -30,7 +30,9 @@ namespace Input
         S,
         D,
         Q,
-        E
+        E,
+        LMB,
+        RMB
     };
 
     enum class KeyState
@@ -41,8 +43,11 @@ namespace Input
     };
 
     static std::unordered_map<Key, int> keyToVKeyMapping = {
-        {Key::W, 0x57}, {Key::A, 0x41}, {Key::S, 0x53},          {Key::D, 0x44},
-        {Key::Q, 0x51}, {Key::E, 0x45}, {Key::Escape, VK_ESCAPE}
+        {Key::W, 0x57},           {Key::A, 0x41},
+        {Key::S, 0x53},           {Key::D, 0x44},
+        {Key::Q, 0x51},           {Key::E, 0x45},
+        {Key::Escape, VK_ESCAPE}, {Key::LMB, VK_LBUTTON},
+        {Key::RMB, VK_RBUTTON}
     };
 } // namespace Input
 
