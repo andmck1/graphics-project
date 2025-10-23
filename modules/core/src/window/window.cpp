@@ -1,4 +1,5 @@
 #include "spdlog/spdlog.h"
+#include <string>
 #include "window.h"
 
 Window::Window(WindowSpec spec)
@@ -18,11 +19,15 @@ bool Window::frame()
         }
         return true;
     }
-    else
-    {
-        this->exit();
-    }
+    this->destroyWindow();
     return false;
+}
+
+void Window::destroyWindow()
+{
+    spdlog::debug("Destroying window");
+    DestroyWindow(this->hwnd);
+    UnregisterClassA(this->spec.windowName.c_str(), this->hInstance);
 }
 
 bool Window::init()
@@ -30,11 +35,11 @@ bool Window::init()
     spdlog::debug("Initialising window");
 
     WNDCLASS wc = {};
-    wc.lpfnWndProc = Window::WndProc;
+    wc.lpfnWndProc = Window::onEvent;
     wc.hInstance = this->hInstance;
     wc.lpszClassName = "DX11WindowClass";
-
     RegisterClass(&wc);
+    this->msg.message = ~WM_QUIT;
 
     RECT rect = {0, 0, this->spec.width, this->spec.height};
     AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
@@ -49,6 +54,11 @@ bool Window::init()
         return false;
 
     ShowWindow(this->hwnd, SW_SHOW);
+
+    SetCursorPos(0, 0);
+    this->mouse.x = 0.f;
+    this->mouse.y = 0.f;
+
     return true;
 }
 
@@ -74,13 +84,63 @@ Input::KeyState Window::getKeyState(Input::Key key)
     return Input::KeyState::NOT_IMPLEMENTED;
 }
 
+Input::MouseState Window::getMouseState()
+{
+    if (this->mouse.dx > this->mouse.jitterThreshold |
+        this->mouse.dy > this->mouse.jitterThreshold |
+        this->mouse.dx < this->mouse.jitterThreshold |
+        this->mouse.dx < this->mouse.jitterThreshold)
+    {
+        return Input::MouseState::MOVED;
+    }
+    return Input::MouseState::NOT_MOVED;
+}
+
+void Window::updateMouse()
+{
+    POINT cursorPos;
+    ScreenToClient(this->hwnd, &cursorPos);
+    GetCursorPos(&cursorPos);
+
+    float newX = (((float) cursorPos.x) / this->spec.width - this->spec.width);
+    float newY =
+        (((float) cursorPos.y) / this->spec.height - this->spec.height);
+    this->mouse.dx = this->mouse.x - newX;
+    this->mouse.dy = this->mouse.y - newY;
+    this->mouse.x = newX;
+    this->mouse.y = newY;
+}
+
+void Window::resetMouse()
+{
+    spdlog::info("Mouse reset");
+    RECT rect;
+    GetClientRect(hwnd, &rect);
+    POINT ul = {rect.left, rect.top};
+    POINT lr = {rect.right, rect.bottom};
+    ClientToScreen(hwnd, &ul);
+    ClientToScreen(hwnd, &lr);
+    RECT clipRect = {ul.x, ul.y, lr.x, lr.y};
+    ClipCursor(&clipRect);
+    this->mouse.isMovable = true;
+}
+
+void Window::unsetMouse()
+{
+    spdlog::info("MOuse unset");
+    ClipCursor(NULL);
+    this->mouse.isMovable = false;
+}
+
 LRESULT CALLBACK
-Window::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+Window::onEvent(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
-    case WM_DESTROY:
-        Window::exit();
+    case WM_QUIT:
+    case WM_CLOSE:
+        return Window::exit();
+        break;
     default:
         return DefWindowProc(hwnd, msg, wParam, lParam);
     }
