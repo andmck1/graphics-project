@@ -44,12 +44,9 @@ void App::handleInputs()
         ) &&
         this->window->mouse.isMovable)
     {
-        if (this->window->getMouseState() == Input::MouseState::MOVED)
-        {
-            this->scene->camera->rotate(
-                this->window->mouse.dx * gCAMERA_ROTATE_SENSITIVITY,
-                this->window->mouse.dy * gCAMERA_ROTATE_SENSITIVITY
-            );
-        }
+        this->scene->camera->rotate(
+            this->window->mouse.dx * gCAMERA_ROTATE_SENSITIVITY,
+            this->window->mouse.dy * gCAMERA_ROTATE_SENSITIVITY
+        );
     }
 }
