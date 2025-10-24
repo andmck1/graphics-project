@@ -1,7 +1,7 @@
 #include "app.h"
 
 const float gCAMERA_MOVE_SPEED = 0.01f;
-const float gCAMERA_ROTATE_SENSITIVITY = .1f;
+const float gCAMERA_ROTATE_SENSITIVITY = .01f;
 
 App::App(Scene *scene, Window *window)
 {

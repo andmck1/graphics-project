@@ -1,6 +1,9 @@
 #include "spdlog/spdlog.h"
+#include <algorithm>
 #include <string>
 #include "window.h"
+
+const float gMOUSE_MAX_DELTA = 1.f;
 
 Window::Window(WindowSpec spec)
 {
@@ -95,18 +98,24 @@ Input::KeyState Window::getKeyState(Input::Key key)
 void Window::updateMouse()
 {
     POINT cursorPos;
-    ScreenToClient(this->hwnd, &cursorPos);
     GetCursorPos(&cursorPos);
+    ScreenToClient(this->hwnd, &cursorPos);
 
     RECT rect;
     GetClientRect(hwnd, &rect);
     int centreX = (rect.right - rect.left) / 2;
     int centreY = (rect.bottom - rect.top) / 2;
 
-    float currX = ((float) cursorPos.x - centreX);
-    float currY = ((float) cursorPos.y - centreY);
-    this->mouse.dx = currX - this->mouse.oldX;
-    this->mouse.dy = currY - this->mouse.oldY;
+    float currX = static_cast<float>(cursorPos.x - centreX);
+    float currY = static_cast<float>(cursorPos.y - centreY);
+
+    this->mouse.dx = std::clamp(
+        currX - this->mouse.oldX, -gMOUSE_MAX_DELTA, gMOUSE_MAX_DELTA
+    );
+    this->mouse.dy = std::clamp(
+        currY - this->mouse.oldY, -gMOUSE_MAX_DELTA, gMOUSE_MAX_DELTA
+    );
+
     this->mouse.oldX = currX;
     this->mouse.oldY = currY;
 }
