@@ -13,11 +13,6 @@ Window::Window(WindowSpec spec)
     init();
 }
 
-Window::~Window()
-{
-    UnregisterClass(this->wc.lpszClassName, wc.hInstance);
-}
-
 bool Window::init()
 {
     spdlog::debug("Initialising window");
@@ -50,7 +45,7 @@ bool Window::createWindow()
     };
     AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
 
-    this->hwnd = CreateWindowExA(
+    this->hwnd = CreateWindowEx(
         0, wc.lpszClassName, this->spec.windowName.c_str(), WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left,
         rect.bottom - rect.top, nullptr, nullptr, this->hInstance, nullptr

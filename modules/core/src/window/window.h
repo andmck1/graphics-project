@@ -25,7 +25,6 @@ class Window
 {
     public:
     Window(WindowSpec spec);
-    ~Window();
 
     WindowSpec spec;
     HWND hwnd = nullptr;
