@@ -251,3 +251,18 @@ bool D3D::updateMatrixBuffer(XMMATRIX worldMatrix, XMMATRIX viewMatrix)
 
     return true;
 }
+
+bool D3D::clearScreen(const float clearColour[4])
+{
+    this->deviceContext->ClearRenderTargetView(
+        this->renderTargetView.Get(), clearColour
+    );
+    return true;
+}
+
+bool D3D::presentScreen()
+{
+    HRESULT presentHR;
+    presentHR = this->swapChain->Present(1, 0);
+    return TryDXCall(presentHR, "Present failed.\n");
+}

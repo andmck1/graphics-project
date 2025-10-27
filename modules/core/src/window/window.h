@@ -25,12 +25,14 @@ class Window
 {
     public:
     Window(WindowSpec spec);
+    ~Window();
 
     WindowSpec spec;
     HWND hwnd = nullptr;
     HINSTANCE hInstance;
     Input::Mouse mouse = Input::Mouse();
-    
+    float mainScale;
+
     bool createWindow();
     bool exit();
     void destroyWindow();
@@ -39,6 +41,7 @@ class Window
 
     private:
     MSG msg = {};
+    WNDCLASS wc = {};
 
     bool init();
     void updateMouse();

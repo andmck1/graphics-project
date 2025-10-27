@@ -2,6 +2,10 @@
 #include <algorithm>
 #include "scene.h"
 
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx11.h"
+
 constexpr float gPITCH_LIMIT = XM_PIDIV2 - 0.01f;
 
 TriangleMesh::TriangleMesh(D3D *graphicsManager)
@@ -127,22 +131,6 @@ Scene::Scene(D3D *graphicsManager)
     this->graphicsManager = graphicsManager;
 }
 
-bool Scene::clearScreen(const float clearColour[4])
-{
-    this->graphicsManager->deviceContext->ClearRenderTargetView(
-        this->graphicsManager->renderTargetView.Get(), clearColour
-    );
-    return true;
-}
-
-bool Scene::presentScreen()
-{
-    HRESULT presentHR;
-    presentHR = this->graphicsManager->swapChain->Present(1, 0);
-
-    return TryDXCall(presentHR, "Present failed.\n");
-}
-
 bool Scene::drawScreen()
 {
     this->graphicsManager->updateMatrixBuffer(
@@ -185,21 +173,67 @@ bool Scene::drawScreen()
 
 bool Scene::render()
 {
-    const float clearColour[4] = {0.392f, 0.584f, 0.929f, 1.0f};
-    if (!this->clearScreen(clearColour))
-    {
-        return false;
-    }
 
     if (!this->drawScreen())
     {
         return false;
     }
 
-    if (!this->presentScreen())
-    {
-        return false;
-    }
+    return true;
+}
+
+DebugScene::DebugScene(D3D *graphicsManager)
+{
+    this->graphicsManager = graphicsManager;
+
+    // imGUI example
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    (void) io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+    ImGui::StyleColorsDark();
+
+    ImGuiStyle &style = ImGui::GetStyle();
+    style.ScaleAllSizes(
+        this->graphicsManager->window->mainScale
+    ); // Bake a fixed style scale. (until we have a solution for dynamic style
+       // scaling, changing this requires resetting Style + calling this again)
+    style.FontScaleDpi =
+        this->graphicsManager->window
+            ->mainScale; // Set initial font scale. (using
+                         // io.ConfigDpiScaleFonts=true makes this unnecessary.
+                         // We leave both here for documentation purpose)
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplWin32_Init(this->graphicsManager->window->hwnd);
+    ImGui_ImplDX11_Init(
+        this->graphicsManager->device.Get(),
+        this->graphicsManager->deviceContext.Get()
+    );
+}
+
+DebugScene::~DebugScene()
+{
+    // Copilot help
+    ImGui_ImplDX11_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+}
+
+bool DebugScene::render()
+{
+    // Copilot help
+    ImGui_ImplDX11_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Begin("Draggable Window");
+    ImGui::Text("Hello from ImGui!");
+    ImGui::End();
+    ImGui::Render();
+    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
     return true;
 }

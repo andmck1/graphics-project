@@ -31,6 +31,8 @@ class D3D
 
     bool init();
     bool updateMatrixBuffer(XMMATRIX worldMatrix, XMMATRIX viewMatrix);
+    bool clearScreen(const float clearColour[4]);
+    bool presentScreen();
 
     private:
     bool createDeviceAndSwapChain();

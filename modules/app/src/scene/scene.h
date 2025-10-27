@@ -57,7 +57,16 @@ class Scene
 
     private:
     D3D *graphicsManager;
-    bool clearScreen(const float clearColour[4]);
     bool drawScreen();
-    bool presentScreen();
+};
+
+class DebugScene
+{
+    public:
+    DebugScene(D3D *graphicsManager);
+    ~DebugScene();
+    bool render();
+
+    private:
+    D3D *graphicsManager;
 };

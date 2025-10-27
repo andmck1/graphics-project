@@ -28,13 +28,19 @@ int main()
     scene.camera = &camera;
     scene.meshWorldMatrix = XMMatrixIdentity();
 
+    DebugScene debugScene = DebugScene(&graphicsManager);
+
     App app = App(&scene, &window);
 
+    const float clearColour[4] = {0.392f, 0.584f, 0.929f, 1.0f};
     while (window.frame())
     {
         app.handleInputs();
         scene.camera->update();
+        graphicsManager.clearScreen(clearColour);
         scene.render();
+        debugScene.render();
+        graphicsManager.presentScreen();
     }
 
     return 0;

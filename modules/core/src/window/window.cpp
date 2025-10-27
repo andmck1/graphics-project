@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <string>
 #include "window.h"
+#include "imgui.h"
+#include "backends/imgui_impl_win32.h"
 
 const float gMOUSE_MAX_DELTA = 1.f;
 
@@ -11,28 +13,41 @@ Window::Window(WindowSpec spec)
     init();
 }
 
+Window::~Window()
+{
+    UnregisterClass(this->wc.lpszClassName, wc.hInstance);
+}
+
 bool Window::init()
 {
     spdlog::debug("Initialising window");
 
+    ImGui_ImplWin32_EnableDpiAwareness();
     if (!this->createWindow())
         return false;
     SetPropW(this->hwnd, L"WINDOWCLASS", (HANDLE) this);
     ShowWindow(this->hwnd, SW_SHOW);
+
+    this->resetMouse();
 
     return true;
 }
 
 bool Window::createWindow()
 {
-    WNDCLASS wc = {};
     wc.lpfnWndProc = Window::onEvent;
     wc.hInstance = this->hInstance;
     wc.lpszClassName = "DX11WindowClass";
     RegisterClass(&wc);
     this->msg.message = ~WM_QUIT;
 
-    RECT rect = {0, 0, this->spec.width, this->spec.height};
+    mainScale = ImGui_ImplWin32_GetDpiScaleForMonitor(
+        MonitorFromPoint(POINT{0, 0}, MONITOR_DEFAULTTOPRIMARY)
+    );
+    RECT rect = {
+        0, 0, (int) (mainScale * this->spec.width),
+        (int) (mainScale * this->spec.height)
+    };
     AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
 
     this->hwnd = CreateWindowExA(
@@ -70,10 +85,7 @@ bool Window::frame()
             TranslateMessage(&this->msg);
             DispatchMessage(&this->msg);
         }
-        this->mouse.oldX = 0.f;
-        this->mouse.oldY = 0.f;
         this->updateMouse();
-        this->centreMouse();
         return true;
     }
     this->destroyWindow();
@@ -122,7 +134,7 @@ void Window::updateMouse()
 
 void Window::resetMouse()
 {
-    spdlog::info("Mouse reset");
+    spdlog::debug("Mouse reset");
 
     RECT rect;
     POINT ul;
@@ -137,7 +149,7 @@ void Window::resetMouse()
     clipRect = {ul.x, ul.y, lr.x, lr.y};
 
     ClipCursor(&clipRect);
-    ShowCursor(FALSE);
+    // ShowCursor(FALSE);
 
     this->mouse.oldX = 0.f;
     this->mouse.oldY = 0.f;
@@ -159,31 +171,34 @@ void Window::centreMouse()
 
 void Window::unsetMouse()
 {
-    spdlog::info("Mouse unset");
-
+    spdlog::debug("Mouse unset");
     ClipCursor(NULL);
     ShowCursor(TRUE);
     this->mouse.isMovable = false;
 }
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
+    HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
+);
 LRESULT CALLBACK
 Window::onEvent(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     Window *window = reinterpret_cast<Window *>(GetPropW(hwnd, L"WINDOWCLASS"));
+
+    if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+        return true;
+
     switch (msg)
     {
-    case WM_QUIT:
-    case WM_CLOSE:
-        return window->exit();
-        break;
     case WM_SETFOCUS:
-        spdlog::debug("window focus set");
         window->resetMouse();
         return 0;
     case WM_KILLFOCUS:
-        spdlog::debug("window focus unset");
         window->unsetMouse();
         return 0;
+    case WM_QUIT:
+    case WM_CLOSE:
+        return window->exit();
     default:
         return DefWindowProc(hwnd, msg, wParam, lParam);
     }

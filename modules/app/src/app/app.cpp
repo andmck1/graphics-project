@@ -11,11 +11,14 @@ App::App(Scene *scene, Window *window)
 
 void App::handleInputs()
 {
+    // Quit
     if (this->window->getKeyState(Input::Key::Escape) ==
         Input::KeyState::PRESSED)
     {
         this->window->exit();
     }
+
+    // Movement
     if (this->window->getKeyState(Input::Key::W) == Input::KeyState::PRESSED)
     {
         this->scene->camera->move(0.f, 0.f, 1.f * gCAMERA_MOVE_SPEED);
@@ -40,8 +43,10 @@ void App::handleInputs()
     {
         this->scene->camera->move(0.f, -1.f * gCAMERA_MOVE_SPEED, 0.f);
     }
-    if ((this->window->getKeyState(Input::Key::RMB) == Input::KeyState::PRESSED
-        ) &&
+
+    // Camera
+    if ((this->window->getKeyState(Input::Key::RMB) ==
+         Input::KeyState::PRESSED) &&
         this->window->mouse.isMovable)
     {
         this->scene->camera->rotate(
