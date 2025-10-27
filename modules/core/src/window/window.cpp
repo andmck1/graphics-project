@@ -1,9 +1,11 @@
-#include "spdlog/spdlog.h"
+#include "window.h"
+
 #include <algorithm>
 #include <string>
-#include "window.h"
+
+#include "spdlog/spdlog.h"
 #include "imgui.h"
-#include "backends/imgui_impl_win32.h"
+#include "imgui_impl_win32.h"
 
 const float gMOUSE_MAX_DELTA = 1.f;
 
