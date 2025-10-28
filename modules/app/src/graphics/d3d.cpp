@@ -1,4 +1,5 @@
 #include <d3dcompiler.h>
+#include <filesystem>
 #include "spdlog/spdlog.h"
 #include "d3d.h"
 #include "utils.h"
@@ -113,9 +114,14 @@ bool D3D::compileShaders()
     HRESULT compileVertexShaderHR;
     HRESULT compilePixelShaderHR;
 
+    UINT compileFlags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG |
+                        D3DCOMPILE_SKIP_OPTIMIZATION;
+
     compileVertexShaderHR = D3DCompileFromFile(
-        L"modules\\app\\shaders\\vertex.hlsl", nullptr, nullptr, "main",
-        "vs_4_0", 0, 0, this->vsBlob.GetAddressOf(),
+        std::filesystem::absolute(L"modules\\app\\shaders\\vertex.hlsl")
+            .c_str(),
+        nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "vs_5_0",
+        compileFlags, 0, this->vsBlob.GetAddressOf(),
         this->errorBlob.GetAddressOf()
     );
     if (!TryDXCall(compileVertexShaderHR, "Failed to compile vertex shader.\n"))
@@ -128,8 +134,9 @@ bool D3D::compileShaders()
     }
 
     compilePixelShaderHR = D3DCompileFromFile(
-        L"modules\\app\\shaders\\pixel.hlsl", nullptr, nullptr, "main",
-        "ps_4_0", 0, 0, this->psBlob.GetAddressOf(),
+        std::filesystem::absolute(L"modules\\app\\shaders\\pixel.hlsl").c_str(),
+        nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "ps_5_0",
+        compileFlags, 0, this->psBlob.GetAddressOf(),
         this->errorBlob.GetAddressOf()
     );
     if (!TryDXCall(compilePixelShaderHR, "Failed to compile pixel shader.\n"))
@@ -265,4 +272,44 @@ bool D3D::presentScreen()
     HRESULT presentHR;
     presentHR = this->swapChain->Present(1, 0);
     return TryDXCall(presentHR, "Present failed.\n");
+}
+
+bool PointLightBuffer::init(D3D *graphicsManager)
+{
+    HRESULT createBufferHR;
+
+    this->graphicsManager = graphicsManager;
+    this->bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+    this->bufferDesc.ByteWidth = sizeof(PointLightBuffer::ShaderBuffer);
+    this->bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    this->bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    this->bufferDesc.MiscFlags = 0;
+    this->bufferDesc.StructureByteStride = 0;
+    createBufferHR = this->graphicsManager->device->CreateBuffer(
+        &(this->bufferDesc), NULL, this->buffer.GetAddressOf()
+    );
+    if (!TryDXCall(createBufferHR, "Failed to create point light buffer."))
+        return false;
+    return true;
+}
+
+bool PointLightBuffer::setPixelShader()
+{
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    PointLightBuffer::ShaderBuffer *bufferData;
+    HRESULT mapHR;
+
+    mapHR = graphicsManager->deviceContext->Map(
+        this->buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource
+    );
+    if (!TryDXCall(mapHR, "Point light buffer pixel shader map failed.\n"))
+        return false;
+    bufferData = (PointLightBuffer::ShaderBuffer *) mappedResource.pData;
+    bufferData->colour = pointLight->colour;
+    bufferData->worldPosition = pointLight->worldPosition;
+    graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
+    graphicsManager->deviceContext->PSSetConstantBuffers(
+        0, 1, this->buffer.GetAddressOf()
+    );
+    return true;
 }

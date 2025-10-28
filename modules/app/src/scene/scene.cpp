@@ -9,6 +9,12 @@
 Scene::Scene(D3D *graphicsManager)
 {
     this->graphicsManager = graphicsManager;
+    this->pointLight = PointLight();
+    this->pointLightBuffer = PointLightBuffer();
+    this->pointLightBuffer.init(graphicsManager);
+    this->pointLightBuffer.pointLight = &this->pointLight;
+    this->pointLight.colour = {1.f, 1.f, 1.f, 1.f};
+    this->pointLight.worldPosition = {1.f, 0.f, 0.f, 0.f};
 }
 
 bool Scene::drawMesh(
@@ -28,6 +34,9 @@ bool Scene::drawMesh(
     if (!this->graphicsManager->updateMatrixBuffer(
             meshWorldMatrix, this->camera->viewMatrix
         ))
+        return false;
+
+    if (!this->pointLightBuffer.setPixelShader())
         return false;
 
     this->graphicsManager->deviceContext->IASetInputLayout(

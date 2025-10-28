@@ -8,6 +8,7 @@
 #include "../graphics/camera/camera.h"
 #include "../graphics/mesh/triangle.h"
 #include "../graphics/mesh/sphere.h"
+#include "../graphics/light/point.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -19,6 +20,10 @@ class Scene
     XMMATRIX triangleMeshWorldMatrix;
     SphereMesh *sphereMesh;
     XMMATRIX sphereMeshWorldMatrix;
+
+    PointLightBuffer pointLightBuffer;
+    PointLight pointLight;
+
     Camera *camera;
 
     Scene(D3D *graphicsManager);

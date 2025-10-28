@@ -8,6 +8,7 @@ add_executable(
     src/graphics/mesh/triangle.cpp
     src/graphics/mesh/sphere.cpp
     src/graphics/camera/camera.cpp
+    src/graphics/light/point.h
 )
 
 target_include_directories(

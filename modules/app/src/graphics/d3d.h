@@ -5,6 +5,8 @@
 #include <directxmath.h>
 #include <window/window.h>
 
+#include "light/point.h"
+
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
@@ -44,4 +46,30 @@ class D3D
     bool createShaders();
     bool createInputLayout();
     bool createMatrixBuffer();
+};
+
+class Buffer
+{
+    public:
+    virtual bool init(D3D *graphicsManager) = 0;
+    virtual bool setPixelShader() = 0;
+    ComPtr<ID3D11Buffer> buffer;
+    D3D11_BUFFER_DESC bufferDesc;
+
+    protected:
+    D3D *graphicsManager;
+};
+
+class PointLightBuffer : Buffer
+{
+    public:
+    bool init(D3D *graphicsManager) override;
+    bool setPixelShader() override;
+
+    PointLight *pointLight;
+    struct ShaderBuffer
+    {
+        XMFLOAT4 colour;
+        XMFLOAT4 worldPosition;
+    };
 };
