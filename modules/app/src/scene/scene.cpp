@@ -1,173 +1,65 @@
-#include "../graphics/utils.h"
-#include <algorithm>
 #include "scene.h"
 
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
-
-constexpr float gPITCH_LIMIT = XM_PIDIV2 - 0.01f;
-
-TriangleMesh::TriangleMesh(D3D *graphicsManager)
-{
-    this->init();
-    this->createBuffers(graphicsManager);
-}
-
-int TriangleMesh::getVertexCount()
-{
-    return this->vertexCoordinates.size();
-}
-
-int TriangleMesh::getVertexIndexCount()
-{
-    return this->vertexIndices.size();
-}
-
-void TriangleMesh::init()
-{
-    this->vertexCoordinates.push_back({0.0f, 1.0f, 0.0f});
-    this->vertexIndices.push_back(0);
-    this->vertexCoordinates.push_back({-1.0f, 0.0f, 0.0f});
-    this->vertexIndices.push_back(1);
-    this->vertexCoordinates.push_back({1.0f, 0.0f, 0.0f});
-    this->vertexIndices.push_back(2);
-}
-
-bool TriangleMesh::createBuffers(D3D *graphicsManager)
-{
-    HRESULT createBufferHR;
-    D3D11_BUFFER_DESC vertexBufferDesc = {};
-    D3D11_BUFFER_DESC indexBufferDesc = {};
-    D3D11_SUBRESOURCE_DATA vertexBufferData;
-    D3D11_SUBRESOURCE_DATA indexBufferData;
-
-    vertexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-    vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    vertexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    vertexBufferDesc.ByteWidth = sizeof(XMFLOAT3) * this->getVertexCount();
-
-    vertexBufferData.pSysMem = this->vertexCoordinates.data();
-    vertexBufferData.SysMemPitch = 0;
-    vertexBufferData.SysMemSlicePitch = 0;
-    vertexBufferDesc.MiscFlags = 0;
-    vertexBufferDesc.StructureByteStride = 0;
-
-    createBufferHR = graphicsManager->device->CreateBuffer(
-        &vertexBufferDesc, &vertexBufferData, this->vertexBuffer.GetAddressOf()
-    );
-    if (!TryDXCall(createBufferHR, "Failed to create vertex buffer.\n"))
-    {
-        return false;
-    }
-
-    indexBufferDesc.ByteWidth =
-        sizeof(unsigned long) * this->getVertexIndexCount();
-    indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-    indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-    indexBufferDesc.CPUAccessFlags = 0;
-    indexBufferDesc.MiscFlags = 0;
-    indexBufferDesc.StructureByteStride = 0;
-
-    indexBufferData.pSysMem = this->vertexIndices.data();
-    indexBufferData.SysMemPitch = 0;
-    indexBufferData.SysMemSlicePitch = 0;
-
-    createBufferHR = graphicsManager->device->CreateBuffer(
-        &indexBufferDesc, &indexBufferData,
-        this->vertexIndexBuffer.GetAddressOf()
-    );
-    if (!TryDXCall(createBufferHR, "Failed to create vertex buffer.\n"))
-    {
-        return false;
-    }
-
-    return true;
-}
-
-Camera::Camera()
-{
-    this->update();
-}
-
-XMMATRIX Camera::getCameraRotation()
-{
-    XMMATRIX yawMatrix = XMMatrixRotationY(yaw);
-    XMMATRIX pitchMatrix = XMMatrixRotationX(pitch);
-    XMMATRIX cameraRotation = pitchMatrix * yawMatrix;
-    return cameraRotation;
-}
-
-void Camera::update()
-{
-    XMMATRIX cameraRotation = getCameraRotation();
-    XMVECTOR forward =
-        XMVector3TransformNormal(XMVectorSet(0, 0, 1, 0), cameraRotation);
-    XMVECTOR up =
-        XMVector3TransformNormal(XMVectorSet(0, 1, 0, 0), cameraRotation);
-    XMVECTOR at = XMVectorAdd(this->eyePosition, forward);
-
-    this->viewMatrix = XMMatrixLookAtLH(this->eyePosition, at, up);
-}
-
-void Camera::move(float dx, float dy, float dz)
-{
-    XMVECTOR moveAmount = {dx, dy, dz};
-    XMMATRIX cameraRotation = this->getCameraRotation();
-    XMVECTOR worldMoveAmount =
-        XMVector3TransformNormal(moveAmount, cameraRotation);
-    this->eyePosition = XMVectorAdd(this->eyePosition, worldMoveAmount);
-}
-
-void Camera::rotate(float dYaw, float dPitch)
-{
-    this->yaw = this->yaw + dYaw;
-    this->pitch = this->pitch + dPitch;
-    this->pitch = std::clamp(pitch, -gPITCH_LIMIT, gPITCH_LIMIT);
-}
+#include <d3d11.h>
+#include <wrl/client.h>
 
 Scene::Scene(D3D *graphicsManager)
 {
     this->graphicsManager = graphicsManager;
 }
 
-bool Scene::drawScreen()
+bool Scene::drawMesh(
+    UINT &stride, UINT &offset, BaseMesh *mesh, XMMATRIX meshWorldMatrix
+)
 {
-    this->graphicsManager->updateMatrixBuffer(
-        this->meshWorldMatrix, this->camera->viewMatrix
-    );
-
-    UINT stride = sizeof(XMFLOAT3);
-    UINT offset = 0;
-
-    this->graphicsManager->deviceContext->OMSetRenderTargets(
-        1, this->graphicsManager->renderTargetView.GetAddressOf(), nullptr
-    );
-    this->graphicsManager->deviceContext->IASetInputLayout(
-        this->graphicsManager->inputLayout.Get()
-    );
     this->graphicsManager->deviceContext->IASetVertexBuffers(
-        0, 1, this->mesh->vertexBuffer.GetAddressOf(), &stride, &offset
+        0, 1, mesh->vertexBuffer.GetAddressOf(), &stride, &offset
     );
     this->graphicsManager->deviceContext->IASetIndexBuffer(
-        this->mesh->vertexIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0
+        mesh->vertexIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0
     );
     this->graphicsManager->deviceContext->IASetPrimitiveTopology(
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST
     );
+
+    if (!this->graphicsManager->updateMatrixBuffer(
+            meshWorldMatrix, this->camera->viewMatrix
+        ))
+        return false;
+
+    this->graphicsManager->deviceContext->IASetInputLayout(
+        this->graphicsManager->inputLayout.Get()
+    );
     this->graphicsManager->deviceContext->VSSetShader(
         this->graphicsManager->vertexShader.Get(), nullptr, 0
-    );
-    this->graphicsManager->deviceContext->VSSetConstantBuffers(
-        0, 1, this->graphicsManager->matrixBuffer.GetAddressOf()
     );
     this->graphicsManager->deviceContext->PSSetShader(
         this->graphicsManager->pixelShader.Get(), nullptr, 0
     );
     this->graphicsManager->deviceContext->DrawIndexed(
-        this->mesh->getVertexIndexCount(), 0, 0
+        mesh->getVertexIndexCount(), 0, 0
     );
 
+    return true;
+}
+
+bool Scene::drawScreen()
+{
+    UINT stride = sizeof(XMFLOAT3);
+    UINT offset = 0;
+    this->graphicsManager->deviceContext->OMSetRenderTargets(
+        1, this->graphicsManager->renderTargetView.GetAddressOf(), nullptr
+    );
+
+    this->drawMesh(
+        stride, offset, this->triangleMesh, this->triangleMeshWorldMatrix
+    );
+    this->drawMesh(
+        stride, offset, this->sphereMesh, this->sphereMeshWorldMatrix
+    );
     return true;
 }
 
@@ -186,7 +78,6 @@ DebugScene::DebugScene(D3D *graphicsManager)
 {
     this->graphicsManager = graphicsManager;
 
-    // imGUI example
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
@@ -196,17 +87,9 @@ DebugScene::DebugScene(D3D *graphicsManager)
     ImGui::StyleColorsDark();
 
     ImGuiStyle &style = ImGui::GetStyle();
-    style.ScaleAllSizes(
-        this->graphicsManager->window->mainScale
-    ); // Bake a fixed style scale. (until we have a solution for dynamic style
-       // scaling, changing this requires resetting Style + calling this again)
-    style.FontScaleDpi =
-        this->graphicsManager->window
-            ->mainScale; // Set initial font scale. (using
-                         // io.ConfigDpiScaleFonts=true makes this unnecessary.
-                         // We leave both here for documentation purpose)
+    style.ScaleAllSizes(this->graphicsManager->window->mainScale);
+    style.FontScaleDpi = this->graphicsManager->window->mainScale;
 
-    // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(this->graphicsManager->window->hwnd);
     ImGui_ImplDX11_Init(
         this->graphicsManager->device.Get(),
@@ -216,7 +99,6 @@ DebugScene::DebugScene(D3D *graphicsManager)
 
 DebugScene::~DebugScene()
 {
-    // Copilot help
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
@@ -224,7 +106,6 @@ DebugScene::~DebugScene()
 
 bool DebugScene::render()
 {
-    // Copilot help
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();

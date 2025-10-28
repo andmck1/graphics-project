@@ -21,12 +21,16 @@ int main()
     D3D graphicsManager = D3D(&window);
     graphicsManager.init();
 
-    TriangleMesh mesh = TriangleMesh(&graphicsManager);
+    TriangleMesh triangleMesh = TriangleMesh(&graphicsManager);
+    SphereMesh sphereMesh = SphereMesh(&graphicsManager);
     Camera camera = Camera();
     Scene scene = Scene(&graphicsManager);
-    scene.mesh = &mesh;
+    scene.triangleMesh = &triangleMesh;
     scene.camera = &camera;
-    scene.meshWorldMatrix = XMMatrixIdentity();
+    scene.sphereMesh = &sphereMesh;
+    scene.triangleMeshWorldMatrix = XMMatrixIdentity();
+    scene.sphereMeshWorldMatrix =
+        XMMatrixIdentity() * XMMatrixTranslation(-1.f, 0.f, 0.f);
 
     DebugScene debugScene = DebugScene(&graphicsManager);
 
