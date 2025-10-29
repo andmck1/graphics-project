@@ -28,6 +28,9 @@ class D3D
     ComPtr<ID3D11PixelShader> pixelShader;
     ComPtr<ID3D11InputLayout> inputLayout;
     ComPtr<ID3D11Buffer> matrixBuffer;
+    ComPtr<ID3D11Texture2D> depthStencilBuffer;
+    ComPtr<ID3D11DepthStencilState> depthStencilState;
+    ComPtr<ID3D11DepthStencilView> depthStencilView;
 
     D3D(Window *window);
 
@@ -40,6 +43,8 @@ class D3D
     bool createDeviceAndSwapChain();
     bool initProjectionMatrix();
     bool setRenderTargetView();
+    bool setDepthBuffer();
+    bool setStencilBuffer();
     bool setRasterizerState();
     bool setViewport();
     bool compileShaders();

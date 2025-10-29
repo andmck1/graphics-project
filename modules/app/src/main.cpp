@@ -13,8 +13,8 @@ int main()
 
     // TODO - move this to config file
     WindowSpec windowSpec;
-    windowSpec.height = 600;
-    windowSpec.width = 800;
+    windowSpec.height = 720;
+    windowSpec.width = 1280;
     windowSpec.windowName = "Graphics Project";
     Window window = Window(windowSpec);
 
@@ -30,7 +30,7 @@ int main()
     scene.sphereMesh = &sphereMesh;
     scene.triangleMeshWorldMatrix = XMMatrixIdentity();
     scene.sphereMeshWorldMatrix =
-        XMMatrixIdentity() * XMMatrixTranslation(-1.f, 0.f, 0.f);
+        XMMatrixIdentity() * XMMatrixTranslation(-3.f, 0.f, 0.f);
 
     DebugScene debugScene = DebugScene(&graphicsManager);
 

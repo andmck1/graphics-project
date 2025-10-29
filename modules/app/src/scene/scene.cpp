@@ -61,7 +61,8 @@ bool Scene::drawScreen()
     UINT stride = sizeof(Vertex);
     UINT offset = 0;
     this->graphicsManager->deviceContext->OMSetRenderTargets(
-        1, this->graphicsManager->renderTargetView.GetAddressOf(), nullptr
+        1, this->graphicsManager->renderTargetView.GetAddressOf(),
+        this->graphicsManager->depthStencilView.Get()
     );
 
     this->drawMesh(
