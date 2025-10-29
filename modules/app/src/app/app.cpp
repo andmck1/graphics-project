@@ -1,7 +1,7 @@
 #include "app.h"
 
 const float gCAMERA_MOVE_SPEED = 0.01f;
-const float gCAMERA_ROTATE_SENSITIVITY = .01f;
+const float gCAMERA_ROTATE_SENSITIVITY = .001f;
 
 App::App(Scene *scene, Window *window)
 {
@@ -45,13 +45,22 @@ void App::handleInputs()
     }
 
     // Camera
-    if ((this->window->getKeyState(Input::Key::RMB) ==
-         Input::KeyState::PRESSED) &&
-        this->window->mouse.isMovable)
+    if (this->window->mouse.isAvailable)
     {
-        this->scene->camera->rotate(
-            this->window->mouse.dx * gCAMERA_ROTATE_SENSITIVITY,
-            this->window->mouse.dy * gCAMERA_ROTATE_SENSITIVITY
-        );
+        if (this->window->getKeyState(Input::Key::RMB) ==
+            Input::KeyState::PRESSED)
+        {
+            this->window->setMouseVisible(false);
+            this->scene->camera->rotate(
+                this->window->mouse.dx * gCAMERA_ROTATE_SENSITIVITY,
+                this->window->mouse.dy * gCAMERA_ROTATE_SENSITIVITY
+            );
+            this->window->centreMouse();
+        }
+        else if (this->window->getKeyState(Input::Key::RMB) ==
+                 Input::KeyState::RELEASED)
+        {
+            this->window->setMouseVisible(true);
+        }
     }
 }

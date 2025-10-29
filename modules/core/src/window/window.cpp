@@ -7,7 +7,7 @@
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 
-const float gMOUSE_MAX_DELTA = 1.f;
+const float gMOUSE_MAX_DELTA = 100.f;
 
 Window::Window(WindowSpec spec)
 {
@@ -25,8 +25,6 @@ bool Window::init()
     SetPropW(this->hwnd, L"WINDOWCLASS", (HANDLE) this);
     ShowWindow(this->hwnd, SW_SHOW);
 
-    this->resetMouse();
-
     return true;
 }
 
@@ -34,7 +32,7 @@ bool Window::createWindow()
 {
     wc.lpfnWndProc = Window::onEvent;
     wc.hInstance = this->hInstance;
-    wc.lpszClassName = "DX11WindowClass";
+    wc.lpszClassName = this->spec.windowName.c_str();
     RegisterClass(&wc);
     this->msg.message = ~WM_QUIT;
 
@@ -129,32 +127,6 @@ void Window::updateMouse()
     this->mouse.oldY = currY;
 }
 
-void Window::resetMouse()
-{
-    spdlog::debug("Mouse reset");
-
-    RECT rect;
-    POINT ul;
-    POINT lr;
-    RECT clipRect;
-
-    GetClientRect(hwnd, &rect);
-    ul = {rect.left, rect.top};
-    ClientToScreen(hwnd, &ul);
-    lr = {rect.right, rect.bottom};
-    ClientToScreen(hwnd, &lr);
-    clipRect = {ul.x, ul.y, lr.x, lr.y};
-
-    ClipCursor(&clipRect);
-    // ShowCursor(FALSE);
-
-    this->mouse.oldX = 0.f;
-    this->mouse.oldY = 0.f;
-    this->mouse.dx = 0.f;
-    this->mouse.dy = 0.f;
-    this->mouse.isMovable = true;
-}
-
 void Window::centreMouse()
 {
     RECT rect;
@@ -164,14 +136,54 @@ void Window::centreMouse()
     POINT centrePoint = {centreX, centreY};
     ClientToScreen(hwnd, &centrePoint);
     SetCursorPos(centrePoint.x, centrePoint.y);
+    this->mouse.oldX = 0.f;
+    this->mouse.oldY = 0.f;
+    this->mouse.dx = 0.f;
+    this->mouse.dy = 0.f;
 }
 
 void Window::unsetMouse()
 {
-    spdlog::debug("Mouse unset");
+    this->mouse.isAvailable = false;
     ClipCursor(NULL);
     ShowCursor(TRUE);
-    this->mouse.isMovable = false;
+}
+
+void Window::setMouseVisible(bool isVisible)
+{
+    Input::Mouse::VisibleState mouseVisibleState = this->mouse.isVisible();
+
+    switch (mouseVisibleState)
+    {
+    case Input::Mouse::VisibleState::VISIBLE:
+        if (!isVisible)
+        {
+            ShowCursor(FALSE);
+        }
+        break;
+    case Input::Mouse::VisibleState::NOT_VISIBLE:
+        if (isVisible)
+        {
+            ShowCursor(TRUE);
+        }
+        break;
+    default:
+        return;
+    }
+}
+
+bool Window::setFocusEvent()
+{
+    spdlog::info("Focus set");
+    this->mouse.isAvailable = true;
+    return 0;
+}
+
+bool Window::unsetFocusEvent()
+{
+    spdlog::info("Focus unset");
+    this->unsetMouse();
+    return 0;
 }
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
@@ -188,11 +200,9 @@ Window::onEvent(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     switch (msg)
     {
     case WM_SETFOCUS:
-        window->resetMouse();
-        return 0;
+        return window->setFocusEvent();
     case WM_KILLFOCUS:
-        window->unsetMouse();
-        return 0;
+        return window->unsetFocusEvent();
     case WM_QUIT:
     case WM_CLOSE:
         return window->exit();

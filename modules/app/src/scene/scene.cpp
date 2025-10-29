@@ -14,7 +14,8 @@ Scene::Scene(D3D *graphicsManager)
     this->pointLightBuffer.init(graphicsManager);
     this->pointLightBuffer.pointLight = &this->pointLight;
     this->pointLight.colour = {1.f, 1.f, 1.f, 1.f};
-    this->pointLight.worldPosition = {1.f, 0.f, 0.f, 0.f};
+    this->pointLight.worldPosition = {0.f, 0.f, -10.f, 0.f};
+    this->pointLight.direction = {0.f, 0.f, 1.f, 0.f};
 }
 
 bool Scene::drawMesh(
@@ -57,7 +58,7 @@ bool Scene::drawMesh(
 
 bool Scene::drawScreen()
 {
-    UINT stride = sizeof(XMFLOAT3);
+    UINT stride = sizeof(Vertex);
     UINT offset = 0;
     this->graphicsManager->deviceContext->OMSetRenderTargets(
         1, this->graphicsManager->renderTargetView.GetAddressOf(), nullptr

@@ -180,15 +180,23 @@ bool D3D::createShaders()
 bool D3D::createInputLayout()
 {
     HRESULT createInputLayoutHR;
+
+    // Lab code
+    // TODO - generalise this somewhere else
     D3D11_INPUT_ELEMENT_DESC layout[] = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
-         D3D11_INPUT_PER_VERTEX_DATA, 0}
+         D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
+         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
+         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
     };
-
+    unsigned int numElements = sizeof(layout) / sizeof(layout[0]);
     createInputLayoutHR = this->device->CreateInputLayout(
-        layout, 1, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(),
-        this->inputLayout.GetAddressOf()
+        layout, numElements, vsBlob->GetBufferPointer(),
+        vsBlob->GetBufferSize(), this->inputLayout.GetAddressOf() 
     );
+
     return TryDXCall(createInputLayoutHR, "Failed to create input layout.\n");
 }
 
@@ -197,10 +205,13 @@ bool D3D::createMatrixBuffer()
     HRESULT createBufferHR;
 
     D3D11_BUFFER_DESC bufferDesc = {};
+    // TODO - generalise this
+    bufferDesc.ByteWidth = sizeof(XMMATRIX) * 3;
     bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
     bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    bufferDesc.ByteWidth = sizeof(XMMATRIX) * 3; // world, view, projection
+    bufferDesc.MiscFlags = 0;
+    bufferDesc.StructureByteStride = 0;
 
     createBufferHR = this->device->CreateBuffer(
         &bufferDesc, nullptr, this->matrixBuffer.GetAddressOf()
@@ -307,6 +318,8 @@ bool PointLightBuffer::setPixelShader()
     bufferData = (PointLightBuffer::ShaderBuffer *) mappedResource.pData;
     bufferData->colour = pointLight->colour;
     bufferData->worldPosition = pointLight->worldPosition;
+    bufferData->direction = pointLight->direction;
+
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->PSSetConstantBuffers(
         0, 1, this->buffer.GetAddressOf()

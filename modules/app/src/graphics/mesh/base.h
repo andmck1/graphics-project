@@ -5,10 +5,19 @@
 #include <directxmath.h>
 #include <vector>
 
+struct Vertex
+{
+    // TODO - give this a constructor
+    XMFLOAT3 positionCoordinate;
+    XMFLOAT2 textureCoordinate;
+    XMFLOAT3 normalVector;
+};
+
 class BaseMesh
 {
     public:
-    std::vector<XMFLOAT3> vertexCoordinates;
+    // TODO - don't keep these in memory, delete after loading
+    std::vector<Vertex> vertices;
     std::vector<unsigned int> vertexIndices;
 
     ComPtr<ID3D11Buffer> vertexBuffer;

@@ -2,7 +2,7 @@ add_library(
     core 
     STATIC 
     src/window/window.cpp src/window/window.h 
-    src/input/input.h
+    src/input/input.cpp src/input/input.h
 )
 target_link_libraries(core PRIVATE spdlog imgui)
 target_include_directories(core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

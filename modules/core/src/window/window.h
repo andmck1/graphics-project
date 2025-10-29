@@ -32,21 +32,23 @@ class Window
     Input::Mouse mouse = Input::Mouse();
     float mainScale;
 
-    bool createWindow();
     bool exit();
-    void destroyWindow();
     bool frame();
     Input::KeyState getKeyState(Input::Key key);
+    void setMouseVisible(bool isVisible);
+    void centreMouse();
 
     private:
     MSG msg = {};
     WNDCLASS wc = {};
 
     bool init();
+    bool createWindow();
+    void destroyWindow();
     void updateMouse();
-    void resetMouse();
     void unsetMouse();
-    void centreMouse();
+    bool setFocusEvent();
+    bool unsetFocusEvent();
 
     static LRESULT CALLBACK
     onEvent(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

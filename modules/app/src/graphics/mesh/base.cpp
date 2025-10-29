@@ -1,10 +1,9 @@
 #include "base.h"
-
 #include "../../graphics/utils.h"
 
 int BaseMesh::getVertexCount()
 {
-    return this->vertexCoordinates.size();
+    return this->vertices.size();
 }
 
 int BaseMesh::getVertexIndexCount()
@@ -23,13 +22,11 @@ bool BaseMesh::createBuffers(D3D *graphicsManager)
     vertexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
     vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     vertexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    vertexBufferDesc.ByteWidth = sizeof(XMFLOAT3) * this->getVertexCount();
+    vertexBufferDesc.ByteWidth = sizeof(Vertex) * this->getVertexCount();
 
-    vertexBufferData.pSysMem = this->vertexCoordinates.data();
+    vertexBufferData.pSysMem = this->vertices.data();
     vertexBufferData.SysMemPitch = 0;
     vertexBufferData.SysMemSlicePitch = 0;
-    vertexBufferDesc.MiscFlags = 0;
-    vertexBufferDesc.StructureByteStride = 0;
 
     createBufferHR = graphicsManager->device->CreateBuffer(
         &vertexBufferDesc, &vertexBufferData, this->vertexBuffer.GetAddressOf()

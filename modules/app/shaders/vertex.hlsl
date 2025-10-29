@@ -1,29 +1,40 @@
+// Note, code provided from lab examples
 cbuffer MatrixBuffer : register(b0)
 {
-    matrix world;
-    matrix view;
-    matrix projection;
+	matrix worldMatrix;
+	matrix viewMatrix;
+	matrix projectionMatrix;
 };
 
-struct VS_INPUT
+struct InputType
 {
-    float3 position : POSITION;
+	float4 position : POSITION;
+	float2 tex : TEXCOORD0;
+	float3 normal : NORMAL;
 };
 
-struct PS_INPUT
+struct OutputType
 {
-    float4 position : SV_POSITION;
+	float4 position : SV_POSITION;
+	float2 tex : TEXCOORD0;
+	float3 normal : NORMAL;
 };
 
-PS_INPUT main(VS_INPUT input)
+OutputType main(InputType input)
 {
-    PS_INPUT output;
+	OutputType output;
 
-    float4 worldPos = mul(float4(input.position, 1.0f), world);
-    float4 viewPos  = mul(worldPos, view);
-    output.position = mul(viewPos, projection);
+	// Calculate the position of the vertex against the world, view, and projection matrices.
+	output.position = mul(input.position, worldMatrix);
+	output.position = mul(output.position, viewMatrix);
+	output.position = mul(output.position, projectionMatrix);
 
-    return output;
+	// Store the texture coordinates for the pixel shader.
+	output.tex = input.tex;
+
+	// Calculate the normal vector against the world matrix only and normalise.
+	output.normal = mul(input.normal, (float3x3)worldMatrix);
+	output.normal = normalize(output.normal);
+
+	return output;
 }
-
-

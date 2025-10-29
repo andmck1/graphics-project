@@ -71,5 +71,7 @@ class PointLightBuffer : Buffer
     {
         XMFLOAT4 colour;
         XMFLOAT4 worldPosition;
+        XMFLOAT4 direction;
     };
+
 };

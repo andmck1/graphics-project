@@ -2,18 +2,30 @@ cbuffer LightBuffer : register(b0)
 {
     float4 colour;
     float4 position;
+    float4 direction;
 }
 
-struct PS_INPUT {
-    float4 pos : SV_POSITION;
-    float4 worldPosition : TEXCOORD1;
+struct InputType
+{
+	float4 position : SV_POSITION;
+	float2 tex : TEXCOORD0;
+	float3 normal : NORMAL;
 };
 
-float4 main(PS_INPUT input) : SV_TARGET {
-    float4 lightVector = position.xyz - input.worldPosition.xyz;
-    float d = length(lightVector);
-    float attenuation = 1.f / (1.f + 0.01*d);
-    return saturate(colour * attenuation);
+float4 calculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
+{
+	float intensity = saturate(dot(normal, lightDirection));
+	float4 colour = saturate(diffuse * intensity);
+	return colour;
 }
 
+float4 main(InputType input) : SV_TARGET
+{
+	float4 lightColour;
 
+	// Sample the texture. Calculate light intensity and colour, return light*texture for final pixel colour.
+	lightColour = calculateLighting(-direction.xyz, input.normal, colour);
+	
+	
+    return lightColour;
+}

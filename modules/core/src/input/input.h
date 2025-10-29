@@ -1,3 +1,5 @@
+#pragma once
+
 #include <unordered_map>
 #include <windows.h>
 
@@ -33,10 +35,19 @@ namespace Input
 
     struct Mouse
     {
+        enum class VisibleState
+        {
+            NOT_VISIBLE,
+            VISIBLE,
+            NOT_AVAILABLE
+        };
+
         float oldX = 0.f;
         float oldY = 0.f;
         float dx = 0.f;
         float dy = 0.f;
-        bool isMovable = false;
+        bool isAvailable = true;
+
+        VisibleState isVisible();
     };
 } // namespace Input

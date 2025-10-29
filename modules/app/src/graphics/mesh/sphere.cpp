@@ -4,19 +4,19 @@ SphereMesh::SphereMesh(D3D *graphicsManager)
 {
     this->init();
     this->createBuffers(graphicsManager);
+    // this->vertices.clear();
+    // this->vertexIndices.clear();
 }
 
+// Copilot help
 void SphereMesh::init()
 {
-    // Copilot help
-    this->vertexCoordinates.clear();
+    this->vertices.clear();
     this->vertexIndices.clear();
 
     int resolution = 20;
-
     const float PI = 3.14159265359f;
 
-    // Generate vertices
     for (int y = 0; y <= resolution; ++y)
     {
         float v = float(y) / resolution;
@@ -31,11 +31,14 @@ void SphereMesh::init()
             float yPos = std::cos(theta);
             float zPos = std::sin(theta) * std::sin(phi);
 
-            this->vertexCoordinates.push_back({xPos, yPos, zPos});
+            Vertex newVertex = Vertex();
+            newVertex.positionCoordinate = {xPos, yPos, zPos};
+            newVertex.normalVector = {xPos, yPos, zPos};
+            newVertex.textureCoordinate = {u, v};
+            this->vertices.push_back(newVertex);
         }
     }
 
-    // Generate indices
     for (int y = 0; y < resolution; ++y)
     {
         for (int x = 0; x < resolution; ++x)
