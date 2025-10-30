@@ -1,14 +1,19 @@
 #include "scene.h"
 
+#include "spdlog/spdlog.h"
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include <d3d11.h>
 #include <wrl/client.h>
+#include <filesystem>
 
-Scene::Scene(D3D *graphicsManager)
+Scene::Scene(SceneConfig *config)
 {
-    this->graphicsManager = graphicsManager;
+    this->graphicsManager = config->graphicsManager;
+    this->loadVertexShaders(config->vertexShaderDirectory);
+    this->loadPixelShaders(config->pixelShaderDirectory);
+
     this->pointLight = PointLight();
     this->pointLightBuffer = PointLightBuffer();
     this->pointLightBuffer.init(graphicsManager);
@@ -16,6 +21,63 @@ Scene::Scene(D3D *graphicsManager)
     this->pointLight.colour = {1.f, 1.f, 1.f, 1.f};
     this->pointLight.worldPosition = {0.f, 0.f, -10.f, 0.f};
     this->pointLight.direction = {0.f, 0.f, 1.f, 0.f};
+}
+
+bool Scene::loadVertexShaders(std::string vertexShaderDirectory)
+{
+    for (const auto &vertexShaderFilepath :
+         std::filesystem::directory_iterator(vertexShaderDirectory))
+    {
+        if (vertexShaderFilepath.path().extension() == ".cso")
+        {
+            const std::string vertexShaderFilepathString =
+                std::filesystem::absolute(vertexShaderFilepath)
+                    .generic_string();
+            spdlog::info(
+                "Loading vertex shader: " + vertexShaderFilepathString
+            );
+
+            ComPtr<ID3DBlob> shaderBlob =
+                this->graphicsManager->loadShader(vertexShaderFilepathString);
+            if (!shaderBlob)
+                return false;
+
+            this->shaderManager.shaderBlobs.insert(
+                {this->shaderManager.shaderFilenameToTypeMapping.at(
+                     vertexShaderFilepath.path().stem().string()
+                 ),
+                 shaderBlob}
+            );
+        }
+    }
+    return true;
+}
+
+bool Scene::loadPixelShaders(std::string pixelShaderDirectory)
+{
+    for (const auto &pixelShaderFilepath :
+         std::filesystem::directory_iterator(pixelShaderDirectory))
+    {
+        if (pixelShaderFilepath.path().extension() == ".cso")
+        {
+            const std::string pixelShaderFilepathString =
+                std::filesystem::absolute(pixelShaderFilepath).generic_string();
+            spdlog::info("Loading pixel shader: " + pixelShaderFilepathString);
+
+            ComPtr<ID3DBlob> shaderBlob =
+                this->graphicsManager->loadShader(pixelShaderFilepathString);
+            if (!shaderBlob)
+                return false;
+
+            this->shaderManager.shaderBlobs.insert(
+                {this->shaderManager.shaderFilenameToTypeMapping.at(
+                     pixelShaderFilepath.path().stem().string()
+                 ),
+                 shaderBlob}
+            );
+        }
+    }
+    return true;
 }
 
 bool Scene::drawMesh(
@@ -98,10 +160,10 @@ DebugScene::DebugScene(D3D *graphicsManager)
     ImGui::StyleColorsDark();
 
     ImGuiStyle &style = ImGui::GetStyle();
-    style.ScaleAllSizes(this->graphicsManager->window->mainScale);
-    style.FontScaleDpi = this->graphicsManager->window->mainScale;
+    style.ScaleAllSizes(this->graphicsManager->config->window->mainScale);
+    style.FontScaleDpi = this->graphicsManager->config->window->mainScale;
 
-    ImGui_ImplWin32_Init(this->graphicsManager->window->hwnd);
+    ImGui_ImplWin32_Init(this->graphicsManager->config->window->hwnd);
     ImGui_ImplDX11_Init(
         this->graphicsManager->device.Get(),
         this->graphicsManager->deviceContext.Get()

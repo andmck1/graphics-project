@@ -4,6 +4,7 @@
 #include "graphics/d3d.h"
 
 #include "spdlog/spdlog.h"
+#include <filesystem>
 
 int main()
 {
@@ -18,7 +19,16 @@ int main()
     windowSpec.windowName = "Graphics Project";
     Window window = Window(windowSpec);
 
-    D3D graphicsManager = D3D(&window);
+    // TODO - give this proper constructor
+    D3DAppConfig d3dAppConfig = D3DAppConfig();
+    d3dAppConfig.window = &window;
+    d3dAppConfig.vertexShaderDirectory =
+        std::filesystem::absolute("./build/shaders/vertex").string();
+    d3dAppConfig.pixelShaderDirectory =
+        std::filesystem::absolute("./build/shaders/pixel").string();
+    spdlog::info(d3dAppConfig.vertexShaderDirectory);
+
+    D3D graphicsManager = D3D(&d3dAppConfig);
     graphicsManager.init();
 
     TriangleMesh triangleMesh = TriangleMesh(&graphicsManager);

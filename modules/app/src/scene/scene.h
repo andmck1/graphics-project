@@ -13,6 +13,30 @@
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
+struct ShaderManager
+{
+    enum class ShaderType
+    {
+        STANDARD_VERTEX,
+        LIGHTING_PIXEL
+    };
+
+    const std::unordered_map<std::string, ShaderType>
+        shaderFilenameToTypeMapping = {
+            {"vertex", ShaderType::STANDARD_VERTEX},
+            {"pixel", ShaderType::LIGHTING_PIXEL}
+    };
+
+    std::unordered_map<ShaderType, ComPtr<ID3DBlob>> shaderBlobs;
+};
+
+struct SceneConfig
+{
+    D3D *graphicsManager;
+    std::string vertexShaderDirectory;
+    std::string pixelShaderDirectory;
+};
+
 class Scene
 {
     public:
@@ -26,7 +50,7 @@ class Scene
 
     Camera *camera;
 
-    Scene(D3D *graphicsManager);
+    Scene(SceneConfig *config);
 
     bool drawMesh(
         UINT &stride, UINT &offset, BaseMesh *mesh, XMMATRIX meshWorldMatrix
@@ -35,7 +59,10 @@ class Scene
 
     private:
     D3D *graphicsManager;
+    ShaderManager shaderManager;
     bool drawScreen();
+    bool loadVertexShaders(std::string vertexShaderDirectory);
+    bool loadPixelShaders(std::string pixelShaderDirectory);
 };
 
 class DebugScene

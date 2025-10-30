@@ -4,9 +4,9 @@
 #include "d3d.h"
 #include "utils.h"
 
-D3D::D3D(Window *window)
+D3D::D3D(D3DAppConfig *config)
 {
-    this->window = window;
+    this->config = config;
 }
 
 bool D3D::createDeviceAndSwapChain()
@@ -14,11 +14,11 @@ bool D3D::createDeviceAndSwapChain()
     HRESULT createDeviceAndSwapChainHR;
     DXGI_SWAP_CHAIN_DESC scd = {};
     scd.BufferCount = 1;
-    scd.BufferDesc.Width = this->window->spec.width;
-    scd.BufferDesc.Height = this->window->spec.height;
+    scd.BufferDesc.Width = this->config->window->spec.width;
+    scd.BufferDesc.Height = this->config->window->spec.height;
     scd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    scd.OutputWindow = this->window->hwnd;
+    scd.OutputWindow = this->config->window->hwnd;
     scd.SampleDesc.Count = 1;
     scd.Windowed = TRUE;
     scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
@@ -42,8 +42,8 @@ bool D3D::createDeviceAndSwapChain()
 
 bool D3D::initProjectionMatrix()
 {
-    float aspectRatio = static_cast<float>(this->window->spec.width) /
-                        static_cast<float>(this->window->spec.height);
+    float aspectRatio = static_cast<float>(this->config->window->spec.width) /
+                        static_cast<float>(this->config->window->spec.height);
     this->projectionMatrix =
         XMMatrixPerspectiveFovLH(XM_PIDIV4, aspectRatio, 0.1f, 100.0f);
 
@@ -99,8 +99,9 @@ bool D3D::setViewport()
     // TODO - move to a config file
     this->viewport.TopLeftX = 0;
     this->viewport.TopLeftY = 0;
-    this->viewport.Width = static_cast<FLOAT>(this->window->spec.width);
-    this->viewport.Height = static_cast<FLOAT>(this->window->spec.height);
+    this->viewport.Width = static_cast<FLOAT>(this->config->window->spec.width);
+    this->viewport.Height =
+        static_cast<FLOAT>(this->config->window->spec.height);
     this->viewport.MinDepth = 0.0f;
     this->viewport.MaxDepth = 1.0f;
 
@@ -108,70 +109,60 @@ bool D3D::setViewport()
     return true;
 }
 
-bool D3D::compileShaders()
+ComPtr<ID3DBlob> D3D::loadShader(std::string shaderFilepath)
 {
-    HRESULT compileVertexShaderHR;
-    HRESULT compilePixelShaderHR;
+    HRESULT loadShaderHR;
+    ComPtr<ID3DBlob> shaderBlob;
 
-    UINT compileFlags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG |
-                        D3DCOMPILE_SKIP_OPTIMIZATION;
-
-    compileVertexShaderHR = D3DCompileFromFile(
-        std::filesystem::absolute(L"modules\\app\\shaders\\vertex.hlsl")
-            .c_str(),
-        nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "vs_5_0",
-        compileFlags, 0, this->vsBlob.GetAddressOf(),
-        this->errorBlob.GetAddressOf()
+    const std::wstring shaderFilepathWString(
+        shaderFilepath.begin(), shaderFilepath.end()
     );
-    if (!TryDXCall(compileVertexShaderHR, "Failed to compile vertex shader.\n"))
-    {
-        if (this->errorBlob)
-        {
-            spdlog::error((char *) this->errorBlob->GetBufferPointer());
-        }
-        return false;
-    }
+    const std::string errorMessage =
+        std::string("Failed to read pixel shader: ") + shaderFilepath;
 
-    compilePixelShaderHR = D3DCompileFromFile(
-        std::filesystem::absolute(L"modules\\app\\shaders\\pixel.hlsl").c_str(),
-        nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "ps_5_0",
-        compileFlags, 0, this->psBlob.GetAddressOf(),
-        this->errorBlob.GetAddressOf()
+    loadShaderHR = D3DReadFileToBlob(
+        shaderFilepathWString.c_str(), shaderBlob.GetAddressOf()
     );
-    if (!TryDXCall(compilePixelShaderHR, "Failed to compile pixel shader.\n"))
-    {
-        if (this->errorBlob)
-        {
-            spdlog::error((char *) errorBlob->GetBufferPointer());
-        }
-        return false;
-    }
+    if (!TryDXCall(loadShaderHR, errorMessage.c_str()))
+        return nullptr;
 
-    return true;
+    return shaderBlob;
+}
+
+ComPtr<ID3D11VertexShader> D3D::createVertexShader(ComPtr<ID3DBlob> shaderBlob)
+{
+    ComPtr<ID3D11VertexShader> vertexShader;
+    HRESULT createVertexShaderHR;
+
+    createVertexShaderHR = this->device->CreateVertexShader(
+        shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr,
+        vertexShader.GetAddressOf()
+    );
+    if (!TryDXCall(createVertexShaderHR, "Failed to create vertex shader.\n"))
+    {
+        return nullptr;
+    }
+    return vertexShader;
+}
+
+ComPtr<ID3D11PixelShader> D3D::createPixelShader(ComPtr<ID3DBlob> shaderBlob)
+{
+    ComPtr<ID3D11PixelShader> pixelShader;
+    HRESULT createPixelShaderHR;
+
+    createPixelShaderHR = this->device->CreatePixelShader(
+        shaderBlob->GetBufferPointer(),
+        shaderBlob->GetBufferSize(),
+        nullptr, pixelShader.GetAddressOf()
+    );
+    if (!TryDXCall(createPixelShaderHR, "Failed to create pixel shader.\n"))
+        return nullptr;
+    return pixelShader;
 }
 
 bool D3D::createShaders()
 {
-    HRESULT createVertexShaderHR;
-    HRESULT createPixelShaderHR;
 
-    createVertexShaderHR = this->device->CreateVertexShader(
-        this->vsBlob->GetBufferPointer(), this->vsBlob->GetBufferSize(),
-        nullptr, vertexShader.GetAddressOf()
-    );
-    if (!TryDXCall(createVertexShaderHR, "Failed to create vertex shader.\n"))
-    {
-        return false;
-    }
-
-    createPixelShaderHR = this->device->CreatePixelShader(
-        this->psBlob->GetBufferPointer(), this->psBlob->GetBufferSize(),
-        nullptr, this->pixelShader.GetAddressOf()
-    );
-    if (!TryDXCall(createPixelShaderHR, "Failed to create pixel shader.\n"))
-    {
-        return false;
-    }
 
     return true;
 }
@@ -192,8 +183,10 @@ bool D3D::createInputLayout()
     };
     unsigned int numElements = sizeof(layout) / sizeof(layout[0]);
     createInputLayoutHR = this->device->CreateInputLayout(
-        layout, numElements, vsBlob->GetBufferPointer(),
-        vsBlob->GetBufferSize(), this->inputLayout.GetAddressOf()
+        layout, numElements,
+        shaderBlobs.at(ShaderType::STANDARD_VERTEX)->GetBufferPointer(),
+        shaderBlobs.at(ShaderType::STANDARD_VERTEX)->GetBufferSize(),
+        this->inputLayout.GetAddressOf()
     );
 
     return TryDXCall(createInputLayoutHR, "Failed to create input layout.\n");
@@ -227,8 +220,8 @@ bool D3D::setDepthBuffer()
     D3D11_TEXTURE2D_DESC depthBufferDesc;
     // Initialize the description of the depth buffer.
     ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
-    depthBufferDesc.Width = this->window->spec.width;
-    depthBufferDesc.Height = this->window->spec.height;
+    depthBufferDesc.Width = this->config->window->spec.width;
+    depthBufferDesc.Height = this->config->window->spec.height;
     depthBufferDesc.MipLevels = 1;
     depthBufferDesc.ArraySize = 1;
     depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -313,7 +306,12 @@ bool D3D::init()
         return false;
     if (!this->setViewport())
         return false;
-    if (!this->compileShaders())
+    // if (!this->compileShaders())
+    // if (!this->loadShaders())
+    //     return false;
+    if (!this->loadVertexShaders())
+        return false;
+    if (!this->loadPixelShaders())
         return false;
     if (!this->createShaders())
         return false;

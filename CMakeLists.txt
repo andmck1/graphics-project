@@ -13,31 +13,31 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 include(FetchContent)
-FetchContent_Declare(spdlog
-    GIT_REPOSITORY https://github.com/gabime/spdlog
-    GIT_TAG v1.15.3
-    GIT_SHALLOW ON
-    EXCLUDE_FROM_ALL
-    SYSTEM)
+FetchContent_Declare(
+  spdlog
+  GIT_REPOSITORY https://github.com/gabime/spdlog
+  GIT_TAG v1.15.3
+  GIT_SHALLOW ON
+  EXCLUDE_FROM_ALL SYSTEM)
 FetchContent_MakeAvailable(spdlog)
 
 include(FetchContent)
-FetchContent_Declare(imgui
-    GIT_REPOSITORY https://github.com/ocornut/imgui
-    GIT_TAG v1.92.4
-    GIT_SHALLOW ON
-    EXCLUDE_FROM_ALL
-    SYSTEM)
+FetchContent_Declare(
+  imgui
+  GIT_REPOSITORY https://github.com/ocornut/imgui
+  GIT_TAG v1.92.4
+  GIT_SHALLOW ON
+  EXCLUDE_FROM_ALL SYSTEM)
 FetchContent_MakeAvailable(imgui)
 
-add_library(imgui STATIC
-    ${imgui_SOURCE_DIR}/imgui.cpp
-    ${imgui_SOURCE_DIR}/imgui_draw.cpp
-    ${imgui_SOURCE_DIR}/imgui_tables.cpp
-    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp
-  )
+add_library(
+  imgui STATIC
+  ${imgui_SOURCE_DIR}/imgui.cpp
+  ${imgui_SOURCE_DIR}/imgui_draw.cpp
+  ${imgui_SOURCE_DIR}/imgui_tables.cpp
+  ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp)
 
 add_subdirectory(modules/core)
 add_subdirectory(modules/app)

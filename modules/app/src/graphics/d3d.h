@@ -10,10 +10,15 @@
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
+struct D3DAppConfig
+{
+    Window *window = nullptr;
+};
+
 class D3D
 {
     public:
-    Window *window;
+    D3DAppConfig *config;
     ComPtr<ID3D11Device> device;
     ComPtr<ID3D11DeviceContext> deviceContext;
     ComPtr<IDXGISwapChain> swapChain;
@@ -22,22 +27,24 @@ class D3D
     D3D11_VIEWPORT viewport = {};
     ComPtr<ID3D11RasterizerState> rasterizerState;
     D3D11_RASTERIZER_DESC rasterizerDesc = {};
-    ComPtr<ID3DBlob> vsBlob, psBlob, errorBlob;
-    // TODO - make this a vector of shaders?
-    ComPtr<ID3D11VertexShader> vertexShader;
-    ComPtr<ID3D11PixelShader> pixelShader;
+    ComPtr<ID3DBlob> errorBlob;
     ComPtr<ID3D11InputLayout> inputLayout;
     ComPtr<ID3D11Buffer> matrixBuffer;
     ComPtr<ID3D11Texture2D> depthStencilBuffer;
     ComPtr<ID3D11DepthStencilState> depthStencilState;
     ComPtr<ID3D11DepthStencilView> depthStencilView;
 
-    D3D(Window *window);
+    D3D(D3DAppConfig *config);
 
     bool init();
+    ComPtr<ID3D11VertexShader> createVertexShader(ComPtr<ID3DBlob> shaderBlob);
+    ComPtr<ID3D11PixelShader> createPixelShader(ComPtr<ID3DBlob> shaderBlob);
+
     bool updateMatrixBuffer(XMMATRIX worldMatrix, XMMATRIX viewMatrix);
     bool clearScreen(const float clearColour[4]);
     bool presentScreen();
+
+    static ComPtr<ID3DBlob> loadShader(std::string shaderFilepath);
 
     private:
     bool createDeviceAndSwapChain();
@@ -47,7 +54,6 @@ class D3D
     bool setStencilBuffer();
     bool setRasterizerState();
     bool setViewport();
-    bool compileShaders();
     bool createShaders();
     bool createInputLayout();
     bool createMatrixBuffer();
@@ -78,5 +84,4 @@ class PointLightBuffer : Buffer
         XMFLOAT4 worldPosition;
         XMFLOAT4 direction;
     };
-
 };
