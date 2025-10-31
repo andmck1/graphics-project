@@ -12,6 +12,7 @@ int main()
 
     spdlog::info("Starting app");
 
+    // TODO - initialise these as pointers?
     // TODO - move this to config file
     WindowSpec windowSpec;
     windowSpec.height = 720;
@@ -22,19 +23,27 @@ int main()
     // TODO - give this proper constructor
     D3DAppConfig d3dAppConfig = D3DAppConfig();
     d3dAppConfig.window = &window;
-    d3dAppConfig.vertexShaderDirectory =
-        std::filesystem::absolute("./build/shaders/vertex").string();
-    d3dAppConfig.pixelShaderDirectory =
-        std::filesystem::absolute("./build/shaders/pixel").string();
-    spdlog::info(d3dAppConfig.vertexShaderDirectory);
 
     D3D graphicsManager = D3D(&d3dAppConfig);
     graphicsManager.init();
 
+    // TODO - give this proper constructor
+    SceneConfig sceneConfig = SceneConfig();
+    ShaderManager shaderManager = ShaderManager(&graphicsManager);
+    sceneConfig.graphicsManager = &graphicsManager;
+    sceneConfig.shaderManager = &shaderManager;
+    sceneConfig.vertexShaderDirectory =
+        std::filesystem::absolute("./build/shaders/vertex").string();
+    sceneConfig.pixelShaderDirectory =
+        std::filesystem::absolute("./build/shaders/pixel").string();
+
+
+
+
     TriangleMesh triangleMesh = TriangleMesh(&graphicsManager);
     SphereMesh sphereMesh = SphereMesh(&graphicsManager);
     Camera camera = Camera();
-    Scene scene = Scene(&graphicsManager);
+    Scene scene = Scene(&sceneConfig);
     scene.triangleMesh = &triangleMesh;
     scene.camera = &camera;
     scene.sphereMesh = &sphereMesh;

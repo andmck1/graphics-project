@@ -4,6 +4,7 @@
 #include <d3d11.h>
 #include <directxmath.h>
 #include <window/window.h>
+#include <vector>
 
 #include "light/point.h"
 
@@ -28,7 +29,6 @@ class D3D
     ComPtr<ID3D11RasterizerState> rasterizerState;
     D3D11_RASTERIZER_DESC rasterizerDesc = {};
     ComPtr<ID3DBlob> errorBlob;
-    ComPtr<ID3D11InputLayout> inputLayout;
     ComPtr<ID3D11Buffer> matrixBuffer;
     ComPtr<ID3D11Texture2D> depthStencilBuffer;
     ComPtr<ID3D11DepthStencilState> depthStencilState;
@@ -39,7 +39,10 @@ class D3D
     bool init();
     ComPtr<ID3D11VertexShader> createVertexShader(ComPtr<ID3DBlob> shaderBlob);
     ComPtr<ID3D11PixelShader> createPixelShader(ComPtr<ID3DBlob> shaderBlob);
-
+    ComPtr<ID3D11InputLayout> createInputLayout(
+        std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDescription,
+        ComPtr<ID3DBlob> shaderBlob
+    );
     bool updateMatrixBuffer(XMMATRIX worldMatrix, XMMATRIX viewMatrix);
     bool clearScreen(const float clearColour[4]);
     bool presentScreen();
@@ -54,8 +57,6 @@ class D3D
     bool setStencilBuffer();
     bool setRasterizerState();
     bool setViewport();
-    bool createShaders();
-    bool createInputLayout();
     bool createMatrixBuffer();
 };
 

@@ -8,7 +8,10 @@ add_executable(
   src/graphics/mesh/triangle.cpp
   src/graphics/mesh/sphere.cpp
   src/graphics/camera/camera.cpp
-  src/graphics/light/point.h)
+  src/graphics/light/point.h
+  src/shader/shader.h
+  src/shader/shader.cpp
+  )
 
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR}
                                         ${imgui_SOURCE_DIR}/backends)

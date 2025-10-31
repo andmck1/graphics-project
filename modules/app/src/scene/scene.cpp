@@ -5,14 +5,16 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include <d3d11.h>
-#include <wrl/client.h>
 #include <filesystem>
+#include <wrl/client.h>
 
 Scene::Scene(SceneConfig *config)
 {
     this->graphicsManager = config->graphicsManager;
-    this->loadVertexShaders(config->vertexShaderDirectory);
-    this->loadPixelShaders(config->pixelShaderDirectory);
+    this->shaderManager = config->shaderManager;
+    this->loadShadersFromDirectory(config->vertexShaderDirectory);
+    this->loadShadersFromDirectory(config->pixelShaderDirectory);
+    this->shaderManager->createShaders();
 
     this->pointLight = PointLight();
     this->pointLightBuffer = PointLightBuffer();
@@ -23,65 +25,26 @@ Scene::Scene(SceneConfig *config)
     this->pointLight.direction = {0.f, 0.f, 1.f, 0.f};
 }
 
-bool Scene::loadVertexShaders(std::string vertexShaderDirectory)
+bool Scene::loadShadersFromDirectory(std::string shaderDirectory)
 {
-    for (const auto &vertexShaderFilepath :
-         std::filesystem::directory_iterator(vertexShaderDirectory))
+    for (const auto &shaderFilepath :
+         std::filesystem::directory_iterator(shaderDirectory))
     {
-        if (vertexShaderFilepath.path().extension() == ".cso")
+        if (shaderFilepath.path().extension() == ".cso")
         {
-            const std::string vertexShaderFilepathString =
-                std::filesystem::absolute(vertexShaderFilepath)
-                    .generic_string();
-            spdlog::info(
-                "Loading vertex shader: " + vertexShaderFilepathString
-            );
-
-            ComPtr<ID3DBlob> shaderBlob =
-                this->graphicsManager->loadShader(vertexShaderFilepathString);
-            if (!shaderBlob)
+            if (!this->shaderManager->loadBlobFromFilename(shaderFilepath))
+            {
+                spdlog::error("Failed to load shader.");
                 return false;
-
-            this->shaderManager.shaderBlobs.insert(
-                {this->shaderManager.shaderFilenameToTypeMapping.at(
-                     vertexShaderFilepath.path().stem().string()
-                 ),
-                 shaderBlob}
-            );
-        }
-    }
-    return true;
-}
-
-bool Scene::loadPixelShaders(std::string pixelShaderDirectory)
-{
-    for (const auto &pixelShaderFilepath :
-         std::filesystem::directory_iterator(pixelShaderDirectory))
-    {
-        if (pixelShaderFilepath.path().extension() == ".cso")
-        {
-            const std::string pixelShaderFilepathString =
-                std::filesystem::absolute(pixelShaderFilepath).generic_string();
-            spdlog::info("Loading pixel shader: " + pixelShaderFilepathString);
-
-            ComPtr<ID3DBlob> shaderBlob =
-                this->graphicsManager->loadShader(pixelShaderFilepathString);
-            if (!shaderBlob)
-                return false;
-
-            this->shaderManager.shaderBlobs.insert(
-                {this->shaderManager.shaderFilenameToTypeMapping.at(
-                     pixelShaderFilepath.path().stem().string()
-                 ),
-                 shaderBlob}
-            );
+            }
         }
     }
     return true;
 }
 
 bool Scene::drawMesh(
-    UINT &stride, UINT &offset, BaseMesh *mesh, XMMATRIX meshWorldMatrix
+    UINT &stride, UINT &offset, BaseMesh *mesh, XMMATRIX meshWorldMatrix,
+    std::vector<ShaderManager::Shader> shaderStack
 )
 {
     this->graphicsManager->deviceContext->IASetVertexBuffers(
@@ -102,15 +65,78 @@ bool Scene::drawMesh(
     if (!this->pointLightBuffer.setPixelShader())
         return false;
 
-    this->graphicsManager->deviceContext->IASetInputLayout(
-        this->graphicsManager->inputLayout.Get()
-    );
-    this->graphicsManager->deviceContext->VSSetShader(
-        this->graphicsManager->vertexShader.Get(), nullptr, 0
-    );
-    this->graphicsManager->deviceContext->PSSetShader(
-        this->graphicsManager->pixelShader.Get(), nullptr, 0
-    );
+    for (ShaderManager::Shader shader : shaderStack)
+    {
+        std::optional<ShaderManager::ShaderType> shaderType =
+            this->shaderManager->getShaderType(shader);
+        if (!shaderType)
+        {
+            spdlog::error("Shader to shader type mapping not implemented.");
+            return false;
+        }
+
+        std::optional<ComPtr<ID3DBlob>> shaderBlob =
+            this->shaderManager->getShaderBlob(shader);
+        if (!shaderBlob)
+        {
+            spdlog::error("Shader to shader blob mapping doesn't exist.");
+            return false;
+        }
+
+        std::optional<std::vector<D3D11_INPUT_ELEMENT_DESC>>
+            inputElementDescription =
+                this->shaderManager->getInputElementDescription(shader);
+
+        if (inputElementDescription)
+        {
+            ComPtr<ID3D11InputLayout> inputLayout =
+                this->graphicsManager->createInputLayout(
+                    inputElementDescription.value(), shaderBlob.value()
+                );
+            this->graphicsManager->deviceContext->IASetInputLayout(
+                inputLayout.Get()
+            );
+        }
+
+        // set shader
+        switch (shaderType.value())
+        {
+        case ShaderManager::ShaderType::VERTEX:
+        {
+            std::optional<ComPtr<ID3D11VertexShader>> vertexShader =
+                this->shaderManager->getLoadedVertexShader(shader);
+            if (!vertexShader)
+            {
+                spdlog::error("Vertex shader not loaded.");
+                return false;
+            }
+            this->graphicsManager->deviceContext->VSSetShader(
+                vertexShader.value().Get(), nullptr, 0
+            );
+            break;
+        }
+        case ShaderManager::ShaderType::PIXEL:
+        {
+            std::optional<ComPtr<ID3D11PixelShader>> pixelShader =
+                this->shaderManager->getLoadedPixelShader(shader);
+            if (!pixelShader)
+            {
+                spdlog::error("Pixel shader not loaded.");
+                return false;
+            }
+            this->graphicsManager->deviceContext->PSSetShader(
+                pixelShader.value().Get(), nullptr, 0
+            );
+            break;
+        }
+        default:
+        {
+            spdlog::error("Shader type not implemented.");
+            return false;
+        }
+        }
+    }
+
     this->graphicsManager->deviceContext->DrawIndexed(
         mesh->getVertexIndexCount(), 0, 0
     );
@@ -127,11 +153,18 @@ bool Scene::drawScreen()
         this->graphicsManager->depthStencilView.Get()
     );
 
+    std::vector<ShaderManager::Shader> shaderStack = {
+        ShaderManager::Shader::STANDARD_VERTEX,
+        ShaderManager::Shader::LIGHTING_PIXEL
+    };
+
     this->drawMesh(
-        stride, offset, this->triangleMesh, this->triangleMeshWorldMatrix
+        stride, offset, this->triangleMesh, this->triangleMeshWorldMatrix,
+        shaderStack
     );
     this->drawMesh(
-        stride, offset, this->sphereMesh, this->sphereMeshWorldMatrix
+        stride, offset, this->sphereMesh, this->sphereMeshWorldMatrix,
+        shaderStack
     );
     return true;
 }

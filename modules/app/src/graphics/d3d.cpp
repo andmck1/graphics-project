@@ -1,6 +1,4 @@
 #include <d3dcompiler.h>
-#include <filesystem>
-#include "spdlog/spdlog.h"
 #include "d3d.h"
 #include "utils.h"
 
@@ -151,45 +149,32 @@ ComPtr<ID3D11PixelShader> D3D::createPixelShader(ComPtr<ID3DBlob> shaderBlob)
     HRESULT createPixelShaderHR;
 
     createPixelShaderHR = this->device->CreatePixelShader(
-        shaderBlob->GetBufferPointer(),
-        shaderBlob->GetBufferSize(),
-        nullptr, pixelShader.GetAddressOf()
+        shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr,
+        pixelShader.GetAddressOf()
     );
     if (!TryDXCall(createPixelShaderHR, "Failed to create pixel shader.\n"))
         return nullptr;
     return pixelShader;
 }
 
-bool D3D::createShaders()
-{
-
-
-    return true;
-}
-
-bool D3D::createInputLayout()
+ComPtr<ID3D11InputLayout> D3D::createInputLayout(
+    std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDescription,
+    ComPtr<ID3DBlob> shaderBlob
+)
 {
     HRESULT createInputLayoutHR;
+    ComPtr<ID3D11InputLayout> inputLayout;
 
-    // Lab code
-    // TODO - generalise this somewhere else
-    D3D11_INPUT_ELEMENT_DESC layout[] = {
-        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
-         D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
-         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
-         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
-    };
-    unsigned int numElements = sizeof(layout) / sizeof(layout[0]);
+    int numElements = inputElementDescription.size();
     createInputLayoutHR = this->device->CreateInputLayout(
-        layout, numElements,
-        shaderBlobs.at(ShaderType::STANDARD_VERTEX)->GetBufferPointer(),
-        shaderBlobs.at(ShaderType::STANDARD_VERTEX)->GetBufferSize(),
-        this->inputLayout.GetAddressOf()
+        inputElementDescription.data(), numElements,
+        shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(),
+        inputLayout.GetAddressOf()
     );
 
-    return TryDXCall(createInputLayoutHR, "Failed to create input layout.\n");
+    if (!TryDXCall(createInputLayoutHR, "Failed to create input layout.\n"))
+        return nullptr;
+    return inputLayout;
 }
 
 bool D3D::createMatrixBuffer()
@@ -305,17 +290,6 @@ bool D3D::init()
     if (!this->setRasterizerState())
         return false;
     if (!this->setViewport())
-        return false;
-    // if (!this->compileShaders())
-    // if (!this->loadShaders())
-    //     return false;
-    if (!this->loadVertexShaders())
-        return false;
-    if (!this->loadPixelShaders())
-        return false;
-    if (!this->createShaders())
-        return false;
-    if (!this->createInputLayout())
         return false;
     if (!this->createMatrixBuffer())
         return false;
