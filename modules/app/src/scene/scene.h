@@ -9,6 +9,9 @@
 #include <core_graphics/mesh/triangle.h>
 #include <core_graphics/mesh/sphere.h>
 #include <core_graphics/light/point.h>
+#include <core_graphics/mesh/quad.h>
+#include <core_graphics/mesh/plane.h>
+#include <core_graphics/mesh/ortho.h>
 
 #include "../shader/shader.h"
 #include "../buffer/pointLightBuffer.h"
@@ -31,6 +34,12 @@ class Scene
     XMMATRIX triangleMeshWorldMatrix;
     SphereMesh *sphereMesh;
     XMMATRIX sphereMeshWorldMatrix;
+    QuadMesh *quadMesh;
+    XMMATRIX quadMeshWorldMatrix;
+    PlaneMesh *planeMesh;
+    XMMATRIX planeMeshWorldMatrix;
+    OrthoMesh *orthoMesh;
+    XMMATRIX orthoMeshWorldMatrix;
 
     PointLightBuffer pointLightBuffer;
     PointLight pointLight;
@@ -52,13 +61,19 @@ class Scene
     bool loadShadersFromDirectory(std::string shaderDirectory);
 };
 
+struct DebugSceneConfig
+{
+    D3D *graphicsManager;
+    float *fps;
+};
+
 class DebugScene
 {
     public:
-    DebugScene(D3D *graphicsManager);
+    DebugScene(DebugSceneConfig *config);
     ~DebugScene();
     bool render();
 
     private:
-    D3D *graphicsManager;
+    DebugSceneConfig *config;
 };

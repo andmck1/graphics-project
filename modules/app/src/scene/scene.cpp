@@ -6,6 +6,7 @@
 #include <imgui_impl_dx11.h>
 #include <d3d11.h>
 #include <filesystem>
+#include <string>
 #include <wrl/client.h>
 
 Scene::Scene(SceneConfig *config)
@@ -166,6 +167,15 @@ bool Scene::drawScreen()
         stride, offset, this->sphereMesh, this->sphereMeshWorldMatrix,
         shaderStack
     );
+    this->drawMesh(
+        stride, offset, this->quadMesh, this->quadMeshWorldMatrix, shaderStack
+    );
+    this->drawMesh(
+        stride, offset, this->planeMesh, this->planeMeshWorldMatrix, shaderStack
+    );
+    this->drawMesh(
+        stride, offset, this->orthoMesh, this->orthoMeshWorldMatrix, shaderStack
+    );
     return true;
 }
 
@@ -180,9 +190,9 @@ bool Scene::render()
     return true;
 }
 
-DebugScene::DebugScene(D3D *graphicsManager)
+DebugScene::DebugScene(DebugSceneConfig *config)
 {
-    this->graphicsManager = graphicsManager;
+    this->config = config;
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -193,13 +203,16 @@ DebugScene::DebugScene(D3D *graphicsManager)
     ImGui::StyleColorsDark();
 
     ImGuiStyle &style = ImGui::GetStyle();
-    style.ScaleAllSizes(this->graphicsManager->config->window->mainScale);
-    style.FontScaleDpi = this->graphicsManager->config->window->mainScale;
+    style.ScaleAllSizes(
+        this->config->graphicsManager->config->window->mainScale
+    );
+    style.FontScaleDpi =
+        this->config->graphicsManager->config->window->mainScale;
 
-    ImGui_ImplWin32_Init(this->graphicsManager->config->window->hwnd);
+    ImGui_ImplWin32_Init(this->config->graphicsManager->config->window->hwnd);
     ImGui_ImplDX11_Init(
-        this->graphicsManager->device.Get(),
-        this->graphicsManager->deviceContext.Get()
+        this->config->graphicsManager->device.Get(),
+        this->config->graphicsManager->deviceContext.Get()
     );
 }
 
@@ -217,7 +230,7 @@ bool DebugScene::render()
     ImGui::NewFrame();
 
     ImGui::Begin("Draggable Window");
-    ImGui::Text("Hello from ImGui!");
+    ImGui::Text("FPS: %.2f", *(this->config->fps));
     ImGui::End();
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

@@ -4,9 +4,10 @@
 #include <core_window/window.h>
 #include <core_graphics/d3d/d3d.h>
 
+#include "core_graphics/mesh/ortho.h"
+#include "core_graphics/mesh/quad.h"
 #include "scene/scene.h"
 #include "app/app.h"
-
 
 int main()
 {
@@ -39,27 +40,44 @@ int main()
     sceneConfig.pixelShaderDirectory =
         std::filesystem::absolute("./build/hlsl/pixel").string();
 
-
-
-
     TriangleMesh triangleMesh = TriangleMesh(&graphicsManager);
     SphereMesh sphereMesh = SphereMesh(&graphicsManager);
+    QuadMesh quadMesh = QuadMesh(&graphicsManager);
+    PlaneMesh planeMesh = PlaneMesh(&graphicsManager);
+    OrthoMesh orthoMesh =
+        OrthoMesh(&graphicsManager, windowSpec.height, windowSpec.width, 0, 0);
+
     Camera camera = Camera();
     Scene scene = Scene(&sceneConfig);
-    scene.triangleMesh = &triangleMesh;
+
     scene.camera = &camera;
+    scene.triangleMesh = &triangleMesh;
     scene.sphereMesh = &sphereMesh;
+    scene.quadMesh = &quadMesh;
+    scene.planeMesh = &planeMesh;
+    scene.orthoMesh = &orthoMesh;
     scene.triangleMeshWorldMatrix = XMMatrixIdentity();
     scene.sphereMeshWorldMatrix =
         XMMatrixIdentity() * XMMatrixTranslation(-3.f, 0.f, 0.f);
-
-    DebugScene debugScene = DebugScene(&graphicsManager);
+    scene.quadMeshWorldMatrix =
+        XMMatrixIdentity() * XMMatrixTranslation(3.f, 0.f, 0.f);
+    scene.planeMeshWorldMatrix = XMMatrixIdentity() * XMMatrixRotationX(-45) *
+                                 XMMatrixTranslation(0.f, -3.f, 0.f);
+    scene.orthoMeshWorldMatrix =
+        XMMatrixIdentity() * XMMatrixTranslation(0.f, 3.f, 0.f);
 
     App app = App(&scene, &window);
 
+    DebugSceneConfig debugSceneConfig = DebugSceneConfig();
+    debugSceneConfig.graphicsManager = &graphicsManager;
+    debugSceneConfig.fps = &app.timer.fps;
+    DebugScene debugScene = DebugScene(&debugSceneConfig);
+
     const float clearColour[4] = {0.392f, 0.584f, 0.929f, 1.0f};
+    app.timer.start();
     while (window.frame())
     {
+        app.timer.frame();
         app.handleInputs();
         scene.camera->update();
         graphicsManager.clearScreen(clearColour);
