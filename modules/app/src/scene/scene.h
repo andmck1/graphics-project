@@ -5,6 +5,8 @@
 #include <directxmath.h>
 
 #include <core_graphics/d3d/d3d.h>
+#include <core_graphics/shader/shader.h>
+#include <core_graphics/shader/shadermanager.h>
 #include <core_graphics/camera/camera.h>
 #include <core_graphics/mesh/triangle.h>
 #include <core_graphics/mesh/sphere.h>
@@ -13,11 +15,17 @@
 #include <core_graphics/mesh/plane.h>
 #include <core_graphics/mesh/ortho.h>
 
-#include "../shader/shader.h"
 #include "../buffer/pointLightBuffer.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
+
+struct SceneMesh
+{
+    BaseMesh *mesh;
+    XMMATRIX worldMatrix;
+    ShaderStack *shaderStack;
+};
 
 struct SceneConfig
 {
@@ -30,16 +38,7 @@ struct SceneConfig
 class Scene
 {
     public:
-    TriangleMesh *triangleMesh;
-    XMMATRIX triangleMeshWorldMatrix;
-    SphereMesh *sphereMesh;
-    XMMATRIX sphereMeshWorldMatrix;
-    QuadMesh *quadMesh;
-    XMMATRIX quadMeshWorldMatrix;
-    PlaneMesh *planeMesh;
-    XMMATRIX planeMeshWorldMatrix;
-    OrthoMesh *orthoMesh;
-    XMMATRIX orthoMeshWorldMatrix;
+    std::vector<SceneMesh> meshes;
 
     PointLightBuffer pointLightBuffer;
     PointLight pointLight;
@@ -48,17 +47,13 @@ class Scene
 
     Scene(SceneConfig *config);
 
-    bool drawMesh(
-        UINT &stride, UINT &offset, BaseMesh *mesh, XMMATRIX meshWorldMatrix,
-        std::vector<ShaderManager::Shader> shaderStack
-    );
+    bool drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh);
     bool render();
 
     private:
     D3D *graphicsManager;
     ShaderManager *shaderManager;
     bool drawScreen();
-    bool loadShadersFromDirectory(std::string shaderDirectory);
 };
 
 struct DebugSceneConfig

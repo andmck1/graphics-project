@@ -22,7 +22,7 @@ void OrthoMesh::init()
     top = ((float) this->height) / 2.f + ((float) this->yPosition);
     bottom = top - (float) this->height;
 
-    for (int i=0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         this->vertices.push_back(Vertex());
     }

@@ -3,8 +3,6 @@ add_executable(
   src/main.cpp
   src/scene/scene.cpp
   src/app/app.cpp
-  src/shader/shader.h
-  src/shader/shader.cpp
   src/buffer/pointLightBuffer.h
   src/buffer/pointLightBuffer.cpp)
 

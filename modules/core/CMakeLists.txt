@@ -13,8 +13,8 @@ target_include_directories(core_utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_library(
   core_graphics STATIC
   src/core_graphics/d3d/d3d.cpp
-  src/core_graphics/d3d/d3d.h
-  src/core_graphics/buffer/buffer.h
+  src/core_graphics/shader/shader.cpp
+  src/core_graphics/shader/shadermanager.cpp
   src/core_graphics/mesh/base.cpp
   src/core_graphics/mesh/triangle.cpp
   src/core_graphics/mesh/sphere.cpp
@@ -22,7 +22,7 @@ add_library(
   src/core_graphics/mesh/plane.cpp
   src/core_graphics/mesh/ortho.cpp
   src/core_graphics/camera/camera.cpp
-  src/core_graphics/light/point.h)
+  )
 target_link_libraries(core_graphics PRIVATE spdlog imgui)
 target_include_directories(core_graphics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 

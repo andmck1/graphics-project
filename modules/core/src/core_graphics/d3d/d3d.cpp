@@ -339,4 +339,3 @@ bool D3D::presentScreen()
     presentHR = this->swapChain->Present(1, 0);
     return TryDXCall(presentHR, "Present failed.\n");
 }
-

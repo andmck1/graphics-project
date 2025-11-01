@@ -5,17 +5,12 @@
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
 #include <d3d11.h>
-#include <filesystem>
-#include <string>
 #include <wrl/client.h>
 
 Scene::Scene(SceneConfig *config)
 {
     this->graphicsManager = config->graphicsManager;
     this->shaderManager = config->shaderManager;
-    this->loadShadersFromDirectory(config->vertexShaderDirectory);
-    this->loadShadersFromDirectory(config->pixelShaderDirectory);
-    this->shaderManager->createShaders();
 
     this->pointLight = PointLight();
     this->pointLightBuffer = PointLightBuffer();
@@ -26,73 +21,33 @@ Scene::Scene(SceneConfig *config)
     this->pointLight.direction = {0.f, 0.f, 1.f, 0.f};
 }
 
-bool Scene::loadShadersFromDirectory(std::string shaderDirectory)
-{
-    for (const auto &shaderFilepath :
-         std::filesystem::directory_iterator(shaderDirectory))
-    {
-        if (shaderFilepath.path().extension() == ".cso")
-        {
-            if (!this->shaderManager->loadBlobFromFilename(shaderFilepath))
-            {
-                spdlog::error("Failed to load shader.");
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-bool Scene::drawMesh(
-    UINT &stride, UINT &offset, BaseMesh *mesh, XMMATRIX meshWorldMatrix,
-    std::vector<ShaderManager::Shader> shaderStack
-)
+bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
 {
     this->graphicsManager->deviceContext->IASetVertexBuffers(
-        0, 1, mesh->vertexBuffer.GetAddressOf(), &stride, &offset
+        0, 1, sceneMesh->mesh->vertexBuffer.GetAddressOf(), &stride, &offset
     );
     this->graphicsManager->deviceContext->IASetIndexBuffer(
-        mesh->vertexIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0
+        sceneMesh->mesh->vertexIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0
     );
     this->graphicsManager->deviceContext->IASetPrimitiveTopology(
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST
     );
 
     if (!this->graphicsManager->updateMatrixBuffer(
-            meshWorldMatrix, this->camera->viewMatrix
+            sceneMesh->worldMatrix, this->camera->viewMatrix
         ))
         return false;
 
     if (!this->pointLightBuffer.setPixelShader())
         return false;
 
-    for (ShaderManager::Shader shader : shaderStack)
+    for (BaseShader *shader : sceneMesh->shaderStack->shaders)
     {
-        std::optional<ShaderManager::ShaderType> shaderType =
-            this->shaderManager->getShaderType(shader);
-        if (!shaderType)
-        {
-            spdlog::error("Shader to shader type mapping not implemented.");
-            return false;
-        }
-
-        std::optional<ComPtr<ID3DBlob>> shaderBlob =
-            this->shaderManager->getShaderBlob(shader);
-        if (!shaderBlob)
-        {
-            spdlog::error("Shader to shader blob mapping doesn't exist.");
-            return false;
-        }
-
-        std::optional<std::vector<D3D11_INPUT_ELEMENT_DESC>>
-            inputElementDescription =
-                this->shaderManager->getInputElementDescription(shader);
-
-        if (inputElementDescription)
+        if (shader->inputElementDescription)
         {
             ComPtr<ID3D11InputLayout> inputLayout =
                 this->graphicsManager->createInputLayout(
-                    inputElementDescription.value(), shaderBlob.value()
+                    shader->inputElementDescription.value(), shader->blob
                 );
             this->graphicsManager->deviceContext->IASetInputLayout(
                 inputLayout.Get()
@@ -100,33 +55,31 @@ bool Scene::drawMesh(
         }
 
         // set shader
-        switch (shaderType.value())
+        switch (shader->type)
         {
-        case ShaderManager::ShaderType::VERTEX:
+        case ShaderType::VERTEX:
         {
-            std::optional<ComPtr<ID3D11VertexShader>> vertexShader =
-                this->shaderManager->getLoadedVertexShader(shader);
-            if (!vertexShader)
+            VertexShader *vertexShader = static_cast<VertexShader *>(shader);
+            if (!shader)
             {
                 spdlog::error("Vertex shader not loaded.");
                 return false;
             }
             this->graphicsManager->deviceContext->VSSetShader(
-                vertexShader.value().Get(), nullptr, 0
+                vertexShader->shader.Get(), nullptr, 0
             );
             break;
         }
-        case ShaderManager::ShaderType::PIXEL:
+        case ShaderType::PIXEL:
         {
-            std::optional<ComPtr<ID3D11PixelShader>> pixelShader =
-                this->shaderManager->getLoadedPixelShader(shader);
+            PixelShader *pixelShader = static_cast<PixelShader *>(shader);
             if (!pixelShader)
             {
                 spdlog::error("Pixel shader not loaded.");
                 return false;
             }
             this->graphicsManager->deviceContext->PSSetShader(
-                pixelShader.value().Get(), nullptr, 0
+                pixelShader->shader.Get(), nullptr, 0
             );
             break;
         }
@@ -139,7 +92,7 @@ bool Scene::drawMesh(
     }
 
     this->graphicsManager->deviceContext->DrawIndexed(
-        mesh->getVertexIndexCount(), 0, 0
+        sceneMesh->mesh->getVertexIndexCount(), 0, 0
     );
 
     return true;
@@ -154,28 +107,11 @@ bool Scene::drawScreen()
         this->graphicsManager->depthStencilView.Get()
     );
 
-    std::vector<ShaderManager::Shader> shaderStack = {
-        ShaderManager::Shader::STANDARD_VERTEX,
-        ShaderManager::Shader::LIGHTING_PIXEL
-    };
+    for (SceneMesh sceneMesh : this->meshes)
+    {
+        this->drawMesh(stride, offset, &sceneMesh);
+    }
 
-    this->drawMesh(
-        stride, offset, this->triangleMesh, this->triangleMeshWorldMatrix,
-        shaderStack
-    );
-    this->drawMesh(
-        stride, offset, this->sphereMesh, this->sphereMeshWorldMatrix,
-        shaderStack
-    );
-    this->drawMesh(
-        stride, offset, this->quadMesh, this->quadMeshWorldMatrix, shaderStack
-    );
-    this->drawMesh(
-        stride, offset, this->planeMesh, this->planeMeshWorldMatrix, shaderStack
-    );
-    this->drawMesh(
-        stride, offset, this->orthoMesh, this->orthoMeshWorldMatrix, shaderStack
-    );
     return true;
 }
 
