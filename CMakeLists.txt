@@ -40,5 +40,5 @@ add_library(
   ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp)
 
 add_subdirectory(modules/core)
+add_subdirectory(modules/shader)
 add_subdirectory(modules/app)
-

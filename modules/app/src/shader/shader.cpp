@@ -1,8 +1,6 @@
 #include "shader.h"
-
-#include "spdlog/spdlog.h"
-
-#include "utils/data.h"
+#include <spdlog/spdlog.h>
+#include <core_utils/data.h>
 
 ShaderManager::ShaderManager(D3D *graphicsManager)
 {

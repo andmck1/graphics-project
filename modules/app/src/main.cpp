@@ -1,10 +1,12 @@
+#include <filesystem>
+#include <spdlog/spdlog.h>
+
+#include <core_window/window.h>
+#include <core_graphics/d3d/d3d.h>
+
 #include "scene/scene.h"
 #include "app/app.h"
-#include "window/window.h"
-#include "graphics/d3d.h"
 
-#include "spdlog/spdlog.h"
-#include <filesystem>
 
 int main()
 {
@@ -33,9 +35,9 @@ int main()
     sceneConfig.graphicsManager = &graphicsManager;
     sceneConfig.shaderManager = &shaderManager;
     sceneConfig.vertexShaderDirectory =
-        std::filesystem::absolute("./build/shaders/vertex").string();
+        std::filesystem::absolute("./build/hlsl/vertex").string();
     sceneConfig.pixelShaderDirectory =
-        std::filesystem::absolute("./build/shaders/pixel").string();
+        std::filesystem::absolute("./build/hlsl/pixel").string();
 
 
 

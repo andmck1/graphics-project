@@ -1,8 +1,8 @@
+#include "buffer.h"
+
 cbuffer LightBuffer : register(b0)
 {
-    float4 colour;
-    float4 position;
-    float4 direction;
+	LightBuffer lightData;
 }
 
 struct InputType
@@ -24,7 +24,7 @@ float4 main(InputType input) : SV_TARGET
 	float4 lightColour;
 
 	// Sample the texture. Calculate light intensity and colour, return light*texture for final pixel colour.
-	lightColour = calculateLighting(-direction.xyz, input.normal, colour);
+	lightColour = calculateLighting(-lightData.direction.xyz, input.normal, lightData.colour);
 	
 	
     return lightColour;

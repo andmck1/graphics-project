@@ -3,7 +3,7 @@
 #include <optional>
 #include <filesystem>
 
-#include "../graphics/d3d.h"
+#include <core_graphics/d3d/d3d.h>
 
 
 class ShaderManager

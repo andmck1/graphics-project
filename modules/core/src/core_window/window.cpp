@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <string>
 
-#include "spdlog/spdlog.h"
-#include "imgui.h"
-#include "imgui_impl_win32.h"
+#include <spdlog/spdlog.h>
+#include <imgui.h>
+#include <imgui_impl_win32.h>
 
 const float gMOUSE_MAX_DELTA = 100.f;
 

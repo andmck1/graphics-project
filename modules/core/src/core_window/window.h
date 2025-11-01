@@ -3,7 +3,7 @@
 #include <string>
 #include <windows.h>
 
-#include "../input/input.h"
+#include <core_input/input.h>
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

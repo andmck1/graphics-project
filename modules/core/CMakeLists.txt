@@ -1,8 +1,33 @@
+add_library(core_window STATIC src/core_window/window.cpp
+                               src/core_window/window.h)
+target_link_libraries(core_window PRIVATE spdlog imgui)
+target_include_directories(core_window
+                           PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+add_library(core_input STATIC src/core_input/input.cpp src/core_input/input.h)
+target_link_libraries(core_input PRIVATE spdlog imgui)
+target_include_directories(core_input
+                           PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+add_library(core_utils STATIC src/core_utils/data.h src/core_utils/graphics.h)
+target_link_libraries(core_utils PRIVATE spdlog imgui)
+target_include_directories(core_utils
+                           PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
 add_library(
-  core STATIC src/window/window.cpp src/window/window.h src/input/input.cpp
-              src/input/input.h src/utils/data.h)
-target_link_libraries(core PRIVATE spdlog imgui)
-target_include_directories(core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+  core_graphics STATIC
+  src/core_graphics/d3d/d3d.cpp
+  src/core_graphics/d3d/d3d.h
+  src/core_graphics/buffer/buffer.h
+  src/core_graphics/mesh/base.cpp
+  src/core_graphics/mesh/triangle.cpp
+  src/core_graphics/mesh/sphere.cpp
+  src/core_graphics/camera/camera.cpp
+  src/core_graphics/light/point.h)
+target_link_libraries(core_graphics PRIVATE spdlog imgui)
+target_include_directories(core_graphics
+                           PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
 target_include_directories(
   imgui PUBLIC ${CMAKE_CURRENT_LIST_DIR}/imgui
                ${CMAKE_CURRENT_LIST_DIR}/imgui/backends)

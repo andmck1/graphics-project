@@ -4,12 +4,14 @@
 #include <d3d11.h>
 #include <directxmath.h>
 
-#include "../graphics/d3d.h"
-#include "../graphics/camera/camera.h"
-#include "../graphics/mesh/triangle.h"
-#include "../graphics/mesh/sphere.h"
-#include "../graphics/light/point.h"
+#include <core_graphics/d3d/d3d.h>
+#include <core_graphics/camera/camera.h>
+#include <core_graphics/mesh/triangle.h>
+#include <core_graphics/mesh/sphere.h>
+#include <core_graphics/light/point.h>
+
 #include "../shader/shader.h"
+#include "../buffer/pointLightBuffer.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;

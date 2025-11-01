@@ -1,5 +1,5 @@
 #include "base.h"
-#include "../../graphics/utils.h"
+#include <core_utils/graphics.h>
 
 int BaseMesh::getVertexCount()
 {
