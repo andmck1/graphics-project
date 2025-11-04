@@ -20,6 +20,9 @@ Scene::Scene(SceneConfig *config)
     this->pointLight.colour = {1.f, 1.f, 1.f, 1.f};
     this->pointLight.worldPosition = {0.f, 0.f, -10.f, 0.f};
     this->pointLight.direction = {0.f, 0.f, 1.f, 0.f};
+
+    this->camera = &config->camera;
+    this->meshes = &config->meshes;
 }
 
 bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
@@ -111,9 +114,9 @@ bool Scene::drawScreen()
         this->graphicsManager->depthStencilView.Get()
     );
 
-    for (SceneMesh sceneMesh : this->meshes)
+    for (std::unique_ptr<SceneMesh> &sceneMeshPtr : *this->meshes)
     {
-        this->drawMesh(stride, offset, &sceneMesh);
+        this->drawMesh(stride, offset, sceneMeshPtr.get());
     }
 
     return true;

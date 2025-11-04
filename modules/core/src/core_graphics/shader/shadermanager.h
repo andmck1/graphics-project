@@ -16,9 +16,9 @@ class ShaderManager
 {
     public:
     ShaderManager(ShaderManagerConfig *config);
+    ShaderManagerConfig *config;
 
     private:
-    ShaderManagerConfig *config;
 
     bool loadShaders();
     bool createShaders();

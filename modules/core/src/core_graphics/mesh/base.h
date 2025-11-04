@@ -16,6 +16,8 @@ struct Vertex
 class BaseMesh
 {
     public:
+    virtual ~BaseMesh() = default;
+
     // TODO - don't keep these in memory, delete after loading
     std::vector<Vertex> vertices;
     std::vector<unsigned int> vertexIndices;

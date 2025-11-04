@@ -16,13 +16,14 @@
 #include <core_graphics/mesh/ortho.h>
 
 #include "../buffer/pointLightBuffer.h"
+#include "core_graphics/mesh/base.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
 struct SceneMesh
 {
-    BaseMesh *mesh;
+    std::unique_ptr<BaseMesh> mesh;
     XMMATRIX worldMatrix;
     ShaderStack *shaderStack;
 };
@@ -33,19 +34,22 @@ struct SceneConfig
     ShaderManager *shaderManager;
     std::string vertexShaderDirectory;
     std::string pixelShaderDirectory;
+
+    Camera camera = Camera();
+
+    ShaderStack shaderStack;
+    std::vector<std::unique_ptr<SceneMesh>> meshes;
 };
 
 class Scene
 {
     public:
-    std::vector<SceneMesh> meshes;
+    Scene(SceneConfig *config);
 
+    std::vector<std::unique_ptr<SceneMesh>> *meshes;
     PointLightBuffer pointLightBuffer;
     PointLight pointLight;
-
     Camera *camera;
-
-    Scene(SceneConfig *config);
 
     bool drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh);
     bool render();

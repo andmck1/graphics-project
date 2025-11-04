@@ -50,9 +50,7 @@ bool Config::initShaderManagerConfig(D3D *graphicsManager)
     return true;
 }
 
-bool Config::initSceneConfig(
-    D3D *graphicsManager, ShaderManager *shaderManager
-)
+bool Config::initSceneConfig(D3D *graphicsManager, ShaderManager *shaderManager)
 {
     this->sceneConfig.graphicsManager = graphicsManager;
     this->sceneConfig.shaderManager = shaderManager;
@@ -60,6 +58,40 @@ bool Config::initSceneConfig(
         std::filesystem::absolute("./build/hlsl/vertex").string();
     this->sceneConfig.pixelShaderDirectory =
         std::filesystem::absolute("./build/hlsl/pixel").string();
+
+    this->sceneConfig.shaderStack.shaders = &shaderManager->config->shaders;
+
+    TriangleMesh triangleMesh = TriangleMesh(graphicsManager);
+    SphereMesh sphereMesh = SphereMesh(graphicsManager);
+    QuadMesh quadMesh = QuadMesh(graphicsManager);
+    PlaneMesh planeMesh = PlaneMesh(graphicsManager);
+
+    std::unique_ptr<SceneMesh> triangleSceneMesh =
+        std::make_unique<SceneMesh>();
+    std::unique_ptr<SceneMesh> sphereSceneMesh = std::make_unique<SceneMesh>();
+    std::unique_ptr<SceneMesh> quadSceneMesh = std::make_unique<SceneMesh>();
+    std::unique_ptr<SceneMesh> planeSceneMesh = std::make_unique<SceneMesh>();
+
+    triangleSceneMesh->mesh = std::make_unique<TriangleMesh>(triangleMesh);
+    triangleSceneMesh->worldMatrix = XMMatrixIdentity();
+    triangleSceneMesh->shaderStack = &this->sceneConfig.shaderStack;
+    sphereSceneMesh->mesh = std::make_unique<SphereMesh>(sphereMesh);
+    sphereSceneMesh->worldMatrix =
+        XMMatrixIdentity() * XMMatrixTranslation(-3.f, 0.f, 0.f);
+    sphereSceneMesh->shaderStack = &this->sceneConfig.shaderStack;
+    quadSceneMesh->mesh = std::make_unique<QuadMesh>(quadMesh);
+    quadSceneMesh->worldMatrix =
+        XMMatrixIdentity() * XMMatrixTranslation(3.f, 0.f, 0.f);
+    quadSceneMesh->shaderStack = &this->sceneConfig.shaderStack;
+    planeSceneMesh->mesh = std::make_unique<PlaneMesh>(planeMesh);
+    planeSceneMesh->worldMatrix = XMMatrixIdentity() * XMMatrixRotationX(-45) *
+                                  XMMatrixTranslation(0.f, -3.f, 0.f);
+    planeSceneMesh->shaderStack = &this->sceneConfig.shaderStack;
+
+    this->sceneConfig.meshes.push_back(std::move(triangleSceneMesh));
+    this->sceneConfig.meshes.push_back(std::move(sphereSceneMesh));
+    this->sceneConfig.meshes.push_back(std::move(quadSceneMesh));
+    this->sceneConfig.meshes.push_back(std::move(planeSceneMesh));
 
     return true;
 }
