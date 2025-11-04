@@ -8,3 +8,9 @@ bool Config::initWindowConfig()
 
     return true;
 }
+
+bool Config::initD3DAppConfig(Window *window)
+{
+    this->d3dAppConfig.window = window; 
+    return true;
+}

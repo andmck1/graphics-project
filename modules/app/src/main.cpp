@@ -17,14 +17,11 @@ int main()
 
     // Window
     config.initWindowConfig();
-    Window window = Window(&(config.windowConfig));
+    Window window = Window(&config.windowConfig);
 
     // D3D app
-    // TODO - give this proper constructor
-    D3DAppConfig d3dAppConfig = D3DAppConfig();
-    d3dAppConfig.window = &window;
-
-    D3D graphicsManager = D3D(&d3dAppConfig);
+    config.initD3DAppConfig(&window);
+    D3D graphicsManager = D3D(&config.d3dAppConfig);
     graphicsManager.init();
 
     VertexShader standardVertexShader = VertexShader();
