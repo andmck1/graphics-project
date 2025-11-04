@@ -3,18 +3,18 @@
 #include <core_window/window.h>
 #include <core_utils/timer.h>
 
-#include "../scene/scene.h"
+#include "../input/input.h"
+
+struct AppConfig
+{
+    AppInput *appInput;
+};
 
 class App
 {
     public:
-    App(Scene *scene, Window *window);
+    AppConfig *config;
+    App(AppConfig *config);
 
     Timer timer = Timer();
-
-    void handleInputs();
-
-    private:
-    Scene *scene;
-    Window *window;
 };

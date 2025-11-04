@@ -38,14 +38,15 @@ int main()
 
     // App
     spdlog::info("Creating app");
-    App app = App(&scene, &window);
+    config.initAppInputConfig(&window, &scene);
+    AppInput appInput = AppInput(&config.appInputConfig);
+    config.initAppConfig(&appInput);
+    App app = App(&config.appConfig);
 
     // Debug Scene
     spdlog::info("Creating debug scene");
-    DebugSceneConfig debugSceneConfig = DebugSceneConfig();
-    debugSceneConfig.graphicsManager = &graphicsManager;
-    debugSceneConfig.fps = &app.timer.fps;
-    DebugScene debugScene = DebugScene(&debugSceneConfig);
+    config.initDebugSceneConfig(&graphicsManager, &app.timer.fps);
+    DebugScene debugScene = DebugScene(&config.debugSceneConfig);
 
     // Main loop
     const float clearColour[4] = {0.392f, 0.584f, 0.929f, 1.0f};
@@ -53,7 +54,7 @@ int main()
     while (window.frame())
     {
         app.timer.frame();
-        app.handleInputs();
+        app.config->appInput->handleInputs(app.timer.deltaTime);
         scene.camera->update();
         graphicsManager.clearScreen(clearColour);
         scene.render();

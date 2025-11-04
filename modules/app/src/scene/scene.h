@@ -60,19 +60,3 @@ class Scene
     bool drawScreen();
 };
 
-struct DebugSceneConfig
-{
-    D3D *graphicsManager;
-    float *fps;
-};
-
-class DebugScene
-{
-    public:
-    DebugScene(DebugSceneConfig *config);
-    ~DebugScene();
-    bool render();
-
-    private:
-    DebugSceneConfig *config;
-};

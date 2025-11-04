@@ -2,22 +2,19 @@
 
 #include <filesystem>
 
-bool Config::initWindowConfig()
+void Config::initWindowConfig()
 {
     this->windowConfig.height = 720;
     this->windowConfig.width = 1280;
     this->windowConfig.windowName = "Graphics Project";
-
-    return true;
 }
 
-bool Config::initD3DAppConfig(Window *window)
+void Config::initD3DAppConfig(Window *window)
 {
     this->d3dAppConfig.window = window;
-    return true;
 }
 
-bool Config::initShaderManagerConfig(D3D *graphicsManager)
+void Config::initShaderManagerConfig(D3D *graphicsManager)
 {
     this->shaderManagerConfig.graphicsManager = graphicsManager;
     this->shaderManagerConfig.vertexShaderDirectory =
@@ -46,11 +43,9 @@ bool Config::initShaderManagerConfig(D3D *graphicsManager)
     this->shaderManagerConfig.shaders.push_back(
         std::make_unique<PixelShader>(lightingPixelShader)
     );
-
-    return true;
 }
 
-bool Config::initSceneConfig(D3D *graphicsManager, ShaderManager *shaderManager)
+void Config::initSceneConfig(D3D *graphicsManager, ShaderManager *shaderManager)
 {
     this->sceneConfig.graphicsManager = graphicsManager;
     this->sceneConfig.shaderManager = shaderManager;
@@ -92,6 +87,23 @@ bool Config::initSceneConfig(D3D *graphicsManager, ShaderManager *shaderManager)
     this->sceneConfig.meshes.push_back(std::move(sphereSceneMesh));
     this->sceneConfig.meshes.push_back(std::move(quadSceneMesh));
     this->sceneConfig.meshes.push_back(std::move(planeSceneMesh));
+}
 
-    return true;
+void Config::initAppInputConfig(Window *window, Scene *scene)
+{
+    this->appInputConfig.window = window;
+    this->appInputConfig.scene = scene;
+    this->appInputConfig.cameraMoveSpeed = 5.f;
+    this->appInputConfig.cameraRotateSensitivity = 0.1f;
+}
+
+void Config::initAppConfig(AppInput *appInput)
+{
+    this->appConfig.appInput = appInput;
+}
+
+void Config::initDebugSceneConfig(D3D *graphicsManager, float *fps)
+{
+    this->debugSceneConfig.graphicsManager = graphicsManager;
+    this->debugSceneConfig.fps = fps;
 }

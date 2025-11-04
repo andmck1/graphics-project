@@ -4,6 +4,9 @@
 #include "core_graphics/shader/shadermanager.h"
 #include "core_window/window.h"
 #include "../scene/scene.h"
+#include "../scene/debugScene.h"
+#include "../input/input.h"
+#include "../app/app.h"
 
 class Config
 {
@@ -12,11 +15,15 @@ class Config
     D3DAppConfig d3dAppConfig = D3DAppConfig();
     ShaderManagerConfig shaderManagerConfig = ShaderManagerConfig();
     SceneConfig sceneConfig = SceneConfig();
+    AppInputConfig appInputConfig = AppInputConfig();
+    AppConfig appConfig = AppConfig();
+    DebugSceneConfig debugSceneConfig = DebugSceneConfig();
 
-    bool initWindowConfig();
-    bool initD3DAppConfig(Window *window);
-    bool initShaderManagerConfig(D3D *graphicsManager);
-    bool initSceneConfig(
-        D3D *graphicsManager, ShaderManager *shaderManager
-    );
+    void initWindowConfig();
+    void initD3DAppConfig(Window *window);
+    void initShaderManagerConfig(D3D *graphicsManager);
+    void initSceneConfig(D3D *graphicsManager, ShaderManager *shaderManager);
+    void initAppInputConfig(Window *window, Scene *scene);
+    void initAppConfig(AppInput *appInput);
+    void initDebugSceneConfig(D3D *graphicsManager, float *fps);
 };
