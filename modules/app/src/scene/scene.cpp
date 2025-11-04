@@ -1,5 +1,6 @@
 #include "scene.h"
 
+#include <memory>
 #include <spdlog/spdlog.h>
 #include <imgui.h>
 #include <imgui_impl_win32.h>
@@ -41,13 +42,14 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
     if (!this->pointLightBuffer.setPixelShader())
         return false;
 
-    for (BaseShader *shader : sceneMesh->shaderStack->shaders)
+    for (std::unique_ptr<BaseShader> &shaderPtr :
+         *sceneMesh->shaderStack->shaders)
     {
-        if (shader->inputElementDescription)
+        if (shaderPtr->inputElementDescription)
         {
             ComPtr<ID3D11InputLayout> inputLayout =
                 this->graphicsManager->createInputLayout(
-                    shader->inputElementDescription.value(), shader->blob
+                    shaderPtr->inputElementDescription.value(), shaderPtr->blob
                 );
             this->graphicsManager->deviceContext->IASetInputLayout(
                 inputLayout.Get()
@@ -55,12 +57,13 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
         }
 
         // set shader
-        switch (shader->type)
+        switch (shaderPtr->type)
         {
         case ShaderType::VERTEX:
         {
-            VertexShader *vertexShader = static_cast<VertexShader *>(shader);
-            if (!shader)
+            VertexShader *vertexShader =
+                dynamic_cast<VertexShader *>(shaderPtr.get());
+            if (!shaderPtr)
             {
                 spdlog::error("Vertex shader not loaded.");
                 return false;
@@ -72,7 +75,8 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
         }
         case ShaderType::PIXEL:
         {
-            PixelShader *pixelShader = static_cast<PixelShader *>(shader);
+            PixelShader *pixelShader =
+                dynamic_cast<PixelShader *>(shaderPtr.get());
             if (!pixelShader)
             {
                 spdlog::error("Pixel shader not loaded.");

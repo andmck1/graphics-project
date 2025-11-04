@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <optional>
 
 #include <core_graphics/d3d/d3d.h>
@@ -12,6 +13,8 @@ enum class ShaderType
 
 struct BaseShader
 {
+    virtual ~BaseShader() = default;
+
     std::string filepath;
     ShaderType type;
     std::optional<std::vector<D3D11_INPUT_ELEMENT_DESC>>
@@ -33,5 +36,5 @@ struct PixelShader : BaseShader
 
 struct ShaderStack
 {
-    std::vector<BaseShader *> shaders;
+    std::vector<std::unique_ptr<BaseShader>> *shaders;
 };

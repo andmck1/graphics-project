@@ -1,3 +1,4 @@
+#include <memory>
 #include <spdlog/spdlog.h>
 
 #include "shadermanager.h"
@@ -11,9 +12,9 @@ ShaderManager::ShaderManager(ShaderManagerConfig *config)
 
 bool ShaderManager::loadShaders()
 {
-    for (BaseShader *shader : this->config->shaders)
+    for (std::unique_ptr<BaseShader> &shaderPtr : this->config->shaders)
     {
-        if (!shader->loadBlob(this->config->graphicsManager))
+        if (!shaderPtr->loadBlob(this->config->graphicsManager))
         {
             spdlog::error("Failed to load shader.");
             return false;
@@ -25,22 +26,28 @@ bool ShaderManager::loadShaders()
 bool ShaderManager::createShaders()
 {
     spdlog::info("Creating shaders");
-    for (BaseShader *shader : this->config->shaders)
+    for (std::unique_ptr<BaseShader> &shaderPtr : this->config->shaders)
     {
-        switch (shader->type)
+        switch (shaderPtr->type)
         {
         case (ShaderType::VERTEX):
         {
-            VertexShader *vertexShader = static_cast<VertexShader *>(shader);
+            VertexShader *vertexShader =
+                dynamic_cast<VertexShader *>(shaderPtr.get());
             vertexShader->shader =
-                this->config->graphicsManager->createVertexShader(shader->blob);
+                this->config->graphicsManager->createVertexShader(
+                    shaderPtr->blob
+                );
             break;
         }
         case (ShaderType::PIXEL):
         {
-            PixelShader *pixelShader = static_cast<PixelShader *>(shader);
+            PixelShader *pixelShader =
+                dynamic_cast<PixelShader *>(shaderPtr.get());
             pixelShader->shader =
-                this->config->graphicsManager->createPixelShader(shader->blob);
+                this->config->graphicsManager->createPixelShader(
+                    shaderPtr->blob
+                );
             break;
         }
         default:

@@ -24,51 +24,19 @@ int main()
     D3D graphicsManager = D3D(&config.d3dAppConfig);
     graphicsManager.init();
 
-    VertexShader standardVertexShader = VertexShader();
-    standardVertexShader.filepath = "./build/hlsl/vertex/vertex.cso";
-    standardVertexShader.type = ShaderType::VERTEX;
-    standardVertexShader.inputElementDescription = {
-        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
-         D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
-         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
-         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
-    };
-
-    PixelShader lightingPixelShader = PixelShader();
-    lightingPixelShader.filepath = "./build/hlsl/pixel/pixel.cso";
-    lightingPixelShader.type = ShaderType::PIXEL;
-
     // Shader manager
-    ShaderManagerConfig shaderManagerConfig = ShaderManagerConfig();
-    shaderManagerConfig.graphicsManager = &graphicsManager;
-    shaderManagerConfig.vertexShaderDirectory =
-        std::filesystem::absolute("./build/hlsl/vertex").string();
-    shaderManagerConfig.pixelShaderDirectory =
-        std::filesystem::absolute("./build/hlsl/pixel").string();
-    shaderManagerConfig.shaders.push_back(&standardVertexShader);
-    shaderManagerConfig.shaders.push_back(&lightingPixelShader);
-    ShaderManager shaderManager = ShaderManager(&shaderManagerConfig);
+    config.initShaderManagerConfig(&graphicsManager);
+    ShaderManager shaderManager = ShaderManager(&config.shaderManagerConfig);
 
     // Scene
-    // TODO - give this proper constructor
-    SceneConfig sceneConfig = SceneConfig();
-    sceneConfig.graphicsManager = &graphicsManager;
-    sceneConfig.shaderManager = &shaderManager;
-    sceneConfig.vertexShaderDirectory =
-        std::filesystem::absolute("./build/hlsl/vertex").string();
-    sceneConfig.pixelShaderDirectory =
-        std::filesystem::absolute("./build/hlsl/pixel").string();
-    Scene scene = Scene(&sceneConfig);
+    config.initSceneConfig(&graphicsManager, &shaderManager);
+    Scene scene = Scene(&config.sceneConfig);
 
     Camera camera = Camera();
     scene.camera = &camera;
 
     ShaderStack sceneShaderStack = ShaderStack();
-
-    sceneShaderStack.shaders.push_back(&standardVertexShader);
-    sceneShaderStack.shaders.push_back(&lightingPixelShader);
+    sceneShaderStack.shaders = &config.shaderManagerConfig.shaders;
 
     TriangleMesh triangleMesh = TriangleMesh(&graphicsManager);
     SphereMesh sphereMesh = SphereMesh(&graphicsManager);
