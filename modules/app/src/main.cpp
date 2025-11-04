@@ -4,6 +4,7 @@
 #include <core_window/window.h>
 #include <core_graphics/d3d/d3d.h>
 
+#include "config/config.h"
 #include "scene/scene.h"
 #include "app/app.h"
 
@@ -12,15 +13,11 @@ int main()
     spdlog::set_level(spdlog::level::debug);
 
     spdlog::info("Starting app");
+    Config config = Config();
 
     // Window
-    // TODO - initialise these as pointers?
-    // TODO - move this to config file
-    WindowSpec windowSpec;
-    windowSpec.height = 720;
-    windowSpec.width = 1280;
-    windowSpec.windowName = "Graphics Project";
-    Window window = Window(windowSpec);
+    config.initWindowConfig();
+    Window window = Window(&(config.windowConfig));
 
     // D3D app
     // TODO - give this proper constructor

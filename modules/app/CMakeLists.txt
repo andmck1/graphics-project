@@ -1,6 +1,7 @@
 add_executable(
   ${PROJECT_NAME}
   src/main.cpp
+  src/config/config.cpp
   src/scene/scene.cpp
   src/app/app.cpp
   src/buffer/pointLightBuffer.h

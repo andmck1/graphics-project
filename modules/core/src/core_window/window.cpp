@@ -9,10 +9,11 @@
 
 const float gMOUSE_MAX_DELTA = 100.f;
 
-Window::Window(WindowSpec spec)
+Window::Window(WindowConfig *config)
 {
-    this->spec = spec;
-    init();
+    this->config = config;
+    if(!init())
+        spdlog::error("Failed to create window");
 }
 
 bool Window::init()
@@ -32,7 +33,7 @@ bool Window::createWindow()
 {
     wc.lpfnWndProc = Window::onEvent;
     wc.hInstance = this->hInstance;
-    wc.lpszClassName = this->spec.windowName.c_str();
+    wc.lpszClassName = this->config->windowName.c_str();
     RegisterClass(&wc);
     this->msg.message = ~WM_QUIT;
 
@@ -40,13 +41,13 @@ bool Window::createWindow()
         MonitorFromPoint(POINT{0, 0}, MONITOR_DEFAULTTOPRIMARY)
     );
     RECT rect = {
-        0, 0, (int) (mainScale * this->spec.width),
-        (int) (mainScale * this->spec.height)
+        0, 0, (int) (mainScale * this->config->width),
+        (int) (mainScale * this->config->height)
     };
     AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
 
     this->hwnd = CreateWindowEx(
-        0, wc.lpszClassName, this->spec.windowName.c_str(), WS_OVERLAPPEDWINDOW,
+        0, wc.lpszClassName, this->config->windowName.c_str(), WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left,
         rect.bottom - rect.top, nullptr, nullptr, this->hInstance, nullptr
     );
@@ -60,7 +61,7 @@ void Window::destroyWindow()
 {
     spdlog::debug("Destroying window");
     DestroyWindow(this->hwnd);
-    UnregisterClassA(this->spec.windowName.c_str(), this->hInstance);
+    UnregisterClassA(this->config->windowName.c_str(), this->hInstance);
 }
 
 bool Window::exit()

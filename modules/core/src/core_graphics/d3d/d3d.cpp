@@ -12,8 +12,8 @@ bool D3D::createDeviceAndSwapChain()
     HRESULT createDeviceAndSwapChainHR;
     DXGI_SWAP_CHAIN_DESC scd = {};
     scd.BufferCount = 1;
-    scd.BufferDesc.Width = this->config->window->spec.width;
-    scd.BufferDesc.Height = this->config->window->spec.height;
+    scd.BufferDesc.Width = this->config->window->config->width;
+    scd.BufferDesc.Height = this->config->window->config->height;
     scd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     scd.OutputWindow = this->config->window->hwnd;
@@ -40,8 +40,8 @@ bool D3D::createDeviceAndSwapChain()
 
 bool D3D::initProjectionMatrix()
 {
-    float aspectRatio = static_cast<float>(this->config->window->spec.width) /
-                        static_cast<float>(this->config->window->spec.height);
+    float aspectRatio = static_cast<float>(this->config->window->config->width) /
+                        static_cast<float>(this->config->window->config->height);
     this->projectionMatrix =
         XMMatrixPerspectiveFovLH(XM_PIDIV4, aspectRatio, 0.1f, 100.0f);
 
@@ -97,9 +97,9 @@ bool D3D::setViewport()
     // TODO - move to a config file
     this->viewport.TopLeftX = 0;
     this->viewport.TopLeftY = 0;
-    this->viewport.Width = static_cast<FLOAT>(this->config->window->spec.width);
+    this->viewport.Width = static_cast<FLOAT>(this->config->window->config->width);
     this->viewport.Height =
-        static_cast<FLOAT>(this->config->window->spec.height);
+        static_cast<FLOAT>(this->config->window->config->height);
     this->viewport.MinDepth = 0.0f;
     this->viewport.MaxDepth = 1.0f;
 
@@ -205,8 +205,8 @@ bool D3D::setDepthBuffer()
     D3D11_TEXTURE2D_DESC depthBufferDesc;
     // Initialize the description of the depth buffer.
     ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
-    depthBufferDesc.Width = this->config->window->spec.width;
-    depthBufferDesc.Height = this->config->window->spec.height;
+    depthBufferDesc.Width = this->config->window->config->width;
+    depthBufferDesc.Height = this->config->window->config->height;
     depthBufferDesc.MipLevels = 1;
     depthBufferDesc.ArraySize = 1;
     depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
