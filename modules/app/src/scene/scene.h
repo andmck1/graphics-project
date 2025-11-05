@@ -15,9 +15,11 @@
 #include <core_graphics/mesh/quad.h>
 #include <core_graphics/mesh/plane.h>
 #include <core_graphics/mesh/ortho.h>
-
-#include "../buffer/pointLightBuffer.h"
 #include "core_graphics/mesh/base.h"
+#include "core_graphics/texture/texture.h"
+
+#include "../sampler/defaultSampler.h"
+#include "../buffer/pointLightBuffer.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -27,6 +29,8 @@ struct SceneMesh
     std::unique_ptr<BaseMesh> mesh;
     XMMATRIX worldMatrix;
     ShaderStack *shaderStack;
+    BaseTexture *texture;
+    std::unique_ptr<BaseSampler> sampler;
 };
 
 struct SceneState

@@ -48,13 +48,18 @@ void State::initShaderManagerState(D3D *graphicsManager)
 
 void State::initTextureManagerState(D3D *graphicsManager)
 {
-    static const uint32_t texturePixelColour = 0xffffffff;
-    std::unique_ptr<DefaultTexture> defaultTexture =
+    static const uint32_t texturePixelColour = 0x01234567;
+    this->textureManagerState.defaultTexture =
         std::make_unique<DefaultTexture>(graphicsManager, texturePixelColour);
-    this->textureManagerState.defaultTexture = std::move(defaultTexture);
+    this->textureManagerState.moonTexture = std::make_unique<FileTexture>(
+        graphicsManager, "./res/textures/moon_heightmap.jpg"
+    );
 }
 
-void State::initSceneState(D3D *graphicsManager, ShaderManager *shaderManager)
+void State::initSceneState(
+    D3D *graphicsManager, ShaderManager *shaderManager,
+    TextureManager *textureManager
+)
 {
     this->sceneState.graphicsManager = graphicsManager;
     this->sceneState.shaderManager = shaderManager;
@@ -63,37 +68,52 @@ void State::initSceneState(D3D *graphicsManager, ShaderManager *shaderManager)
     // shaders
     this->sceneState.shaderStack.shaders = &shaderManager->state->shaders;
 
-    // meshes
-    TriangleMesh triangleMesh = TriangleMesh(graphicsManager);
-    SphereMesh sphereMesh = SphereMesh(graphicsManager);
-    QuadMesh quadMesh = QuadMesh(graphicsManager);
-    PlaneMesh planeMesh = PlaneMesh(graphicsManager);
+    // sampler
+    DefaultSampler defaultSampler = DefaultSampler();
 
+    // meshes
+    // TODO - make this a templated function
+    // TODO - handle bool returns
+    TriangleMesh triangleMesh = TriangleMesh(graphicsManager);
     std::unique_ptr<SceneMesh> triangleSceneMesh =
         std::make_unique<SceneMesh>();
-    std::unique_ptr<SceneMesh> sphereSceneMesh = std::make_unique<SceneMesh>();
-    std::unique_ptr<SceneMesh> quadSceneMesh = std::make_unique<SceneMesh>();
-    std::unique_ptr<SceneMesh> planeSceneMesh = std::make_unique<SceneMesh>();
-
+    defaultSampler.init(graphicsManager);
     triangleSceneMesh->mesh = std::make_unique<TriangleMesh>(triangleMesh);
     triangleSceneMesh->worldMatrix = XMMatrixIdentity();
     triangleSceneMesh->shaderStack = &this->sceneState.shaderStack;
+    triangleSceneMesh->texture = textureManager->state->moonTexture.get();
+    triangleSceneMesh->sampler =
+        std::make_unique<DefaultSampler>(defaultSampler);
+    this->sceneState.meshes.push_back(std::move(triangleSceneMesh));
+
+    std::unique_ptr<SceneMesh> sphereSceneMesh = std::make_unique<SceneMesh>();
+    SphereMesh sphereMesh = SphereMesh(graphicsManager);
     sphereSceneMesh->mesh = std::make_unique<SphereMesh>(sphereMesh);
     sphereSceneMesh->worldMatrix =
         XMMatrixIdentity() * XMMatrixTranslation(-3.f, 0.f, 0.f);
     sphereSceneMesh->shaderStack = &this->sceneState.shaderStack;
+    sphereSceneMesh->texture = textureManager->state->defaultTexture.get();
+    sphereSceneMesh->sampler = std::make_unique<DefaultSampler>(defaultSampler);
+    this->sceneState.meshes.push_back(std::move(sphereSceneMesh));
+
+    std::unique_ptr<SceneMesh> quadSceneMesh = std::make_unique<SceneMesh>();
+    QuadMesh quadMesh = QuadMesh(graphicsManager);
     quadSceneMesh->mesh = std::make_unique<QuadMesh>(quadMesh);
     quadSceneMesh->worldMatrix =
         XMMatrixIdentity() * XMMatrixTranslation(3.f, 0.f, 0.f);
     quadSceneMesh->shaderStack = &this->sceneState.shaderStack;
+    quadSceneMesh->texture = textureManager->state->defaultTexture.get();
+    quadSceneMesh->sampler = std::make_unique<DefaultSampler>(defaultSampler);
+    this->sceneState.meshes.push_back(std::move(quadSceneMesh));
+
+    std::unique_ptr<SceneMesh> planeSceneMesh = std::make_unique<SceneMesh>();
+    PlaneMesh planeMesh = PlaneMesh(graphicsManager);
     planeSceneMesh->mesh = std::make_unique<PlaneMesh>(planeMesh);
     planeSceneMesh->worldMatrix = XMMatrixIdentity() * XMMatrixRotationX(-45) *
                                   XMMatrixTranslation(0.f, -3.f, 0.f);
     planeSceneMesh->shaderStack = &this->sceneState.shaderStack;
-
-    this->sceneState.meshes.push_back(std::move(triangleSceneMesh));
-    this->sceneState.meshes.push_back(std::move(sphereSceneMesh));
-    this->sceneState.meshes.push_back(std::move(quadSceneMesh));
+    planeSceneMesh->texture = textureManager->state->defaultTexture.get();
+    planeSceneMesh->sampler = std::make_unique<DefaultSampler>(defaultSampler);
     this->sceneState.meshes.push_back(std::move(planeSceneMesh));
 
     // lights

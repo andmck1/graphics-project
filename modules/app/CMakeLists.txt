@@ -7,15 +7,18 @@ add_executable(
   src/scene/debugScene.cpp
   src/input/input.cpp
   src/app/app.cpp
-  src/buffer/pointLightBuffer.h
-  src/buffer/pointLightBuffer.cpp)
+  src/buffer/pointLightBuffer.cpp
+  src/sampler/defaultSampler.cpp
+  )
 
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR}
                                         ${imgui_SOURCE_DIR}/backends)
+
 target_link_libraries(
   ${PROJECT_NAME}
   spdlog
   imgui
+  DirectXTK
   d3d11
   D3DCompiler
   core_window

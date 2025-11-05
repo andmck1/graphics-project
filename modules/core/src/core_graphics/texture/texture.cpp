@@ -1,6 +1,8 @@
 #include "texture.h"
 #include "core_utils/graphics.h"
+#include <filesystem>
 #include <spdlog/spdlog.h>
+#include "WICTextureLoader.h"
 
 DefaultTexture::DefaultTexture(
     D3D *graphicsManager, uint32_t texturePixelColour
@@ -27,6 +29,7 @@ bool DefaultTexture::loadTexture()
     texture2DDescription.Usage = D3D11_USAGE_IMMUTABLE;
     texture2DDescription.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 
+    spdlog::debug("Loading default texture");
     createTexture2DHR = this->graphicsManager->device->CreateTexture2D(
         &texture2DDescription, &texture2DInitalData,
         this->texture.GetAddressOf()
@@ -44,6 +47,7 @@ bool DefaultTexture::createResource()
     shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
+    spdlog::debug("Creating default texture resource");
     createShaderResourceViewHR =
         this->graphicsManager->device->CreateShaderResourceView(
             this->texture.Get(), &shaderResourceViewDesc,
@@ -60,5 +64,74 @@ bool DefaultTexture::load()
         return false;
     if (!this->createResource())
         return false;
+    return true;
+}
+
+bool DefaultTexture::setPixelShader(int startSlot, int numViews)
+{
+    this->graphicsManager->deviceContext->PSSetShaderResources(
+        startSlot, numViews, this->textureResource.GetAddressOf()
+    );
+
+    return true;
+}
+
+FileTexture::FileTexture(D3D *graphicsManager, std::string filepath)
+{
+    this->graphicsManager = graphicsManager;
+    this->filepath = std::filesystem::absolute(std::filesystem::path(filepath));
+}
+
+// Some help from lab here
+bool FileTexture::loadTexture()
+{
+    HRESULT createTexture2DHR;
+
+    spdlog::debug("Loading texture from file: " + filepath.string());
+
+    createTexture2DHR = CreateWICTextureFromFile(
+        this->graphicsManager->device.Get(),
+        this->graphicsManager->deviceContext.Get(), filepath.wstring().c_str(),
+        NULL, this->textureResource.GetAddressOf(), 0
+    );
+
+    return TryDXCall(createTexture2DHR, "Failed to create texture");
+}
+
+bool FileTexture::createResource()
+{
+    HRESULT createShaderResourceViewHR;
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
+    shaderResourceViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    shaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+    spdlog::debug("Creating default texture resource");
+    createShaderResourceViewHR =
+        this->graphicsManager->device->CreateShaderResourceView(
+            this->texture.Get(), &shaderResourceViewDesc,
+            this->textureResource.GetAddressOf()
+        );
+    return TryDXCall(
+        createShaderResourceViewHR, "Failed to create texture resource"
+    );
+}
+
+bool FileTexture::load()
+{
+    if (!this->loadTexture())
+        return false;
+    if (!this->createResource())
+        return false;
+    return true;
+}
+
+bool FileTexture::setPixelShader(int startSlot, int numViews)
+{
+    this->graphicsManager->deviceContext->PSSetShaderResources(
+        startSlot, numViews, this->textureResource.GetAddressOf()
+    );
+
     return true;
 }

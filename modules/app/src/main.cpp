@@ -39,7 +39,7 @@ int main()
 
     // Scene
     spdlog::info("Creating scene");
-    state.initSceneState(&graphicsManager, &shaderManager);
+    state.initSceneState(&graphicsManager, &shaderManager, &textureManager);
     Scene scene = Scene(&state.sceneState);
 
     // App

@@ -30,6 +30,12 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
     if (!this->state->pointLightBuffer->setPixelShader())
         return false;
 
+    if (!sceneMesh->texture->setPixelShader(0, 1))
+        return false;
+
+    if (!sceneMesh->sampler->setPixelShader(this->state->graphicsManager))
+        return false;
+
     for (std::unique_ptr<BaseShader> &shaderPtr :
          *sceneMesh->shaderStack->shaders)
     {
@@ -109,9 +115,7 @@ bool Scene::drawScreen()
 
 bool Scene::render()
 {
-    this->state->graphicsManager->clearScreen(
-        this->state->clearColour.data()
-    );
+    this->state->graphicsManager->clearScreen(this->state->clearColour.data());
     if (!this->drawScreen())
     {
         return false;

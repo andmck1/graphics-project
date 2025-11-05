@@ -10,7 +10,7 @@ TextureManager::TextureManager(TextureManagerState *state)
 bool TextureManager::loadAll()
 {
     spdlog::info("Loading all textures");
-    if (!this->state->defaultTexture)
+    if (!this->state->defaultTexture->load())
         return false;
 
     return true;

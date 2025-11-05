@@ -25,7 +25,10 @@ class State
     void initD3DAppState(Window *window);
     void initShaderManagerState(D3D *graphicsManager);
     void initTextureManagerState(D3D *graphicsManager);
-    void initSceneState(D3D *graphicsManager, ShaderManager *shaderManager);
+    void initSceneState(
+        D3D *graphicsManager, ShaderManager *shaderManager,
+        TextureManager *textureManager
+    );
     void initAppInputState(Window *window, Scene *scene);
     void initAppState(AppInput *appInput);
     void initDebugSceneState(D3D *graphicsManager, float *fps);

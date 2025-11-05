@@ -4,7 +4,6 @@
 #include <core_graphics/buffer/buffer.h>
 #include <core_graphics/light/point.h>
 
-#include <memory>
 #include <shared_shader/buffer.h>
 
 class PointLightBuffer : Buffer

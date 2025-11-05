@@ -1,0 +1,28 @@
+{
+    "rdocCaptureSettings": 1,
+    "settings": {
+        "autoStart": false,
+        "commandLine": "",
+        "environment": [
+        ],
+        "executable": "C:\\Users\\alast\\dev\\uni-cgt\\cmp502-programming-for-games\\cmp502-graphics-project\\build\\bin\\GraphicsProject.exe",
+        "inject": false,
+        "numQueuedFrames": 0,
+        "options": {
+            "allowFullscreen": true,
+            "allowVSync": true,
+            "apiValidation": false,
+            "captureAllCmdLists": false,
+            "captureCallstacks": false,
+            "captureCallstacksOnlyDraws": false,
+            "debugOutputMute": true,
+            "delayForDebugger": 0,
+            "hookIntoChildren": false,
+            "refAllResources": false,
+            "softMemoryLimit": 0,
+            "verifyBufferAccess": false
+        },
+        "queuedFrameCap": 0,
+        "workingDir": "C:/Users/alast/dev/uni-cgt/cmp502-programming-for-games/cmp502-graphics-project"
+    }
+}

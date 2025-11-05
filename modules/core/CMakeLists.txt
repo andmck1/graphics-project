@@ -10,6 +10,7 @@ add_library(core_utils STATIC src/core_utils/timer.cpp)
 target_link_libraries(core_utils PRIVATE spdlog imgui)
 target_include_directories(core_utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
+
 add_library(
   core_graphics STATIC
   src/core_graphics/d3d/d3d.cpp
@@ -24,8 +25,8 @@ add_library(
   src/core_graphics/mesh/ortho.cpp
   src/core_graphics/camera/camera.cpp
   )
-target_link_libraries(core_graphics PRIVATE spdlog imgui)
-target_include_directories(core_graphics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+  target_link_libraries(core_graphics PRIVATE spdlog imgui directxtk)
+  target_include_directories(core_graphics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${DirectXTK_SOURCE_DIR}/Inc)
 
 target_include_directories(
   imgui PUBLIC ${CMAKE_CURRENT_LIST_DIR}/imgui
