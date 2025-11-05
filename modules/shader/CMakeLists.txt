@@ -1,5 +1,7 @@
-add_library(shared_shader STATIC src/shared_shader/buffer.cpp
-                                 src/shared_shader/buffer.h)
+add_library(shared_shader STATIC src/shared_shader/lightingBuffer.cpp
+                                 src/shared_shader/lightingBuffer.h
+                                src/shared_shader/standardVertexBuffer.cpp
+                            src/shared_shader/standardVertexBuffer.h)
 target_link_libraries(shared_shader d3d11 D3DCompiler)
 target_include_directories(shared_shader PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 

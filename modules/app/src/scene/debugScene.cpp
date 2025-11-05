@@ -42,9 +42,61 @@ bool DebugScene::render()
 
     ImGui::Begin("Draggable Window");
     ImGui::Text("FPS: %.2f", *(this->state->fps));
-    ImGui::SliderFloat3(
-        "Ambient Light Colour", this->state->ambientLightColour, 0.f, 1.f
-    );
+    ImGui::Checkbox("Show Light Meshes?", this->state->isLightMeshesEnabled);
+    if (ImGui::CollapsingHeader("Ambient Light Settings"))
+    {
+        ImGui::ColorPicker3(
+            "Colour", this->state->ambientLightColour,
+            ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
+
+        );
+        ImGui::Checkbox("Ambient Enabled?", this->state->isAmbientLightEnabled);
+    }
+    if (ImGui::CollapsingHeader("Point Light Settings"))
+    {
+        ImGui::ColorPicker3(
+            "Diffuse", this->state->pointLightDiffuseColour,
+            ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
+
+        );
+        ImGui::ColorPicker3(
+            "Specular", this->state->pointLightSpecularColour,
+            ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
+
+        );
+        ImGui::SliderFloat(
+            "Specular Power", this->state->pointLightSpecularPower, 0.01f, 50.f,
+            "%.3f", false
+        );
+        ImGui::SliderFloat3(
+            "World Position", this->state->pointLightWorldPosition, -1000.f,
+            1000.f
+        );
+        ImGui::SliderFloat(
+            "Attenuation Coefficient C0",
+            &this->state->pointLightAttenuationCoefficients[0], 0.1f, 1.f,
+            "%.3f", false
+        );
+        ImGui::SliderFloat(
+            "Attenuation Coefficient C1",
+            &this->state->pointLightAttenuationCoefficients[1], 0.0001f, 0.001f,
+            "%.5f", true
+        );
+        ImGui::SliderFloat(
+            "Attenuation Coefficient C2",
+            &this->state->pointLightAttenuationCoefficients[2], 0.00001f,
+            0.0001f, "%.6f", true
+        );
+        ImGui::Checkbox(
+            "Diffuse Enabled?", this->state->isPointLightDiffuseEnabled
+        );
+        ImGui::Checkbox(
+            "Specular Enabled?", this->state->isPointLightSpecularEnabled
+        );
+        ImGui::Checkbox(
+            "Attenuation Enabled?", this->state->isPointLightAttenuationEnabled
+        );
+    }
     ImGui::End();
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

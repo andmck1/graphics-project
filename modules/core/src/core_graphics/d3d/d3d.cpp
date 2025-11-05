@@ -297,7 +297,10 @@ bool D3D::init()
     return true;
 }
 
-bool D3D::updateMatrixBuffer(XMMATRIX worldMatrix, XMMATRIX viewMatrix)
+bool D3D::updateMatrixBuffer(
+    XMMATRIX worldMatrix, XMMATRIX viewMatrix, int bufferSlot,
+    int numberOfBuffers
+)
 {
     HRESULT mapHR;
     D3D11_MAPPED_SUBRESOURCE mappedResource;

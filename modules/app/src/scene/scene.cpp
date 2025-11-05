@@ -23,11 +23,17 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
     );
 
     if (!this->state->graphicsManager->updateMatrixBuffer(
-            sceneMesh->worldMatrix, this->state->camera.viewMatrix
+            sceneMesh->worldMatrix, this->state->camera.viewMatrix, 0, 1
         ))
         return false;
 
-    if (!this->state->ambientLightBuffer->setPixelShader())
+    if (!this->state->cameraBuffer->setVertexShader(1, 1))
+        return false;
+
+    if (!this->state->ambientLightBuffer->setPixelShader(0, 1))
+        return false;
+
+    if (!this->state->pointLightBuffer->setPixelShader(1, 1))
         return false;
 
     if (!sceneMesh->texture->setPixelShader(0, 1))

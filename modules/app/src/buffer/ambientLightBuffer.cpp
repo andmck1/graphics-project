@@ -20,7 +20,7 @@ bool AmbientLightBuffer::init(D3D *graphicsManager)
     return true;
 }
 
-bool AmbientLightBuffer::setPixelShader()
+bool AmbientLightBuffer::setPixelShader(int bufferSlot, int numberOfBuffers)
 {
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     AmbientLightBuffer::ShaderBuffer *bufferData;
@@ -32,15 +32,17 @@ bool AmbientLightBuffer::setPixelShader()
     if (!TryDXCall(mapHR, "Ambient light buffer pixel shader map failed.\n"))
         return false;
     bufferData = (AmbientLightBuffer::ShaderBuffer *) mappedResource.pData;
-    bufferData->type = XMINT4{LightShader::LIGHT_TYPE_AMBIENT, 0, 0, 0};
+    bufferData->type = XMINT4{LightingShader::LIGHT_TYPE_AMBIENT, 0, 0, 0};
     bufferData->colour = XMFLOAT4(
-        ambientLight->colour[0], ambientLight->colour[1],
-        ambientLight->colour[2], 0.f 
+        this->ambientLight->colour[0], ambientLight->colour[1],
+        this->ambientLight->colour[2], 0.f
     );
+    bufferData->isEnabled=
+        XMINT4((int) *this->ambientLight->isEnabled, 0, 0, 0);
 
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->PSSetConstantBuffers(
-        0, 1, this->buffer.GetAddressOf()
+        bufferSlot, numberOfBuffers, this->buffer.GetAddressOf()
     );
     return true;
 }

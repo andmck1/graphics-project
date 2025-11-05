@@ -4,16 +4,16 @@
 #include <core_graphics/buffer/buffer.h>
 #include <core_graphics/light/ambient.h>
 
-#include <shared_shader/buffer.h>
+#include <shared_shader/lightingBuffer.h>
 
-class AmbientLightBuffer : public Buffer
+class AmbientLightBuffer : public PixelBuffer 
 {
     public:
     bool init(D3D *graphicsManager) override;
-    bool setPixelShader() override;
+    bool setPixelShader(int bufferSlot, int numberOfBuffers) override;
 
     AmbientLight *ambientLight;
-    struct ShaderBuffer : LightShader::AmbientLightBuffer
+    struct ShaderBuffer : LightingShader::AmbientLightBuffer
     {
     };
 };

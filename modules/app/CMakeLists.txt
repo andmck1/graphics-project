@@ -9,6 +9,7 @@ add_executable(
   src/app/app.cpp
   src/buffer/ambientLightBuffer.cpp
   src/buffer/pointLightBuffer.cpp
+  src/buffer/cameraBuffer.cpp
   src/sampler/defaultSampler.cpp
   )
 

@@ -20,6 +20,7 @@
 #include "core_graphics/texture/texture.h"
 
 #include "../sampler/defaultSampler.h"
+#include "../buffer/cameraBuffer.h"
 #include "../buffer/ambientLightBuffer.h"
 #include "../buffer/pointLightBuffer.h"
 
@@ -47,7 +48,13 @@ struct SceneState
     ShaderStack shaderStack;
     std::vector<std::unique_ptr<SceneMesh>> meshes;
     std::unique_ptr<AmbientLight> ambientLight;
+    std::unique_ptr<PointLight> pointLight;
+
+    // buffers
+    std::unique_ptr<CameraBuffer> cameraBuffer;
+    std::unique_ptr<PointLightBuffer> pointLightBuffer;
     std::unique_ptr<AmbientLightBuffer> ambientLightBuffer;
+
 };
 
 class Scene

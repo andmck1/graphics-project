@@ -20,7 +20,7 @@ bool PointLightBuffer::init(D3D *graphicsManager)
     return true;
 }
 
-bool PointLightBuffer::setPixelShader()
+bool PointLightBuffer::setPixelShader(int bufferSlot, int numberOfBuffers)
 {
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     PointLightBuffer::ShaderBuffer *bufferData;
@@ -32,15 +32,36 @@ bool PointLightBuffer::setPixelShader()
     if (!TryDXCall(mapHR, "Point light buffer pixel shader map failed.\n"))
         return false;
     bufferData = (PointLightBuffer::ShaderBuffer *) mappedResource.pData;
-    bufferData->type = LightShader::LIGHT_TYPE_POINT;
-    bufferData->diffuseColour = pointLight->colour;
-    bufferData->specularColour = pointLight->colour;
-    bufferData->worldPosition = pointLight->worldPosition;
-    bufferData->attenuationCoefficients = {0.1f, 0.01f, 0.001f, 0.f};
+    bufferData->type = XMINT4{LightingShader::LIGHT_TYPE_POINT, 0, 0, 0};
+    bufferData->diffuseColour = XMFLOAT4(
+        this->pointLight->diffuseColour[0], pointLight->diffuseColour[1],
+        this->pointLight->diffuseColour[2], 0.f
+    );
+    bufferData->specularColour = XMFLOAT4(
+        this->pointLight->specularColour[0], pointLight->specularColour[1],
+        this->pointLight->specularColour[2], 0.f
+    );
+    bufferData->specularPower =
+        XMFLOAT4(*this->pointLight->specularPower, 0.f, 0.f, 0.f);
+    bufferData->worldPosition = XMFLOAT4(
+        this->pointLight->worldPosition[0], pointLight->worldPosition[1],
+        this->pointLight->worldPosition[2], 0.f
+    );
+    bufferData->attenuationCoefficients = XMFLOAT4(
+        this->pointLight->attenuationCoefficients[0],
+        this->pointLight->attenuationCoefficients[1],
+        this->pointLight->attenuationCoefficients[2], 0.f
+    );
+    bufferData->isDiffuseEnabled =
+        XMINT4((int) *this->pointLight->isDiffuseEnabled, 0, 0, 0);
+    bufferData->isSpecularEnabled =
+        XMINT4((int) *this->pointLight->isSpecularEnabled, 0, 0, 0);
+    bufferData->isAttenuationEnabled =
+        XMINT4((int) *this->pointLight->isAttenuationEnabled, 0, 0, 0);
 
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->PSSetConstantBuffers(
-        0, 1, this->buffer.GetAddressOf()
+        bufferSlot, numberOfBuffers, this->buffer.GetAddressOf()
     );
     return true;
 }

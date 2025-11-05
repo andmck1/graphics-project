@@ -1,7 +1,7 @@
 // https://stackoverflow.com/questions/34886497/how-to-share-a-struct-between-c-directx-and-hlsl
-#pragma once
 
 #ifdef __cplusplus
+#pragma once
 #define SEMANTIC(sem)
 #else
 #define SEMANTIC(sem) : sem
@@ -13,7 +13,7 @@ using namespace DirectX;
 using float4 = XMFLOAT4;
 using int4 = XMINT4;
 
-namespace LightShader
+namespace LightingShader
 {
 #endif
     static const int LIGHT_TYPE_AMBIENT = 0;
@@ -23,22 +23,27 @@ namespace LightShader
 
     struct AmbientLightBuffer
     {
-        int4 type; 
+        int4 type;
         float4 colour;
+        int4 isEnabled;
     };
 
     struct PointLightBuffer
     {
-        int type;
+        int4 type;
         float4 worldPosition;
         float4 diffuseColour;
         float4 specularColour;
+        float4 specularPower;
         float4 attenuationCoefficients;
+        int4 isDiffuseEnabled;
+        int4 isSpecularEnabled;
+        int4 isAttenuationEnabled;
     };
 
     struct DirectionalLightBuffer
     {
-        int type;
+        int4 type;
         float4 worldPosition;
         float4 diffuseColour;
         float4 specularColour;

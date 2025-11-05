@@ -6,7 +6,20 @@ struct DebugSceneState
 {
     D3D *graphicsManager;
     float *fps;
+
+    bool *isLightMeshesEnabled;
+
+    bool *isAmbientLightEnabled;
     float *ambientLightColour;
+
+    float *pointLightDiffuseColour;
+    float *pointLightSpecularColour;
+    float *pointLightSpecularPower;
+    float *pointLightWorldPosition;
+    float *pointLightAttenuationCoefficients;
+    bool *isPointLightDiffuseEnabled;
+    bool *isPointLightSpecularEnabled;
+    bool *isPointLightAttenuationEnabled;
 };
 
 class DebugScene

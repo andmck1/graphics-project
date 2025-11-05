@@ -4,16 +4,16 @@
 #include <core_graphics/buffer/buffer.h>
 #include <core_graphics/light/point.h>
 
-#include <shared_shader/buffer.h>
+#include <shared_shader/lightingBuffer.h>
 
-class PointLightBuffer : public Buffer
+class PointLightBuffer : public PixelBuffer 
 {
     public:
     bool init(D3D *graphicsManager) override;
-    bool setPixelShader() override;
+    bool setPixelShader(int bufferSlot, int numberOfBuffers) override;
 
     PointLight *pointLight;
-    struct ShaderBuffer : LightShader::PointLightBuffer
+    struct ShaderBuffer : LightingShader::PointLightBuffer
     {
     };
 };
