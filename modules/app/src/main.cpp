@@ -51,7 +51,6 @@ int main()
 
     // Debug Scene
     spdlog::info("Creating debug scene");
-    bool temp = true;
     state.initDebugSceneState(
         &graphicsManager, &app.timer.fps,
         scene.state->ambientLight->colour.get(),
@@ -63,8 +62,7 @@ int main()
         scene.state->ambientLight->isEnabled.get(),
         scene.state->pointLight->isDiffuseEnabled.get(),
         scene.state->pointLight->isSpecularEnabled.get(),
-        scene.state->pointLight->isAttenuationEnabled.get(),
-        &temp
+        scene.state->pointLight->isAttenuationEnabled.get()
     );
     DebugScene debugScene = DebugScene(&state.debugSceneState);
 

@@ -37,6 +37,6 @@ class State
         float *pointLightSpecularPower, float *pointLightWorldPosition,
         float *pointLightAttenuationCoefficients, bool *isAmbientLightEnabled,
         bool *isPointLightDiffuseEnabled, bool *isPointLightSpecularEnabled,
-        bool *isPointLightAttenuationEnabled, bool *isLightMeshesEnabled
+        bool *isPointLightAttenuationEnabled
     );
 };

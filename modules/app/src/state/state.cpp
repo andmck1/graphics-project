@@ -203,7 +203,7 @@ void State::initDebugSceneState(
     float *pointLightSpecularPower, float *pointLightWorldPosition,
     float *pointLightAttenuationCoefficients, bool *isAmbientLightEnabled,
     bool *isPointLightDiffuseEnabled, bool *isPointLightSpecularEnabled,
-    bool *isPointLightAttenuationEnabled, bool *isLightMeshesEnabled
+    bool *isPointLightAttenuationEnabled
 )
 {
     this->debugSceneState.graphicsManager = graphicsManager;
@@ -222,5 +222,4 @@ void State::initDebugSceneState(
         isPointLightSpecularEnabled;
     this->debugSceneState.isPointLightAttenuationEnabled =
         isPointLightAttenuationEnabled;
-    this->debugSceneState.isLightMeshesEnabled = isLightMeshesEnabled;
 }

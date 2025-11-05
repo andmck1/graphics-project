@@ -7,8 +7,6 @@ struct DebugSceneState
     D3D *graphicsManager;
     float *fps;
 
-    bool *isLightMeshesEnabled;
-
     bool *isAmbientLightEnabled;
     float *ambientLightColour;
 

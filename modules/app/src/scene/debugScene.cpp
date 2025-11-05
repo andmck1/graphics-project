@@ -42,7 +42,6 @@ bool DebugScene::render()
 
     ImGui::Begin("Draggable Window");
     ImGui::Text("FPS: %.2f", *(this->state->fps));
-    ImGui::Checkbox("Show Light Meshes?", this->state->isLightMeshesEnabled);
     if (ImGui::CollapsingHeader("Ambient Light Settings"))
     {
         ImGui::ColorPicker3(
