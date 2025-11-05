@@ -2,9 +2,9 @@
 #include <core_utils/graphics.h>
 #include "d3d.h"
 
-D3D::D3D(D3DAppConfig *config)
+D3D::D3D(D3DAppState *state)
 {
-    this->config = config;
+    this->state = state;
 }
 
 bool D3D::createDeviceAndSwapChain()
@@ -12,11 +12,11 @@ bool D3D::createDeviceAndSwapChain()
     HRESULT createDeviceAndSwapChainHR;
     DXGI_SWAP_CHAIN_DESC scd = {};
     scd.BufferCount = 1;
-    scd.BufferDesc.Width = this->config->window->config->width;
-    scd.BufferDesc.Height = this->config->window->config->height;
+    scd.BufferDesc.Width = this->state->window->state->width;
+    scd.BufferDesc.Height = this->state->window->state->height;
     scd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    scd.OutputWindow = this->config->window->hwnd;
+    scd.OutputWindow = this->state->window->hwnd;
     scd.SampleDesc.Count = 1;
     scd.Windowed = TRUE;
     scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
@@ -40,8 +40,8 @@ bool D3D::createDeviceAndSwapChain()
 
 bool D3D::initProjectionMatrix()
 {
-    float aspectRatio = static_cast<float>(this->config->window->config->width) /
-                        static_cast<float>(this->config->window->config->height);
+    float aspectRatio = static_cast<float>(this->state->window->state->width) /
+                        static_cast<float>(this->state->window->state->height);
     this->projectionMatrix =
         XMMatrixPerspectiveFovLH(XM_PIDIV4, aspectRatio, 0.1f, 100.0f);
 
@@ -97,9 +97,10 @@ bool D3D::setViewport()
     // TODO - move to a config file
     this->viewport.TopLeftX = 0;
     this->viewport.TopLeftY = 0;
-    this->viewport.Width = static_cast<FLOAT>(this->config->window->config->width);
+    this->viewport.Width =
+        static_cast<FLOAT>(this->state->window->state->width);
     this->viewport.Height =
-        static_cast<FLOAT>(this->config->window->config->height);
+        static_cast<FLOAT>(this->state->window->state->height);
     this->viewport.MinDepth = 0.0f;
     this->viewport.MaxDepth = 1.0f;
 
@@ -205,8 +206,8 @@ bool D3D::setDepthBuffer()
     D3D11_TEXTURE2D_DESC depthBufferDesc;
     // Initialize the description of the depth buffer.
     ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
-    depthBufferDesc.Width = this->config->window->config->width;
-    depthBufferDesc.Height = this->config->window->config->height;
+    depthBufferDesc.Width = this->state->window->state->width;
+    depthBufferDesc.Height = this->state->window->state->height;
     depthBufferDesc.MipLevels = 1;
     depthBufferDesc.ArraySize = 1;
     depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;

@@ -4,7 +4,7 @@
 #include <core_window/window.h>
 #include <core_graphics/d3d/d3d.h>
 
-#include "config/config.h"
+#include "state/state.h"
 #include "scene/scene.h"
 #include "app/app.h"
 
@@ -13,50 +13,49 @@ int main()
     spdlog::set_level(spdlog::level::debug);
 
     spdlog::info("Starting app");
-    Config config = Config();
+    State state = State();
 
     // Window
     spdlog::info("Creating window");
-    config.initWindowConfig();
-    Window window = Window(&config.windowConfig);
+    state.initWindowState();
+    Window window = Window(&state.windowState);
 
     // D3D app
-    config.initD3DAppConfig(&window);
+    state.initD3DAppState(&window);
     spdlog::info("Creating d3d app");
-    D3D graphicsManager = D3D(&config.d3dAppConfig);
+    D3D graphicsManager = D3D(&state.d3dAppState);
     graphicsManager.init();
 
     // Shader manager
     spdlog::info("Creating shaders");
-    config.initShaderManagerConfig(&graphicsManager);
-    ShaderManager shaderManager = ShaderManager(&config.shaderManagerConfig);
+    state.initShaderManagerState(&graphicsManager);
+    ShaderManager shaderManager = ShaderManager(&state.shaderManagerState);
 
     // Scene
     spdlog::info("Creating scene");
-    config.initSceneConfig(&graphicsManager, &shaderManager);
-    Scene scene = Scene(&config.sceneConfig);
+    state.initSceneState(&graphicsManager, &shaderManager);
+    Scene scene = Scene(&state.sceneState);
 
     // App
     spdlog::info("Creating app");
-    config.initAppInputConfig(&window, &scene);
-    AppInput appInput = AppInput(&config.appInputConfig);
-    config.initAppConfig(&appInput);
-    App app = App(&config.appConfig);
+    state.initAppInputState(&window, &scene);
+    AppInput appInput = AppInput(&state.appInputState);
+    state.initAppState(&appInput);
+    App app = App(&state.appState);
 
     // Debug Scene
     spdlog::info("Creating debug scene");
-    config.initDebugSceneConfig(&graphicsManager, &app.timer.fps);
-    DebugScene debugScene = DebugScene(&config.debugSceneConfig);
+    state.initDebugSceneState(&graphicsManager, &app.timer.fps);
+    DebugScene debugScene = DebugScene(&state.debugSceneState);
 
     // Main loop
-    const float clearColour[4] = {0.392f, 0.584f, 0.929f, 1.0f};
+    spdlog::info("Running app");
     app.timer.start();
     while (window.frame())
     {
         app.timer.frame();
-        app.config->appInput->handleInputs(app.timer.deltaTime);
-        scene.camera->update();
-        graphicsManager.clearScreen(clearColour);
+        app.state->appInput->handleInputs(app.timer.deltaTime);
+        scene.state->camera.update();
         scene.render();
         debugScene.render();
         graphicsManager.presentScreen();

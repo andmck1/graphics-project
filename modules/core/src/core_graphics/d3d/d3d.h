@@ -9,7 +9,7 @@
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
-struct D3DAppConfig
+struct D3DAppState
 {
     Window *window = nullptr;
 };
@@ -17,7 +17,7 @@ struct D3DAppConfig
 class D3D
 {
     public:
-    D3DAppConfig *config;
+    D3DAppState *state;
     ComPtr<ID3D11Device> device;
     ComPtr<ID3D11DeviceContext> deviceContext;
     ComPtr<IDXGISwapChain> swapChain;
@@ -32,7 +32,7 @@ class D3D
     ComPtr<ID3D11DepthStencilState> depthStencilState;
     ComPtr<ID3D11DepthStencilView> depthStencilView;
 
-    D3D(D3DAppConfig *config);
+    D3D(D3DAppState *state);
 
     bool init();
     ComPtr<ID3D11VertexShader> createVertexShader(ComPtr<ID3DBlob> shaderBlob);

@@ -7,7 +7,7 @@
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-struct WindowConfig
+struct WindowState
 {
     int height;
     int width;
@@ -24,9 +24,9 @@ struct WindowEvent
 class Window
 {
     public:
-    Window(WindowConfig *config);
+    Window(WindowState *state);
 
-    WindowConfig *config;
+    WindowState *state;
     HWND hwnd = nullptr;
     HINSTANCE hInstance;
     Input::Mouse mouse = Input::Mouse();

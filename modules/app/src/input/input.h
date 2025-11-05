@@ -3,7 +3,7 @@
 #include "core_window/window.h"
 #include "../scene/scene.h"
 
-struct AppInputConfig
+struct AppInputState
 {
     Window *window;
     Scene *scene;
@@ -14,9 +14,9 @@ struct AppInputConfig
 class AppInput
 {
     public:
-    AppInput(AppInputConfig *config);
+    AppInput(AppInputState *state);
     void handleInputs(float deltaTime);
 
     private:
-    AppInputConfig *config;
+    AppInputState *state;
 };

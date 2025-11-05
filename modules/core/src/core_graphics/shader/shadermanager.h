@@ -4,7 +4,7 @@
 
 #include <memory>
 
-struct ShaderManagerConfig
+struct ShaderManagerState
 {
     D3D *graphicsManager;
     std::string vertexShaderDirectory;
@@ -15,8 +15,8 @@ struct ShaderManagerConfig
 class ShaderManager
 {
     public:
-    ShaderManager(ShaderManagerConfig *config);
-    ShaderManagerConfig *config;
+    ShaderManager(ShaderManagerState *state);
+    ShaderManagerState *state;
 
     private:
 

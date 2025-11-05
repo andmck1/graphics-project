@@ -2,7 +2,7 @@
 
 #include <core_graphics/d3d/d3d.h>
 
-struct DebugSceneConfig
+struct DebugSceneState
 {
     D3D *graphicsManager;
     float *fps;
@@ -11,10 +11,10 @@ struct DebugSceneConfig
 class DebugScene
 {
     public:
-    DebugScene(DebugSceneConfig *config);
+    DebugScene(DebugSceneState *state);
     ~DebugScene();
     bool render();
 
     private:
-    DebugSceneConfig *config;
+    DebugSceneState *state;
 };

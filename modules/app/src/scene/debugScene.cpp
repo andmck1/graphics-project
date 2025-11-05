@@ -4,9 +4,9 @@
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
 
-DebugScene::DebugScene(DebugSceneConfig *config)
+DebugScene::DebugScene(DebugSceneState *state)
 {
-    this->config = config;
+    this->state = state;
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -18,15 +18,15 @@ DebugScene::DebugScene(DebugSceneConfig *config)
 
     ImGuiStyle &style = ImGui::GetStyle();
     style.ScaleAllSizes(
-        this->config->graphicsManager->config->window->mainScale
+        this->state->graphicsManager->state->window->mainScale
     );
     style.FontScaleDpi =
-        this->config->graphicsManager->config->window->mainScale;
+        this->state->graphicsManager->state->window->mainScale;
 
-    ImGui_ImplWin32_Init(this->config->graphicsManager->config->window->hwnd);
+    ImGui_ImplWin32_Init(this->state->graphicsManager->state->window->hwnd);
     ImGui_ImplDX11_Init(
-        this->config->graphicsManager->device.Get(),
-        this->config->graphicsManager->deviceContext.Get()
+        this->state->graphicsManager->device.Get(),
+        this->state->graphicsManager->deviceContext.Get()
     );
 }
 
@@ -44,7 +44,7 @@ bool DebugScene::render()
     ImGui::NewFrame();
 
     ImGui::Begin("Draggable Window");
-    ImGui::Text("FPS: %.2f", *(this->config->fps));
+    ImGui::Text("FPS: %.2f", *(this->state->fps));
     ImGui::End();
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

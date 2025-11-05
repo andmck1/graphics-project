@@ -5,7 +5,7 @@
 
 #include "../input/input.h"
 
-struct AppConfig
+struct AppState
 {
     AppInput *appInput;
 };
@@ -13,8 +13,8 @@ struct AppConfig
 class App
 {
     public:
-    AppConfig *config;
-    App(AppConfig *config);
+    AppState *state;
+    App(AppState *state);
 
     Timer timer = Timer();
 };

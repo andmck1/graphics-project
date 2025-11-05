@@ -3,6 +3,7 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include <directxmath.h>
+#include <array>
 
 #include <core_graphics/d3d/d3d.h>
 #include <core_graphics/shader/shader.h>
@@ -28,35 +29,28 @@ struct SceneMesh
     ShaderStack *shaderStack;
 };
 
-struct SceneConfig
+struct SceneState
 {
     D3D *graphicsManager;
     ShaderManager *shaderManager;
     std::string vertexShaderDirectory;
     std::string pixelShaderDirectory;
+    std::array<float, 4> clearColour = {0.f, 0.f, 0.f, 0.f};
 
     Camera camera = Camera();
-
     ShaderStack shaderStack;
     std::vector<std::unique_ptr<SceneMesh>> meshes;
+    std::unique_ptr<PointLight> pointLight;
+    std::unique_ptr<PointLightBuffer> pointLightBuffer;
 };
 
 class Scene
 {
     public:
-    Scene(SceneConfig *config);
-
-    std::vector<std::unique_ptr<SceneMesh>> *meshes;
-    PointLightBuffer pointLightBuffer;
-    PointLight pointLight;
-    Camera *camera;
+    Scene(SceneState *state);
+    SceneState *state;
 
     bool drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh);
-    bool render();
-
-    private:
-    D3D *graphicsManager;
-    ShaderManager *shaderManager;
     bool drawScreen();
+    bool render();
 };
-
