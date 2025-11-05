@@ -5,7 +5,7 @@ AppInput::AppInput(AppInputState *state)
     this->state = state;
 }
 
-void AppInput::handleInputs(float deltaTime)
+void AppInput::handleInputs()
 {
     if (this->state->window->mouse.isAvailable)
     {
@@ -22,42 +22,42 @@ void AppInput::handleInputs(float deltaTime)
             Input::KeyState::PRESSED)
         {
             this->state->scene->state->camera.move(
-                0.f, 0.f, 1.f * this->state->cameraMoveSpeed * deltaTime
+                0.f, 0.f, 1.f * this->state->cameraMoveSpeed * *this->deltaTime
             );
         }
         if (this->state->window->getKeyState(Input::Key::S) ==
             Input::KeyState::PRESSED)
         {
             this->state->scene->state->camera.move(
-                0.f, 0.f, -1.f * this->state->cameraMoveSpeed * deltaTime
+                0.f, 0.f, -1.f * this->state->cameraMoveSpeed * *this->deltaTime
             );
         }
         if (this->state->window->getKeyState(Input::Key::A) ==
             Input::KeyState::PRESSED)
         {
             this->state->scene->state->camera.move(
-                1.f * -this->state->cameraMoveSpeed * deltaTime, 0.f, 0.f
+                1.f * -this->state->cameraMoveSpeed * *this->deltaTime, 0.f, 0.f
             );
         }
         if (this->state->window->getKeyState(Input::Key::D) ==
             Input::KeyState::PRESSED)
         {
             this->state->scene->state->camera.move(
-                1.f * this->state->cameraMoveSpeed * deltaTime, 0.f, 0.f
+                1.f * this->state->cameraMoveSpeed * *this->deltaTime, 0.f, 0.f
             );
         }
         if (this->state->window->getKeyState(Input::Key::Q) ==
             Input::KeyState::PRESSED)
         {
             this->state->scene->state->camera.move(
-                0.f, 1.f * this->state->cameraMoveSpeed * deltaTime, 0.f
+                0.f, 1.f * this->state->cameraMoveSpeed * *this->deltaTime, 0.f
             );
         }
         if (this->state->window->getKeyState(Input::Key::E) ==
             Input::KeyState::PRESSED)
         {
             this->state->scene->state->camera.move(
-                0.f, -1.f * this->state->cameraMoveSpeed * deltaTime, 0.f
+                0.f, -1.f * this->state->cameraMoveSpeed * *this->deltaTime, 0.f
             );
         }
 
@@ -68,9 +68,9 @@ void AppInput::handleInputs(float deltaTime)
             this->state->window->setMouseVisible(false);
             this->state->scene->state->camera.rotate(
                 this->state->window->mouse.dx *
-                    this->state->cameraRotateSensitivity * deltaTime,
+                    this->state->cameraRotateSensitivity * *this->deltaTime,
                 this->state->window->mouse.dy *
-                    this->state->cameraRotateSensitivity * deltaTime
+                    this->state->cameraRotateSensitivity * *this->deltaTime
             );
             this->state->window->centreMouse();
         }

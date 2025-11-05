@@ -1,4 +1,3 @@
-#include <filesystem>
 #include <spdlog/spdlog.h>
 
 #include <core_window/window.h>
@@ -54,7 +53,7 @@ int main()
     while (window.frame())
     {
         app.timer.frame();
-        app.state->appInput->handleInputs(app.timer.deltaTime);
+        app.state->appInput->handleInputs();
         scene.state->camera.update();
         scene.render();
         debugScene.render();

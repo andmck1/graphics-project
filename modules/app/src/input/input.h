@@ -15,7 +15,8 @@ class AppInput
 {
     public:
     AppInput(AppInputState *state);
-    void handleInputs(float deltaTime);
+    void handleInputs();
+    float *deltaTime;
 
     private:
     AppInputState *state;
