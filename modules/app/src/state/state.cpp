@@ -1,4 +1,5 @@
 #include "state.h"
+#include "core_graphics/texture/texture.h"
 
 #include <filesystem>
 
@@ -43,6 +44,14 @@ void State::initShaderManagerState(D3D *graphicsManager)
     this->shaderManagerState.shaders.push_back(
         std::make_unique<PixelShader>(lightingPixelShader)
     );
+}
+
+void State::initTextureManagerState(D3D *graphicsManager)
+{
+    static const uint32_t texturePixelColour = 0xffffffff;
+    std::unique_ptr<DefaultTexture> defaultTexture =
+        std::make_unique<DefaultTexture>(graphicsManager, texturePixelColour);
+    this->textureManagerState.defaultTexture = std::move(defaultTexture);
 }
 
 void State::initSceneState(D3D *graphicsManager, ShaderManager *shaderManager)

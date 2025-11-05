@@ -3,6 +3,7 @@
 #include <core_window/window.h>
 #include <core_graphics/d3d/d3d.h>
 
+#include "texture/textureManager.h"
 #include "state/state.h"
 #include "scene/scene.h"
 #include "app/app.h"
@@ -29,6 +30,12 @@ int main()
     spdlog::info("Creating shaders");
     state.initShaderManagerState(&graphicsManager);
     ShaderManager shaderManager = ShaderManager(&state.shaderManagerState);
+
+    // Texture manager
+    spdlog::info("Creating texture manager");
+    state.initTextureManagerState(&graphicsManager);
+    TextureManager textureManager = TextureManager(&state.textureManagerState);
+    textureManager.loadAll();
 
     // Scene
     spdlog::info("Creating scene");

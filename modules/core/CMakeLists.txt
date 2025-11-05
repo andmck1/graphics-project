@@ -15,6 +15,7 @@ add_library(
   src/core_graphics/d3d/d3d.cpp
   src/core_graphics/shader/shader.cpp
   src/core_graphics/shader/shadermanager.cpp
+  src/core_graphics/texture/texture.cpp
   src/core_graphics/mesh/base.cpp
   src/core_graphics/mesh/triangle.cpp
   src/core_graphics/mesh/sphere.cpp
