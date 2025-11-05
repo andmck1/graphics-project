@@ -6,14 +6,14 @@
 
 #include <shared_shader/buffer.h>
 
-class PointLightBuffer : Buffer
+class PointLightBuffer : public Buffer
 {
     public:
     bool init(D3D *graphicsManager) override;
     bool setPixelShader() override;
 
     PointLight *pointLight;
-    struct ShaderBuffer : LightShader::LightBuffer
+    struct ShaderBuffer : LightShader::PointLightBuffer
     {
     };
 };

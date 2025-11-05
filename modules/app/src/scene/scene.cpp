@@ -27,7 +27,7 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
         ))
         return false;
 
-    if (!this->state->pointLightBuffer->setPixelShader())
+    if (!this->state->ambientLightBuffer->setPixelShader())
         return false;
 
     if (!sceneMesh->texture->setPixelShader(0, 1))

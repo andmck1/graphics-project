@@ -7,7 +7,9 @@ struct TextureManagerState
 {
     std::unique_ptr<DefaultTexture> defaultTexture;
     std::unique_ptr<FileTexture> moonTexture;
-    std::unique_ptr<FileTexture> botwTexture;
+    std::unique_ptr<FileTexture> botwHeightMap;
+    std::unique_ptr<FileTexture> ukHeightMap;
+    std::unique_ptr<FileTexture> mountainsHeightMap;
 };
 
 class TextureManager
@@ -17,5 +19,4 @@ class TextureManager
 
     TextureManagerState *state;
     bool loadAll();
-
 };

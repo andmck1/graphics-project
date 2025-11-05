@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../d3d/d3d.h"
 
 class Buffer

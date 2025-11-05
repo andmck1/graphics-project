@@ -17,11 +17,8 @@ DebugScene::DebugScene(DebugSceneState *state)
     ImGui::StyleColorsDark();
 
     ImGuiStyle &style = ImGui::GetStyle();
-    style.ScaleAllSizes(
-        this->state->graphicsManager->state->window->mainScale
-    );
-    style.FontScaleDpi =
-        this->state->graphicsManager->state->window->mainScale;
+    style.ScaleAllSizes(this->state->graphicsManager->state->window->mainScale);
+    style.FontScaleDpi = this->state->graphicsManager->state->window->mainScale;
 
     ImGui_ImplWin32_Init(this->state->graphicsManager->state->window->hwnd);
     ImGui_ImplDX11_Init(
@@ -45,6 +42,9 @@ bool DebugScene::render()
 
     ImGui::Begin("Draggable Window");
     ImGui::Text("FPS: %.2f", *(this->state->fps));
+    ImGui::SliderFloat3(
+        "Ambient Light Colour", this->state->ambientLightColour, 0.f, 1.f
+    );
     ImGui::End();
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

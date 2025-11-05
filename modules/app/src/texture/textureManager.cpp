@@ -15,6 +15,12 @@ bool TextureManager::loadAll()
         return false;
     if (!this->state->moonTexture->load())
         return false;
+    if (!this->state->botwHeightMap->load())
+        return false;
+    if (!this->state->ukHeightMap->load())
+        return false;
+    if (!this->state->mountainsHeightMap->load())
+        return false;
 
     return true;
 }

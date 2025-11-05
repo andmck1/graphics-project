@@ -39,7 +39,7 @@ void State::initShaderManagerState(D3D *graphicsManager)
     );
 
     PixelShader lightingPixelShader = PixelShader();
-    lightingPixelShader.filepath = "./build/hlsl/pixel/pixel.cso";
+    lightingPixelShader.filepath = "./build/hlsl/pixel/lighting.cso";
     lightingPixelShader.type = ShaderType::PIXEL;
     this->shaderManagerState.shaders.push_back(
         std::make_unique<PixelShader>(lightingPixelShader)
@@ -54,6 +54,16 @@ void State::initTextureManagerState(D3D *graphicsManager)
     this->textureManagerState.moonTexture = std::make_unique<FileTexture>(
         graphicsManager, "./textures/moon_heightmap.jpg"
     );
+    this->textureManagerState.botwHeightMap = std::make_unique<FileTexture>(
+        graphicsManager, "./textures/botw_heightmap.png"
+    );
+    this->textureManagerState.ukHeightMap = std::make_unique<FileTexture>(
+        graphicsManager, "./textures/uk_heightmap.jpg"
+    );
+    this->textureManagerState.mountainsHeightMap =
+        std::make_unique<FileTexture>(
+            graphicsManager, "./textures/mountains_heightmap.png"
+        );
 }
 
 void State::initSceneState(
@@ -112,23 +122,26 @@ void State::initSceneState(
     planeSceneMesh->worldMatrix =
         XMMatrixIdentity() * XMMatrixTranslation(-10.f, -3.f, -10.f);
     planeSceneMesh->shaderStack = &this->sceneState.shaderStack;
-    planeSceneMesh->texture = textureManager->state->defaultTexture.get();
+    planeSceneMesh->texture = textureManager->state->botwHeightMap.get();
     planeSceneMesh->sampler = std::make_unique<DefaultSampler>(defaultSampler);
     this->sceneState.meshes.push_back(std::move(planeSceneMesh));
 
     // lights
-    std::unique_ptr<PointLight> pointLight = std::make_unique<PointLight>();
-    std::unique_ptr<PointLightBuffer> pointLightBuffer =
-        std::make_unique<PointLightBuffer>();
+    std::unique_ptr<AmbientLight> ambientLight =
+        std::make_unique<AmbientLight>();
+    std::unique_ptr<AmbientLightBuffer> ambientLightBuffer =
+        std::make_unique<AmbientLightBuffer>();
 
-    pointLight->colour = {1.f, 1.f, 1.f, 1.f};
-    pointLight->worldPosition = {0.f, 0.f, -10.f, 0.f};
-    pointLight->direction = {0.f, 0.f, 1.f, 0.f};
-    pointLightBuffer->init(graphicsManager);
+    ambientLight->colour = std::make_unique<float[]>(3);
+    ambientLight->colour[0] = 0.1f;
+    ambientLight->colour[1] = 0.1f;
+    ambientLight->colour[2] = 0.1f;
 
-    this->sceneState.pointLight = std::move(pointLight);
-    pointLightBuffer->pointLight = this->sceneState.pointLight.get();
-    this->sceneState.pointLightBuffer = std::move(pointLightBuffer);
+    ambientLightBuffer->init(graphicsManager);
+
+    this->sceneState.ambientLight = std::move(ambientLight);
+    ambientLightBuffer->ambientLight = this->sceneState.ambientLight.get();
+    this->sceneState.ambientLightBuffer = std::move(ambientLightBuffer);
 }
 
 void State::initAppInputState(Window *window, Scene *scene)
@@ -144,8 +157,11 @@ void State::initAppState(AppInput *appInput)
     this->appState.appInput = appInput;
 }
 
-void State::initDebugSceneState(D3D *graphicsManager, float *fps)
+void State::initDebugSceneState(
+    D3D *graphicsManager, float *fps, float *ambientLightColour
+)
 {
     this->debugSceneState.graphicsManager = graphicsManager;
     this->debugSceneState.fps = fps;
+    this->debugSceneState.ambientLightColour = ambientLightColour;
 }

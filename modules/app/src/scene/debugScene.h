@@ -6,6 +6,7 @@ struct DebugSceneState
 {
     D3D *graphicsManager;
     float *fps;
+    float *ambientLightColour;
 };
 
 class DebugScene

@@ -31,5 +31,7 @@ class State
     );
     void initAppInputState(Window *window, Scene *scene);
     void initAppState(AppInput *appInput);
-    void initDebugSceneState(D3D *graphicsManager, float *fps);
+    void initDebugSceneState(
+        D3D *graphicsManager, float *fps, float *ambientLightColour
+    );
 };

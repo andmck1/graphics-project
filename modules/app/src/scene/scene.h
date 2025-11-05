@@ -11,6 +11,7 @@
 #include <core_graphics/camera/camera.h>
 #include <core_graphics/mesh/triangle.h>
 #include <core_graphics/mesh/sphere.h>
+#include <core_graphics/light/ambient.h>
 #include <core_graphics/light/point.h>
 #include <core_graphics/mesh/quad.h>
 #include <core_graphics/mesh/plane.h>
@@ -19,6 +20,7 @@
 #include "core_graphics/texture/texture.h"
 
 #include "../sampler/defaultSampler.h"
+#include "../buffer/ambientLightBuffer.h"
 #include "../buffer/pointLightBuffer.h"
 
 using namespace Microsoft::WRL;
@@ -44,8 +46,8 @@ struct SceneState
     Camera camera = Camera();
     ShaderStack shaderStack;
     std::vector<std::unique_ptr<SceneMesh>> meshes;
-    std::unique_ptr<PointLight> pointLight;
-    std::unique_ptr<PointLightBuffer> pointLightBuffer;
+    std::unique_ptr<AmbientLight> ambientLight;
+    std::unique_ptr<AmbientLightBuffer> ambientLightBuffer;
 };
 
 class Scene

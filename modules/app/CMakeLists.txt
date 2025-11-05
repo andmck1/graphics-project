@@ -7,6 +7,7 @@ add_executable(
   src/scene/debugScene.cpp
   src/input/input.cpp
   src/app/app.cpp
+  src/buffer/ambientLightBuffer.cpp
   src/buffer/pointLightBuffer.cpp
   src/sampler/defaultSampler.cpp
   )

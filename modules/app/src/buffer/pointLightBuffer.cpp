@@ -32,9 +32,11 @@ bool PointLightBuffer::setPixelShader()
     if (!TryDXCall(mapHR, "Point light buffer pixel shader map failed.\n"))
         return false;
     bufferData = (PointLightBuffer::ShaderBuffer *) mappedResource.pData;
-    bufferData->colour = pointLight->colour;
+    bufferData->type = LightShader::LIGHT_TYPE_POINT;
+    bufferData->diffuseColour = pointLight->colour;
+    bufferData->specularColour = pointLight->colour;
     bufferData->worldPosition = pointLight->worldPosition;
-    bufferData->direction = pointLight->direction;
+    bufferData->attenuationCoefficients = {0.1f, 0.01f, 0.001f, 0.f};
 
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->PSSetConstantBuffers(
