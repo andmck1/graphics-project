@@ -83,7 +83,7 @@ FileTexture::FileTexture(D3D *graphicsManager, std::string filepath)
 }
 
 // Some help from lab here
-bool FileTexture::loadTexture()
+bool FileTexture::loadAndCreateTextureResource()
 {
     HRESULT createTexture2DHR;
 
@@ -98,31 +98,9 @@ bool FileTexture::loadTexture()
     return TryDXCall(createTexture2DHR, "Failed to create texture");
 }
 
-bool FileTexture::createResource()
-{
-    HRESULT createShaderResourceViewHR;
-
-    D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
-    shaderResourceViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    shaderResourceViewDesc.Texture2D.MipLevels = 1;
-
-    spdlog::debug("Creating default texture resource");
-    createShaderResourceViewHR =
-        this->graphicsManager->device->CreateShaderResourceView(
-            this->texture.Get(), &shaderResourceViewDesc,
-            this->textureResource.GetAddressOf()
-        );
-    return TryDXCall(
-        createShaderResourceViewHR, "Failed to create texture resource"
-    );
-}
-
 bool FileTexture::load()
 {
-    if (!this->loadTexture())
-        return false;
-    if (!this->createResource())
+    if (!this->loadAndCreateTextureResource())
         return false;
     return true;
 }

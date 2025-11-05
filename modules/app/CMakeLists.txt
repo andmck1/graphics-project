@@ -18,7 +18,6 @@ target_link_libraries(
   ${PROJECT_NAME}
   spdlog
   imgui
-  DirectXTK
   d3d11
   D3DCompiler
   core_window

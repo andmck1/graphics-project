@@ -7,6 +7,7 @@ struct TextureManagerState
 {
     std::unique_ptr<DefaultTexture> defaultTexture;
     std::unique_ptr<FileTexture> moonTexture;
+    std::unique_ptr<FileTexture> botwTexture;
 };
 
 class TextureManager

@@ -6,7 +6,7 @@ target_include_directories(shared_shader PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # Fix this and remove hardcoding. need to use FXC_PATH and check if already set
 # use FXC_ARGS to avoid windows escaping issues
 set(FXC_PATH
-    "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/fxc.exe")
+    "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x86/fxc.exe")
 
 # Help from copilot here and
 # https://stackoverflow.com/questions/71299716/how-to-compile-hlsl-shaders-during-build-with-cmake

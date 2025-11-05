@@ -43,8 +43,7 @@ class FileTexture : public BaseTexture
     uint32_t texturePixelColour;
     ComPtr<ID3D11Texture2D> texture;
 
-    bool loadTexture();
-    bool createResource();
+    bool loadAndCreateTextureResource();
 
     std::filesystem::path filepath;
 };

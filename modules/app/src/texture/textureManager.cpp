@@ -9,8 +9,11 @@ TextureManager::TextureManager(TextureManagerState *state)
 
 bool TextureManager::loadAll()
 {
+    // TODO - make this loop
     spdlog::info("Loading all textures");
     if (!this->state->defaultTexture->load())
+        return false;
+    if (!this->state->moonTexture->load())
         return false;
 
     return true;

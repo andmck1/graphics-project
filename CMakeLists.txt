@@ -30,16 +30,6 @@ FetchContent_Declare(
   EXCLUDE_FROM_ALL SYSTEM)
 FetchContent_MakeAvailable(imgui)
 
-set(DIRECTX_ARCH x86)
-include(FetchContent)
-FetchContent_Declare(
-    directxtk
-    GIT_REPOSITORY https://github.com/microsoft/DirectXTK
-    GIT_TAG oct2025
-    GIT_SHALLOW ON
-    EXCLUDE_FROM_ALL SYSTEM)
-FetchContent_MakeAvailable(directxtk)
-
 add_library(
   imgui STATIC
   ${imgui_SOURCE_DIR}/imgui.cpp
@@ -47,13 +37,24 @@ add_library(
   ${imgui_SOURCE_DIR}/imgui_tables.cpp
   ${imgui_SOURCE_DIR}/imgui_widgets.cpp
   ${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp)
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp
+  )
+
+set(DIRECTX_ARCH x86)
+include(FetchContent)
+FetchContent_Declare(
+    dxtk
+  GIT_REPOSITORY https://github.com/microsoft/DirectXTK
+  GIT_TAG oct2025
+  GIT_SHALLOW ON
+  EXCLUDE_FROM_ALL SYSTEM)
+FetchContent_MakeAvailable(dxtk)
 
 add_library(
-    directxtk STATIC
+    dxtk STATIC
     ${DirectXTK_SOURCE_DIR}/Src/WICTextureLoader.cpp
 )
 
-add_subdirectory(modules/core)
 add_subdirectory(modules/shader)
+add_subdirectory(modules/core)
 add_subdirectory(modules/app)

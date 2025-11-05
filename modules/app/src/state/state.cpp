@@ -52,7 +52,7 @@ void State::initTextureManagerState(D3D *graphicsManager)
     this->textureManagerState.defaultTexture =
         std::make_unique<DefaultTexture>(graphicsManager, texturePixelColour);
     this->textureManagerState.moonTexture = std::make_unique<FileTexture>(
-        graphicsManager, "./res/textures/moon_heightmap.jpg"
+        graphicsManager, "./textures/moon_heightmap.jpg"
     );
 }
 
@@ -81,7 +81,7 @@ void State::initSceneState(
     triangleSceneMesh->mesh = std::make_unique<TriangleMesh>(triangleMesh);
     triangleSceneMesh->worldMatrix = XMMatrixIdentity();
     triangleSceneMesh->shaderStack = &this->sceneState.shaderStack;
-    triangleSceneMesh->texture = textureManager->state->moonTexture.get();
+    triangleSceneMesh->texture = textureManager->state->defaultTexture.get();
     triangleSceneMesh->sampler =
         std::make_unique<DefaultSampler>(defaultSampler);
     this->sceneState.meshes.push_back(std::move(triangleSceneMesh));
@@ -92,7 +92,7 @@ void State::initSceneState(
     sphereSceneMesh->worldMatrix =
         XMMatrixIdentity() * XMMatrixTranslation(-3.f, 0.f, 0.f);
     sphereSceneMesh->shaderStack = &this->sceneState.shaderStack;
-    sphereSceneMesh->texture = textureManager->state->defaultTexture.get();
+    sphereSceneMesh->texture = textureManager->state->moonTexture.get();
     sphereSceneMesh->sampler = std::make_unique<DefaultSampler>(defaultSampler);
     this->sceneState.meshes.push_back(std::move(sphereSceneMesh));
 
@@ -109,8 +109,8 @@ void State::initSceneState(
     std::unique_ptr<SceneMesh> planeSceneMesh = std::make_unique<SceneMesh>();
     PlaneMesh planeMesh = PlaneMesh(graphicsManager);
     planeSceneMesh->mesh = std::make_unique<PlaneMesh>(planeMesh);
-    planeSceneMesh->worldMatrix = XMMatrixIdentity() * XMMatrixRotationX(-45) *
-                                  XMMatrixTranslation(0.f, -3.f, 0.f);
+    planeSceneMesh->worldMatrix =
+        XMMatrixIdentity() * XMMatrixTranslation(-10.f, -3.f, -10.f);
     planeSceneMesh->shaderStack = &this->sceneState.shaderStack;
     planeSceneMesh->texture = textureManager->state->defaultTexture.get();
     planeSceneMesh->sampler = std::make_unique<DefaultSampler>(defaultSampler);
