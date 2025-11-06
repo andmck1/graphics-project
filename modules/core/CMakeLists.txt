@@ -14,7 +14,9 @@ add_library(
   core_graphics STATIC
   src/core_graphics/d3d/d3d.cpp
   src/core_graphics/shader/shader.cpp
-  src/core_graphics/shader/shadermanager.cpp
+  src/core_graphics/shadermanager/base.cpp
+  src/core_graphics/sampler/base.cpp
+  src/core_graphics/sampler/default.cpp
   src/core_graphics/texture/texture.cpp
   src/core_graphics/mesh/base.cpp
   src/core_graphics/mesh/triangle.cpp
@@ -23,6 +25,7 @@ add_library(
   src/core_graphics/mesh/plane.cpp
   src/core_graphics/mesh/ortho.cpp
   src/core_graphics/camera/camera.cpp
+  src/core_graphics/scene/base.cpp
   )
 target_link_libraries(core_graphics PRIVATE spdlog imgui dxtk)
 target_include_directories(core_graphics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

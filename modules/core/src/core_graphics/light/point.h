@@ -1,11 +1,12 @@
 #pragma once
 
+#include <core_graphics/scene/base.h>
 #include <memory>
 #include <directxmath.h>
 
 using namespace DirectX;
 
-struct PointLight 
+struct PointLight
 {
     std::unique_ptr<float[]> diffuseColour;
     std::unique_ptr<float[]> specularColour;
@@ -15,4 +16,5 @@ struct PointLight
     std::unique_ptr<bool> isDiffuseEnabled;
     std::unique_ptr<bool> isSpecularEnabled;
     std::unique_ptr<bool> isAttenuationEnabled;
+    BaseSceneMesh *sceneMesh;
 };

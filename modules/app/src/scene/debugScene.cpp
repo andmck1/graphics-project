@@ -80,8 +80,8 @@ bool DebugScene::render()
                 "%.3f", false
             );
             ImGui::SliderFloat3(
-                "World Position", pointLight->worldPosition.get(), -1000.f,
-                1000.f
+                "World Position", pointLight->worldPosition.get(), -10.f,
+                10.f
             );
             ImGui::SliderFloat(
                 "Attenuation Coefficient C0",

@@ -4,7 +4,7 @@
 
 #include <memory>
 
-struct ShaderManagerState
+struct BaseShaderManagerState
 {
     D3D *graphicsManager;
     std::string vertexShaderDirectory;
@@ -12,14 +12,13 @@ struct ShaderManagerState
     std::vector<std::unique_ptr<BaseShader>> shaders;
 };
 
-class ShaderManager
+class BaseShaderManager
 {
     public:
-    ShaderManager(ShaderManagerState *state);
-    ShaderManagerState *state;
+    BaseShaderManager(BaseShaderManagerState *state);
+    BaseShaderManagerState *state;
 
     private:
-
     bool loadShaders();
     bool createShaders();
 };

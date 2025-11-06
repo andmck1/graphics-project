@@ -3,6 +3,7 @@ add_executable(
   src/main.cpp
   src/state/state.cpp
   src/texture/textureManager.cpp
+  src/shadermanager/shaderManager.cpp
   src/scene/scene.cpp
   src/scene/debugScene.cpp
   src/input/input.cpp
@@ -10,7 +11,6 @@ add_executable(
   src/buffer/ambientLightBuffer.cpp
   src/buffer/pointLightBuffer.cpp
   src/buffer/cameraBuffer.cpp
-  src/sampler/defaultSampler.cpp
   )
 
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR}

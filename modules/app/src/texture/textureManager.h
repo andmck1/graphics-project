@@ -10,6 +10,7 @@ struct TextureManagerState
     std::unique_ptr<FileTexture> botwHeightMap;
     std::unique_ptr<FileTexture> ukHeightMap;
     std::unique_ptr<FileTexture> mountainsHeightMap;
+    std::unique_ptr<FileTexture> lightDebugTexture;
 };
 
 class TextureManager

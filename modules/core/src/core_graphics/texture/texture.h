@@ -1,17 +1,11 @@
 #pragma once
 
+#include "base.h"
+
 #include "core_graphics/d3d/d3d.h"
 #include <d3d11.h>
 #include <wrl/client.h>
 #include <filesystem>
-
-class BaseTexture
-{
-    public:
-    virtual ~BaseTexture() = default;
-    virtual bool load() = 0;
-    virtual bool setPixelShader(int startSlot, int numberView) = 0;
-};
 
 class DefaultTexture : public BaseTexture
 {

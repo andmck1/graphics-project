@@ -21,6 +21,8 @@ bool TextureManager::loadAll()
         return false;
     if (!this->state->mountainsHeightMap->load())
         return false;
+    if (!this->state->lightDebugTexture->load())
+        return false;
 
     return true;
 }

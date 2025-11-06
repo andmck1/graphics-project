@@ -1,4 +1,4 @@
-#include "defaultSampler.h"
+#include "default.h"
 #include "core_utils/graphics.h"
 
 bool DefaultSampler::init(D3D *graphicsManager)

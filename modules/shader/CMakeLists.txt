@@ -1,8 +1,8 @@
 # TODO - make this not hardcoded
 set(FXC_PATH
     "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/fxc.exe")
-# set(FXC_PATH
-#    "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/fxc.exe")
+# set(FXC_PATH "C:/Program Files (x86)/Windows
+# Kits/10/bin/10.0.22621.0/x86/fxc.exe")
 
 add_library(
   shared_shader STATIC
@@ -15,7 +15,8 @@ target_include_directories(shared_shader PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # Help from copilot here and
 # https://stackoverflow.com/questions/71299716/how-to-compile-hlsl-shaders-during-build-with-cmake
 set(VERTEX_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/vertex.hlsl")
-set(PIXEL_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/lighting.hlsl")
+set(PIXEL_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/lighting.hlsl"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/lightSource.hlsl")
 set(HLSL_SHADER_FILES ${VERTEX_SHADERS} ${PIXEL_SHADERS})
 set(CMAKE_HLSL_OUTPUT_DIR ${CMAKE_BINARY_DIR}/hlsl)
 

@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "core_graphics/light/point.h"
 
 #include <memory>
 #include <spdlog/spdlog.h>
@@ -42,8 +43,7 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
     if (!sceneMesh->sampler->setPixelShader(this->state->graphicsManager))
         return false;
 
-    for (std::unique_ptr<BaseShader> &shaderPtr :
-         *sceneMesh->shaderStack->shaders)
+    for (BaseShader* shaderPtr : sceneMesh->shaderStack->shaders)
     {
         if (shaderPtr->inputElementDescription)
         {
@@ -62,7 +62,7 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
         case ShaderType::VERTEX:
         {
             VertexShader *vertexShader =
-                dynamic_cast<VertexShader *>(shaderPtr.get());
+                dynamic_cast<VertexShader *>(shaderPtr);
             if (!shaderPtr)
             {
                 spdlog::error("Vertex shader not loaded.");
@@ -76,7 +76,7 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
         case ShaderType::PIXEL:
         {
             PixelShader *pixelShader =
-                dynamic_cast<PixelShader *>(shaderPtr.get());
+                dynamic_cast<PixelShader *>(shaderPtr);
             if (!pixelShader)
             {
                 spdlog::error("Pixel shader not loaded.");
@@ -119,9 +119,24 @@ bool Scene::drawScreen()
     return true;
 }
 
+void Scene::updateMeshPositions()
+{
+    for (int i = 0; i < this->state->pointLights.size(); i++)
+    {
+        PointLight *pointLight = this->state->pointLights[i].get();
+        pointLight->sceneMesh->worldMatrix =
+            XMMatrixIdentity() * XMMatrixTranslation(
+                                     pointLight->worldPosition.get()[0],
+                                     pointLight->worldPosition.get()[1],
+                                     pointLight->worldPosition.get()[2]
+                                 );
+    }
+}
+
 bool Scene::render()
 {
     this->state->graphicsManager->clearScreen(this->state->clearColour.data());
+    this->updateMeshPositions();
     if (!this->drawScreen())
     {
         return false;

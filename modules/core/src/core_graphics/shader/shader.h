@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <optional>
 
 #include <core_graphics/d3d/d3d.h>
@@ -36,5 +35,5 @@ struct PixelShader : BaseShader
 
 struct ShaderStack
 {
-    std::vector<std::unique_ptr<BaseShader>> *shaders;
+    std::vector<BaseShader*> shaders;
 };

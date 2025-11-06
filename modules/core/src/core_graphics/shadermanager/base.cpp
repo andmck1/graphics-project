@@ -1,16 +1,15 @@
-#include <memory>
 #include <spdlog/spdlog.h>
 
-#include "shadermanager.h"
+#include "base.h"
 
-ShaderManager::ShaderManager(ShaderManagerState *state)
+BaseShaderManager::BaseShaderManager(BaseShaderManagerState *state)
 {
     this->state = state;
     this->loadShaders();
     this->createShaders();
 }
 
-bool ShaderManager::loadShaders()
+bool BaseShaderManager::loadShaders()
 {
     for (std::unique_ptr<BaseShader> &shaderPtr : this->state->shaders)
     {
@@ -23,7 +22,7 @@ bool ShaderManager::loadShaders()
     return true;
 }
 
-bool ShaderManager::createShaders()
+bool BaseShaderManager::createShaders()
 {
     spdlog::info("Creating shaders");
     for (std::unique_ptr<BaseShader> &shaderPtr : this->state->shaders)
