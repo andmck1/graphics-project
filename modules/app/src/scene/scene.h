@@ -47,13 +47,14 @@ struct SceneState
     Camera camera = Camera();
     ShaderStack shaderStack;
     std::vector<std::unique_ptr<SceneMesh>> meshes;
-    std::unique_ptr<AmbientLight> ambientLight;
-    std::unique_ptr<PointLight> pointLight;
 
-    // buffers
-    std::unique_ptr<CameraBuffer> cameraBuffer;
-    std::unique_ptr<PointLightBuffer> pointLightBuffer;
+    std::unique_ptr<AmbientLight> ambientLight;
     std::unique_ptr<AmbientLightBuffer> ambientLightBuffer;
+
+    std::vector<std::unique_ptr<PointLight>> pointLights;
+    std::unique_ptr<PointLightsBuffer> pointLightsBuffer;
+
+    std::unique_ptr<CameraBuffer> cameraBuffer;
 
 };
 

@@ -1,4 +1,5 @@
 #include "state.h"
+#include "core_graphics/light/ambient.h"
 #include "core_graphics/texture/texture.h"
 
 #include <filesystem>
@@ -147,8 +148,8 @@ void State::initSceneState(
 
     // -- point
     std::unique_ptr<PointLight> pointLight = std::make_unique<PointLight>();
-    std::unique_ptr<PointLightBuffer> pointLightBuffer =
-        std::make_unique<PointLightBuffer>();
+    std::unique_ptr<PointLightsBuffer> pointLightsBuffer =
+        std::make_unique<PointLightsBuffer>();
 
     pointLight->diffuseColour = std::make_unique<float[]>(3);
     pointLight->diffuseColour[0] = 1.f;
@@ -171,11 +172,36 @@ void State::initSceneState(
     pointLight->isDiffuseEnabled = std::make_unique<bool>(true);
     pointLight->isSpecularEnabled = std::make_unique<bool>(true);
     pointLight->isAttenuationEnabled = std::make_unique<bool>(true);
+    this->sceneState.pointLights.push_back(std::move(pointLight));
 
-    pointLightBuffer->init(graphicsManager);
-    this->sceneState.pointLight = std::move(pointLight);
-    pointLightBuffer->pointLight = this->sceneState.pointLight.get();
-    this->sceneState.pointLightBuffer = std::move(pointLightBuffer);
+    std::unique_ptr<PointLight> pointLight2 = std::make_unique<PointLight>();
+
+    pointLight2->diffuseColour = std::make_unique<float[]>(3);
+    pointLight2->diffuseColour[0] = 1.f;
+    pointLight2->diffuseColour[1] = 1.f;
+    pointLight2->diffuseColour[2] = 1.f;
+    pointLight2->specularColour = std::make_unique<float[]>(3);
+    pointLight2->specularColour[0] = 1.f;
+    pointLight2->specularColour[1] = 1.f;
+    pointLight2->specularColour[2] = 1.f;
+    pointLight2->specularPower = std::make_unique<float>();
+    *pointLight2->specularPower = 10.f;
+    pointLight2->worldPosition = std::make_unique<float[]>(3);
+    pointLight2->worldPosition[0] = 100.f;
+    pointLight2->worldPosition[1] = 100.f;
+    pointLight2->worldPosition[2] = 100.f;
+    pointLight2->attenuationCoefficients = std::make_unique<float[]>(3);
+    pointLight2->attenuationCoefficients[0] = .432f;
+    pointLight2->attenuationCoefficients[1] = .00056f;
+    pointLight2->attenuationCoefficients[2] = .000010f;
+    pointLight2->isDiffuseEnabled = std::make_unique<bool>(true);
+    pointLight2->isSpecularEnabled = std::make_unique<bool>(true);
+    pointLight2->isAttenuationEnabled = std::make_unique<bool>(true);
+    this->sceneState.pointLights.push_back(std::move(pointLight2));
+
+    pointLightsBuffer->pointLights = &this->sceneState.pointLights;
+    pointLightsBuffer->init(graphicsManager);
+    this->sceneState.pointLightsBuffer = std::move(pointLightsBuffer);
 
     std::unique_ptr<CameraBuffer> cameraBuffer =
         std::make_unique<CameraBuffer>();
@@ -198,28 +224,13 @@ void State::initAppState(AppInput *appInput)
 }
 
 void State::initDebugSceneState(
-    D3D *graphicsManager, float *fps, float *ambientLightColour,
-    float *pointLightDiffuseColour, float *pointLightSpecularColour,
-    float *pointLightSpecularPower, float *pointLightWorldPosition,
-    float *pointLightAttenuationCoefficients, bool *isAmbientLightEnabled,
-    bool *isPointLightDiffuseEnabled, bool *isPointLightSpecularEnabled,
-    bool *isPointLightAttenuationEnabled
+    D3D *graphicsManager, float *fps, AmbientLight *ambientLight,
+    std::vector<std::unique_ptr<PointLight>> *pointLights
 )
 {
     this->debugSceneState.graphicsManager = graphicsManager;
     this->debugSceneState.fps = fps;
-    this->debugSceneState.ambientLightColour = ambientLightColour;
-    this->debugSceneState.pointLightDiffuseColour = pointLightDiffuseColour;
-    this->debugSceneState.pointLightSpecularColour = pointLightSpecularColour;
-    this->debugSceneState.pointLightSpecularPower = pointLightSpecularPower;
-    this->debugSceneState.pointLightWorldPosition = pointLightWorldPosition;
-    this->debugSceneState.pointLightAttenuationCoefficients =
-        pointLightAttenuationCoefficients;
-    this->debugSceneState.isAmbientLightEnabled = isAmbientLightEnabled;
-    this->debugSceneState.isPointLightDiffuseEnabled =
-        isPointLightDiffuseEnabled;
-    this->debugSceneState.isPointLightSpecularEnabled =
-        isPointLightSpecularEnabled;
-    this->debugSceneState.isPointLightAttenuationEnabled =
-        isPointLightAttenuationEnabled;
+
+    this->debugSceneState.ambientLight = ambientLight;
+    this->debugSceneState.pointLights = pointLights;
 }

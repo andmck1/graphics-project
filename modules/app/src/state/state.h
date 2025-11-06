@@ -32,11 +32,7 @@ class State
     void initAppInputState(Window *window, Scene *scene);
     void initAppState(AppInput *appInput);
     void initDebugSceneState(
-        D3D *graphicsManager, float *fps, float *ambientLightColour,
-        float *pointLightDiffuseColour, float *pointLightSpecularColour,
-        float *pointLightSpecularPower, float *pointLightWorldPosition,
-        float *pointLightAttenuationCoefficients, bool *isAmbientLightEnabled,
-        bool *isPointLightDiffuseEnabled, bool *isPointLightSpecularEnabled,
-        bool *isPointLightAttenuationEnabled
+        D3D *graphicsManager, float *fps, AmbientLight *ambientLight,
+        std::vector<std::unique_ptr<PointLight>> *pointLights
     );
 };

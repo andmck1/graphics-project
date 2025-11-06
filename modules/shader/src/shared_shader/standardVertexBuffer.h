@@ -14,7 +14,7 @@ using int4 = XMINT4;
 namespace StandardVertexShader 
 {
 #endif
-    struct CameraBuffer 
+    struct CameraBufferType
     {
         float4 worldPosition;
     };

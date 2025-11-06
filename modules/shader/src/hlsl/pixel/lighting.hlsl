@@ -5,13 +5,10 @@ SamplerState textureSampler: register(s0);
 
 cbuffer AmbientLightBuffer: register(b0)
 {
-	AmbientLightBuffer ambientLightData;
+	AmbientLightBufferType ambientLightData;
 }
 
-cbuffer PointLightBuffer : register(b1)
-{
-	PointLightBuffer pointLightData;
-}
+StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t1);
 
 struct InputType
 {
@@ -159,24 +156,36 @@ float4 getTextureColour(Texture2D _objectTexture, SamplerState _textureSampler, 
 float4 main(InputType input) : SV_TARGET
 {
 	float4 textureColour;
-	float4 lightColour;
+	float4 lightColourTotal = 0.f;
+	int totalNPointLights = 0;
+
 	textureColour = getTextureColour(objectTexture, textureSampler, input.tex);
-	lightColour = calculateLighting(
-		ambientLightData.colour.rgb,
-		ambientLightData.isEnabled.r,
-		pointLightData.diffuseColour.rgb,
-		pointLightData.specularColour.rgb,
-		pointLightData.specularPower.r,
-		pointLightData.worldPosition.xyz,
-		pointLightData.attenuationCoefficients.xyz,
-		pointLightData.isDiffuseEnabled.r,
-		pointLightData.isSpecularEnabled.r,
-		pointLightData.isAttenuationEnabled.r,
-		input.worldPosition,
-		input.normal,
-		input.viewVector
-	).rgbb;
-	lightColour[3] = 1.f;
+
+	PointLightBufferType firstPointLightData = PointLightBuffer[0];
+	totalNPointLights = firstPointLightData.nLights.x;
+	for(int i=0; i<totalNPointLights; i++)
+	{
+		float4 lightColour;
+		PointLightBufferType pointLightData = PointLightBuffer[i];
+
+		lightColour = calculateLighting(
+			ambientLightData.colour.rgb,
+			ambientLightData.isEnabled.r,
+			pointLightData.diffuseColour.rgb,
+			pointLightData.specularColour.rgb,
+			pointLightData.specularPower.r,
+			pointLightData.worldPosition.xyz,
+			pointLightData.attenuationCoefficients.xyz,
+			pointLightData.isDiffuseEnabled.r,
+			pointLightData.isSpecularEnabled.r,
+			pointLightData.isAttenuationEnabled.r,
+			input.worldPosition,
+			input.normal,
+			input.viewVector
+		).rgbb;
+		lightColour[3] = 1.f;
+		lightColourTotal += lightColour;
+	}
 	
-    return textureColour * lightColour;
+    return textureColour * lightColourTotal;
 }

@@ -1,4 +1,5 @@
 #include "debugScene.h"
+#include "core_graphics/light/point.h"
 
 #include <imgui.h>
 #include <imgui_impl_win32.h>
@@ -36,6 +37,8 @@ DebugScene::~DebugScene()
 
 bool DebugScene::render()
 {
+    int nPointLights = 0;
+
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
@@ -45,56 +48,66 @@ bool DebugScene::render()
     if (ImGui::CollapsingHeader("Ambient Light Settings"))
     {
         ImGui::ColorPicker3(
-            "Colour", this->state->ambientLightColour,
+            "Colour", this->state->ambientLight->colour.get(),
             ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
 
         );
-        ImGui::Checkbox("Ambient Enabled?", this->state->isAmbientLightEnabled);
+        ImGui::Checkbox(
+            "Ambient Enabled?", this->state->ambientLight->isEnabled.get()
+        );
     }
-    if (ImGui::CollapsingHeader("Point Light Settings"))
+
+    nPointLights = this->state->pointLights->size();
+    for (int i = 0; i < nPointLights; i++)
     {
-        ImGui::ColorPicker3(
-            "Diffuse", this->state->pointLightDiffuseColour,
-            ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
+        std::string pointLightHeading =
+            "Point Light " + std::to_string(i) + " Settings";
+        if (ImGui::CollapsingHeader(pointLightHeading.c_str()))
+        {
+            PointLight *pointLight = this->state->pointLights->at(i).get();
+            ImGui::ColorPicker3(
+                "Diffuse", pointLight->diffuseColour.get(),
+                ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
 
-        );
-        ImGui::ColorPicker3(
-            "Specular", this->state->pointLightSpecularColour,
-            ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
+            );
+            ImGui::ColorPicker3(
+                "Specular", pointLight->specularColour.get(),
+                ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
 
-        );
-        ImGui::SliderFloat(
-            "Specular Power", this->state->pointLightSpecularPower, 0.01f, 50.f,
-            "%.3f", false
-        );
-        ImGui::SliderFloat3(
-            "World Position", this->state->pointLightWorldPosition, -1000.f,
-            1000.f
-        );
-        ImGui::SliderFloat(
-            "Attenuation Coefficient C0",
-            &this->state->pointLightAttenuationCoefficients[0], 0.1f, 1.f,
-            "%.3f", false
-        );
-        ImGui::SliderFloat(
-            "Attenuation Coefficient C1",
-            &this->state->pointLightAttenuationCoefficients[1], 0.0001f, 0.001f,
-            "%.5f", true
-        );
-        ImGui::SliderFloat(
-            "Attenuation Coefficient C2",
-            &this->state->pointLightAttenuationCoefficients[2], 0.00001f,
-            0.0001f, "%.6f", true
-        );
-        ImGui::Checkbox(
-            "Diffuse Enabled?", this->state->isPointLightDiffuseEnabled
-        );
-        ImGui::Checkbox(
-            "Specular Enabled?", this->state->isPointLightSpecularEnabled
-        );
-        ImGui::Checkbox(
-            "Attenuation Enabled?", this->state->isPointLightAttenuationEnabled
-        );
+            );
+            ImGui::SliderFloat(
+                "Specular Power", pointLight->specularPower.get(), 0.01f, 50.f,
+                "%.3f", false
+            );
+            ImGui::SliderFloat3(
+                "World Position", pointLight->worldPosition.get(), -1000.f,
+                1000.f
+            );
+            ImGui::SliderFloat(
+                "Attenuation Coefficient C0",
+                &pointLight->attenuationCoefficients[0], 0.1f, 1.f, "%.3f",
+                false
+            );
+            ImGui::SliderFloat(
+                "Attenuation Coefficient C1",
+                &pointLight->attenuationCoefficients[1], 0.0001f, 0.001f,
+                "%.5f", true
+            );
+            ImGui::SliderFloat(
+                "Attenuation Coefficient C2",
+                &pointLight->attenuationCoefficients[2], 0.00001f, 0.0001f,
+                "%.6f", true
+            );
+            ImGui::Checkbox(
+                "Diffuse Enabled?", pointLight->isDiffuseEnabled.get()
+            );
+            ImGui::Checkbox(
+                "Specular Enabled?", pointLight->isSpecularEnabled.get()
+            );
+            ImGui::Checkbox(
+                "Attenuation Enabled?", pointLight->isSpecularEnabled.get()
+            );
+        }
     }
     ImGui::End();
     ImGui::Render();

@@ -16,19 +16,21 @@ using int4 = XMINT4;
 namespace LightingShader
 {
 #endif
+    static const int MAX_POINT_LIGHTS = 5;
+
     static const int LIGHT_TYPE_AMBIENT = 0;
     static const int LIGHT_TYPE_POINT = 1;
     static const int LIGHT_TYPE_DIRECTIONAL = 2;
     static const int LIGHT_TYPE_SPOT = 3;
 
-    struct AmbientLightBuffer
+    struct AmbientLightBufferType
     {
         int4 type;
         float4 colour;
         int4 isEnabled;
     };
 
-    struct PointLightBuffer
+    struct PointLightBufferType
     {
         int4 type;
         float4 worldPosition;
@@ -39,9 +41,10 @@ namespace LightingShader
         int4 isDiffuseEnabled;
         int4 isSpecularEnabled;
         int4 isAttenuationEnabled;
+        int4 nLights;
     };
 
-    struct DirectionalLightBuffer
+    struct DirectionalLightBufferType
     {
         int4 type;
         float4 worldPosition;

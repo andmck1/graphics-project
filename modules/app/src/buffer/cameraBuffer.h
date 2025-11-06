@@ -13,7 +13,7 @@ class CameraBuffer : public VertexBuffer
     bool setVertexShader(int bufferSlot, int numberOfBuffers) override;
 
     Camera *camera;
-    struct ShaderBuffer : StandardVertexShader::CameraBuffer
+    struct ShaderBuffer : StandardVertexShader::CameraBufferType
     {
     };
 };

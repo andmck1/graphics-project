@@ -13,7 +13,7 @@ class AmbientLightBuffer : public PixelBuffer
     bool setPixelShader(int bufferSlot, int numberOfBuffers) override;
 
     AmbientLight *ambientLight;
-    struct ShaderBuffer : LightingShader::AmbientLightBuffer
+    struct ShaderBuffer : LightingShader::AmbientLightBufferType
     {
     };
 };

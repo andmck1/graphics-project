@@ -53,16 +53,7 @@ int main()
     spdlog::info("Creating debug scene");
     state.initDebugSceneState(
         &graphicsManager, &app.timer.fps,
-        scene.state->ambientLight->colour.get(),
-        scene.state->pointLight->diffuseColour.get(),
-        scene.state->pointLight->specularColour.get(),
-        scene.state->pointLight->specularPower.get(),
-        scene.state->pointLight->worldPosition.get(),
-        scene.state->pointLight->attenuationCoefficients.get(),
-        scene.state->ambientLight->isEnabled.get(),
-        scene.state->pointLight->isDiffuseEnabled.get(),
-        scene.state->pointLight->isSpecularEnabled.get(),
-        scene.state->pointLight->isAttenuationEnabled.get()
+        state.sceneState.ambientLight.get(), &state.sceneState.pointLights
     );
     DebugScene debugScene = DebugScene(&state.debugSceneState);
 

@@ -24,3 +24,15 @@ class PixelBuffer : public Buffer
     public:
     virtual bool setPixelShader(int bufferSlot, int numberOfBuffers) = 0;
 };
+
+class StructuredBuffer : public Buffer
+{
+};
+
+class StructuredPixelBuffer : public StructuredBuffer
+{
+    public:
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+    ComPtr<ID3D11ShaderResourceView> shaderResourceView;
+    virtual bool setPixelShader(int bufferSlot, int numberOfBuffers) = 0;
+};

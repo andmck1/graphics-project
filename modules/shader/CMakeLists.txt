@@ -1,14 +1,16 @@
-add_library(shared_shader STATIC src/shared_shader/lightingBuffer.cpp
-                                 src/shared_shader/lightingBuffer.h
-                                src/shared_shader/standardVertexBuffer.cpp
-                            src/shared_shader/standardVertexBuffer.h)
+# TODO - make this not hardcoded
+set(FXC_PATH
+    "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/fxc.exe")
+# set(FXC_PATH
+#    "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/fxc.exe")
+
+add_library(
+  shared_shader STATIC
+  src/shared_shader/lightingBuffer.cpp src/shared_shader/lightingBuffer.h
+  src/shared_shader/standardVertexBuffer.cpp
+  src/shared_shader/standardVertexBuffer.h)
 target_link_libraries(shared_shader d3d11 D3DCompiler)
 target_include_directories(shared_shader PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
-
-# Fix this and remove hardcoding. need to use FXC_PATH and check if already set
-# use FXC_ARGS to avoid windows escaping issues
-set(FXC_PATH
-    "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x86/fxc.exe")
 
 # Help from copilot here and
 # https://stackoverflow.com/questions/71299716/how-to-compile-hlsl-shaders-during-build-with-cmake
@@ -43,13 +45,24 @@ foreach(FILE ${HLSL_SHADER_FILES})
   set(PDB_FILE "${OUTPUT_DIR}/${FILE_WE}.pdb")
   list(APPEND CSO_SHADER_FILES ${CSO_FILE})
 
+  set(FXC_ARGS
+      /nologo
+      /Emain
+      /T${shadertype}_${shadermodel}
+      /I
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/shared_shader/
+      $<IF:$<CONFIG:DEBUG>,/Od,/O1>
+      /Zi
+      /Fo
+      ${CSO_FILE}
+      /Fd
+      ${PDB_FILE}
+      ${FILE})
+
   # Zi and Fo flags for debugging
   add_custom_command(
     OUTPUT ${CSO_FILE}
-    COMMAND
-      ${FXC_PATH} /nologo /Emain /T${shadertype}_${shadermodel} /I
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/shared_shader/
-      $<IF:$<CONFIG:DEBUG>,/Od,/O1> /Zi /Fo ${CSO_FILE} /Fd ${PDB_FILE} ${FILE}
+    COMMAND ${FXC_PATH} ${FXC_ARGS}
     DEPENDS ${FILE}
     COMMENT "Compiling HLSL shader: ${FILE}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
