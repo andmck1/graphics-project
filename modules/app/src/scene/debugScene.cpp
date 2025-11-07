@@ -93,13 +93,13 @@ bool DebugScene::render()
             );
             ImGui::SliderFloat(
                 ("Attenuation Coefficient C1#Point#" + iString).c_str(),
-                &pointLight->attenuationCoefficients[1], 0.01f, .3f,
-                "%.5f", false 
+                &pointLight->attenuationCoefficients[1], 0.01f, .3f, "%.5f",
+                false
             );
             ImGui::SliderFloat(
                 ("Attenuation Coefficient C2#Point#" + iString).c_str(),
-                &pointLight->attenuationCoefficients[2], .01f, .1f,
-                "%.6f", false 
+                &pointLight->attenuationCoefficients[2], .01f, .1f, "%.6f",
+                false
             );
             ImGui::Checkbox(
                 ("Diffuse Enabled?#Point#" + iString).c_str(),
@@ -157,6 +157,17 @@ bool DebugScene::render()
             );
         }
     }
+
+    ImGui::SliderFloat(
+        "Water Wave Magnitude", this->state->water->magnitude.get(), 0.1f, 10.f
+    );
+    ImGui::SliderFloat(
+        "Water Wave Number", this->state->water->waveNumber.get(), 0.1f, 1.f
+    );
+    ImGui::SliderFloat(
+        "Water Wave Angular Velocity",
+        this->state->water->angularVelocity.get(), 0.1f, 10.f
+    );
 
     ImGui::End();
     ImGui::Render();

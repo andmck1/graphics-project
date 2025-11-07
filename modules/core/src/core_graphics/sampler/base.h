@@ -6,5 +6,6 @@ class BaseSampler
 {
     public:
     virtual ~BaseSampler() = default;
+    virtual bool setVertexShader(D3D *graphicsManager) = 0;
     virtual bool setPixelShader(D3D *graphicsManager) = 0;
 };

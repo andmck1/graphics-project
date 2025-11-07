@@ -38,7 +38,7 @@ bool CameraBuffer::setVertexShader(int bufferSlot, int numberOfBuffers)
     );
 
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
-    graphicsManager->deviceContext->PSSetConstantBuffers(
+    graphicsManager->deviceContext->VSSetConstantBuffers(
         bufferSlot, numberOfBuffers, this->buffer.GetAddressOf()
     );
     return true;

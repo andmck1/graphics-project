@@ -31,6 +31,23 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
     if (!this->state->cameraBuffer->setVertexShader(1, 1))
         return false;
 
+    if (sceneMesh->heightMap != nullptr)
+    {
+        if (!sceneMesh->heightMapSampler->setVertexShader(
+                this->state->graphicsManager
+            ))
+            return false;
+        if (!sceneMesh->heightMap->setVertexShader(0, 1))
+            return false;
+    }
+    
+    // TODO - GET RID OF THIS CHECK
+    if (sceneMesh->isWave)
+    {
+        if (!this->state->waveDataBuffer->setVertexShader(2, 1))
+            return false;
+    }
+
     if (!this->state->ambientLightBuffer->setPixelShader(0, 1))
         return false;
 
@@ -43,7 +60,9 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
     if (!sceneMesh->texture->setPixelShader(0, 1))
         return false;
 
-    if (!sceneMesh->sampler->setPixelShader(this->state->graphicsManager))
+    if (!sceneMesh->textureSampler->setPixelShader(
+            this->state->graphicsManager
+        ))
         return false;
 
     for (BaseShader *shaderPtr : sceneMesh->shaderStack->shaders)
@@ -133,7 +152,6 @@ void Scene::updateMeshPositions()
                                      pointLight->worldPosition.get()[2]
                                  );
     }
-
 }
 
 bool Scene::render()

@@ -14,7 +14,9 @@ target_include_directories(shared_shader PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # Help from copilot here and
 # https://stackoverflow.com/questions/71299716/how-to-compile-hlsl-shaders-during-build-with-cmake
-set(VERTEX_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/vertex.hlsl")
+set(VERTEX_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/standard.hlsl"
+                   "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/heightMap.hlsl"
+                   "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/wave.hlsl")
 set(PIXEL_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/lighting.hlsl"
                   "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/lightSource.hlsl")
 set(HLSL_SHADER_FILES ${VERTEX_SHADERS} ${PIXEL_SHADERS})

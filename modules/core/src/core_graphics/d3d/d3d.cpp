@@ -43,7 +43,7 @@ bool D3D::initProjectionMatrix()
     float aspectRatio = static_cast<float>(this->state->window->state->width) /
                         static_cast<float>(this->state->window->state->height);
     this->projectionMatrix =
-        XMMatrixPerspectiveFovLH(XM_PIDIV4, aspectRatio, 0.1f, 100.0f);
+        XMMatrixPerspectiveFovLH(XM_PIDIV4, aspectRatio, 0.1f, 5000.0f);
 
     return true;
 }
@@ -320,7 +320,7 @@ bool D3D::updateMatrixBuffer(
 
     this->deviceContext->Unmap(this->matrixBuffer.Get(), 0);
     this->deviceContext->VSSetConstantBuffers(
-        0, 1, matrixBuffer.GetAddressOf()
+        bufferSlot, numberOfBuffers, matrixBuffer.GetAddressOf()
     );
 
     return true;

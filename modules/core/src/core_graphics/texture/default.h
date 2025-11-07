@@ -5,7 +5,6 @@
 #include "core_graphics/d3d/d3d.h"
 #include <d3d11.h>
 #include <wrl/client.h>
-#include <filesystem>
 
 class DefaultTexture : public BaseTexture
 {
@@ -13,6 +12,7 @@ class DefaultTexture : public BaseTexture
     DefaultTexture(D3D *graphicsManager, uint32_t texturePixelColour);
     ComPtr<ID3D11ShaderResourceView> textureResource;
     bool load() override;
+    bool setVertexShader(int startSlot, int numberView) override;
     bool setPixelShader(int startSlot, int numberView) override;
 
     private:
@@ -24,20 +24,3 @@ class DefaultTexture : public BaseTexture
     bool createResource();
 };
 
-class FileTexture : public BaseTexture
-{
-    public:
-    FileTexture(D3D *graphicsManager, std::string filepath);
-    ComPtr<ID3D11ShaderResourceView> textureResource;
-    bool load() override;
-    bool setPixelShader(int startSlot, int numberView) override;
-
-    private:
-    D3D *graphicsManager;
-    uint32_t texturePixelColour;
-    ComPtr<ID3D11Texture2D> texture;
-
-    bool loadAndCreateTextureResource();
-
-    std::filesystem::path filepath;
-};

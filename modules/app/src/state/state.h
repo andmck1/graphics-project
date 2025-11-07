@@ -2,6 +2,7 @@
 
 #include "core_graphics/light/directional.h"
 #include "core_graphics/shader/shader.h"
+#include "core_graphics/water/water.h"
 #include "core_window/window.h"
 #include "core_graphics/d3d/d3d.h"
 #include "../shadermanager/shadermanager.h"
@@ -37,7 +38,8 @@ class State
     void initDebugSceneState(
         D3D *graphicsManager, float *fps, AmbientLight *ambientLight,
         std::vector<std::unique_ptr<PointLight>> *pointLights,
-        std::vector<std::unique_ptr<DirectionalLight>> *directionalLights
+        std::vector<std::unique_ptr<DirectionalLight>> *directionalLights,
+        Water *water
     );
 
     private:
@@ -46,9 +48,12 @@ class State
     template <typename MeshType>
     void initSceneStateMesh(
         ShaderStack *shaderStack, BaseTexture *texture, BaseSampler *sampler,
+        BaseTexture *heightMap = nullptr,
+        BaseSampler *heightMapSampler = nullptr,
         XMMATRIX initScaling = XMMatrixIdentity(),
         XMMATRIX initRotation = XMMatrixIdentity(),
         XMMATRIX initTranslation = XMMatrixIdentity()
+
     );
     void initSceneStateMeshes();
     void initSceneStateAmbientLight();
@@ -68,4 +73,5 @@ class State
         bool initIsAttenuationEnabled
     );
     void initSceneStateCamera();
+    void initSceneStateWater();
 };

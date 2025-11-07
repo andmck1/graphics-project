@@ -18,7 +18,6 @@ namespace StandardVertexShader
     {
         float4 worldPosition;
     };
-
 #ifdef __cplusplus
 }
 #endif

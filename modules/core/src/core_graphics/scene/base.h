@@ -7,6 +7,7 @@
 
 #include <memory>
 
+// TODO - split out this abstraction
 class BaseSceneMesh
 {
     public:
@@ -18,7 +19,11 @@ class BaseSceneMesh
     XMFLOAT3 scaling;
     ShaderStack *shaderStack;
     BaseTexture *texture;
-    BaseSampler *sampler;
+    BaseSampler *textureSampler;
+    BaseTexture *heightMap;
+    BaseSampler *heightMapSampler;
+    // TODO - GET RID OF THIS
+    bool isWave = false;
 };
 
 class BaseScene

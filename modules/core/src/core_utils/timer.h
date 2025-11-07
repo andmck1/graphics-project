@@ -10,6 +10,7 @@ class Timer
         INT64 tickFrequency = 1;
         float fps = 0.f;
         float deltaTime = 1.f;
+        float totalTime = 0.f;
 
         void start();
         void frame();

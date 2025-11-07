@@ -11,7 +11,7 @@ void PlaneMesh::init()
     // Lab code
     int vertexCount, indexCount, index, i, j;
     float positionX, positionZ, u, v, increment;
-    int resolution = 100;
+    int resolution = 1000;
 
     vertexCount = (resolution - 1) * (resolution - 1) * 6;
 

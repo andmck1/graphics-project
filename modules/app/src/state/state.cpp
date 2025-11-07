@@ -1,7 +1,11 @@
 #include "state.h"
 #include "core_graphics/light/ambient.h"
-#include "core_graphics/texture/texture.h"
+#include "core_graphics/texture/default.h"
+#include "core_graphics/texture/file.h"
+#include "core_graphics/water/water.h"
 
+#include <DirectXMathMatrix.inl>
+#include <directxmath.h>
 #include <spdlog/spdlog.h>
 #include <filesystem>
 
@@ -29,7 +33,7 @@ void State::initShaderManagerState(D3D *graphicsManager)
         std::filesystem::absolute("./build/hlsl/pixel").string();
 
     VertexShader standardVertexShader = VertexShader();
-    standardVertexShader.filepath = "./build/hlsl/vertex/vertex.cso";
+    standardVertexShader.filepath = "./build/hlsl/vertex/standard.cso";
     standardVertexShader.type = ShaderType::VERTEX;
     standardVertexShader.inputElementDescription = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
@@ -43,6 +47,40 @@ void State::initShaderManagerState(D3D *graphicsManager)
         std::make_unique<VertexShader>(standardVertexShader)
     );
     BaseShader *standardVertexShaderPtr =
+        this->shaderManagerState.shaders.back().get();
+
+    VertexShader waveVertexShader = VertexShader();
+    waveVertexShader.filepath = "./build/hlsl/vertex/wave.cso";
+    waveVertexShader.type = ShaderType::VERTEX;
+    waveVertexShader.inputElementDescription = {
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
+         D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
+         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
+         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+    };
+    this->shaderManagerState.shaders.push_back(
+        std::make_unique<VertexShader>(waveVertexShader)
+    );
+    BaseShader *waveVertexShaderPtr =
+        this->shaderManagerState.shaders.back().get();
+
+    VertexShader heightMapVertexShader = VertexShader();
+    heightMapVertexShader.filepath = "./build/hlsl/vertex/heightMap.cso";
+    heightMapVertexShader.type = ShaderType::VERTEX;
+    heightMapVertexShader.inputElementDescription = {
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
+         D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
+         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
+         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+    };
+    this->shaderManagerState.shaders.push_back(
+        std::make_unique<VertexShader>(heightMapVertexShader)
+    );
+    BaseShader *heightMapVertexShaderPtr =
         this->shaderManagerState.shaders.back().get();
 
     PixelShader lightingPixelShader = PixelShader();
@@ -67,19 +105,20 @@ void State::initShaderManagerState(D3D *graphicsManager)
         std::vector({standardVertexShaderPtr, lightingPixelShaderPtr});
     this->shaderManagerState.lightSourceShaderStack.shaders =
         std::vector({standardVertexShaderPtr, lightSourcePixelShaderPtr});
+    this->shaderManagerState.heightMappedObjectShaderStack.shaders =
+        std::vector({heightMapVertexShaderPtr, lightingPixelShaderPtr});
+    this->shaderManagerState.waveDataShaderStack.shaders =
+        std::vector({waveVertexShaderPtr, lightingPixelShaderPtr});
 }
 
 void State::initTextureManagerState(D3D *graphicsManager)
 {
     spdlog::debug("Initialising texture manager state");
-    static const uint32_t texturePixelColour = 0x01234567;
+    static const uint32_t texturePixelColour = 0xFF0000;
     this->textureManagerState.defaultTexture =
         std::make_unique<DefaultTexture>(graphicsManager, texturePixelColour);
     this->textureManagerState.moonTexture = std::make_unique<FileTexture>(
         graphicsManager, "./textures/moon_heightmap.jpg"
-    );
-    this->textureManagerState.botwHeightMap = std::make_unique<FileTexture>(
-        graphicsManager, "./textures/botw_heightmap.png"
     );
     this->textureManagerState.ukHeightMap = std::make_unique<FileTexture>(
         graphicsManager, "./textures/uk_heightmap.jpg"
@@ -88,6 +127,9 @@ void State::initTextureManagerState(D3D *graphicsManager)
         std::make_unique<FileTexture>(
             graphicsManager, "./textures/mountains_heightmap.png"
         );
+    this->textureManagerState.mountainsTexture = std::make_unique<FileTexture>(
+        graphicsManager, "./textures/mountains.png"
+    );
     this->textureManagerState.lightDebugTexture = std::make_unique<FileTexture>(
         graphicsManager, "./textures/light_debug.jpg"
     );
@@ -95,17 +137,23 @@ void State::initTextureManagerState(D3D *graphicsManager)
 
 void State::initSceneStateSampler()
 {
-    spdlog::debug("Initialising scene state sampler.");
-    DefaultSampler _defaultSampler = DefaultSampler();
-    _defaultSampler.init(this->sceneState.graphicsManager);
-    this->sceneState.defaultSampler =
-        std::move(std::make_unique<DefaultSampler>(_defaultSampler));
+    spdlog::debug("Initialising scene state samplers.");
+    ClampSampler _clampSampler = ClampSampler();
+    _clampSampler.init(this->sceneState.graphicsManager);
+    this->sceneState.clampSampler =
+        std::move(std::make_unique<ClampSampler>(_clampSampler));
+
+    WrapSampler _wrapSampler = WrapSampler();
+    _wrapSampler.init(this->sceneState.graphicsManager);
+    this->sceneState.wrapSampler =
+        std::move(std::make_unique<WrapSampler>(_wrapSampler));
 }
 
 template <typename MeshType>
 void State::initSceneStateMesh(
     ShaderStack *shaderStack, BaseTexture *texture, BaseSampler *sampler,
-    XMMATRIX initScaling, XMMATRIX initRotation, XMMATRIX initTranslation
+    BaseTexture *heightMap, BaseSampler *heightMapSampler, XMMATRIX initScaling,
+    XMMATRIX initRotation, XMMATRIX initTranslation
 )
 {
     spdlog::debug("Initialising scene state mesh");
@@ -118,38 +166,30 @@ void State::initSceneStateMesh(
         XMMatrixIdentity() * initScaling * initRotation * initTranslation;
     sceneMesh->shaderStack = shaderStack;
     sceneMesh->texture = texture;
-    sceneMesh->sampler = sampler;
+    sceneMesh->textureSampler = sampler;
+    sceneMesh->heightMap = heightMap;
+    sceneMesh->heightMapSampler = heightMapSampler;
     this->sceneState.meshes.push_back(std::move(sceneMesh));
 }
 
 void State::initSceneStateMeshes()
 {
     spdlog::debug("Initialising scene state meshes");
-    this->initSceneStateMesh<TriangleMesh>(
-        &this->shaderManagerState.defaultShaderStack,
-        this->sceneState.textureManager->state->defaultTexture.get(),
-        this->sceneState.defaultSampler.get()
-    );
-
     this->initSceneStateMesh<SphereMesh>(
         &this->shaderManagerState.defaultShaderStack,
         this->sceneState.textureManager->state->moonTexture.get(),
-        this->sceneState.defaultSampler.get(), XMMatrixIdentity(),
-        XMMatrixIdentity(), XMMatrixTranslation(-3.f, 0.f, 0.f)
-    );
-
-    this->initSceneStateMesh<QuadMesh>(
-        &this->shaderManagerState.defaultShaderStack,
-        this->sceneState.textureManager->state->defaultTexture.get(),
-        this->sceneState.defaultSampler.get(), XMMatrixIdentity(),
-        XMMatrixIdentity(), XMMatrixTranslation(3.f, 0.f, 0.f)
+        this->sceneState.clampSampler.get(), nullptr, nullptr,
+        XMMatrixIdentity(), XMMatrixIdentity(),
+        XMMatrixTranslation(-3.f, 0.f, 0.f)
     );
 
     this->initSceneStateMesh<PlaneMesh>(
-        &this->shaderManagerState.defaultShaderStack,
-        this->sceneState.textureManager->state->botwHeightMap.get(),
-        this->sceneState.defaultSampler.get(), XMMatrixIdentity(),
-        XMMatrixIdentity(), XMMatrixTranslation(-10.f, -3.f, -10.f)
+        &this->shaderManagerState.heightMappedObjectShaderStack,
+        this->sceneState.textureManager->state->mountainsHeightMap.get(),
+        this->sceneState.clampSampler.get(),
+        this->sceneState.textureManager->state->mountainsHeightMap.get(),
+        this->sceneState.wrapSampler.get(), XMMatrixIdentity(),
+        XMMatrixIdentity(), XMMatrixIdentity()
     );
 }
 
@@ -189,8 +229,8 @@ void State::initSceneStatePointLight(
     this->initSceneStateMesh<SphereMesh>(
         &this->shaderManagerState.lightSourceShaderStack,
         this->sceneState.textureManager->state->lightDebugTexture.get(),
-        this->sceneState.defaultSampler.get(), XMMatrixScaling(.1f, .1f, .1f),
-        XMMatrixIdentity(),
+        this->sceneState.clampSampler.get(), nullptr, nullptr,
+        XMMatrixScaling(.1f, .1f, .1f), XMMatrixIdentity(),
         XMMatrixTranslation(
             initWorldPosition.x, initWorldPosition.y, initWorldPosition.z
         )
@@ -259,16 +299,6 @@ void State::initSceneStateDirectionalLight(
     std::unique_ptr<DirectionalLightsBuffer> directionalLightsBuffer =
         std::make_unique<DirectionalLightsBuffer>();
 
-    this->initSceneStateMesh<SphereMesh>(
-        &this->shaderManagerState.lightSourceShaderStack,
-        this->sceneState.textureManager->state->lightDebugTexture.get(),
-        this->sceneState.defaultSampler.get(), XMMatrixScaling(.1f, .1f, .1f),
-        XMMatrixIdentity(),
-        XMMatrixTranslation(
-            initWorldPosition.x, initWorldPosition.y, initWorldPosition.z
-        )
-    );
-
     directionalLight->diffuseColour = std::make_unique<float[]>(3);
     directionalLight->diffuseColour[0] = initDiffuseColour.x;
     directionalLight->diffuseColour[1] = initDiffuseColour.y;
@@ -324,6 +354,37 @@ void State::initSceneStateCamera()
     this->sceneState.cameraBuffer = std::move(cameraBuffer);
 }
 
+void State::initSceneStateWater()
+{
+    spdlog::debug("Initialising scene state water");
+
+    std::unique_ptr<Water> water = std::make_unique<Water>();
+    water->magnitude = std::make_unique<float>(2.f);
+    water->waveNumber = std::make_unique<float>(0.1f);
+    water->angularVelocity = std::make_unique<float>(0.5f);
+    this->sceneState.water = std::move(water);
+
+    std::unique_ptr<WaveDataBuffer> waveDataBuffer =
+        std::make_unique<WaveDataBuffer>();
+    waveDataBuffer->totalTime = &this->sceneState.timer.totalTime;
+    waveDataBuffer->magnitude = this->sceneState.water->magnitude.get();
+    waveDataBuffer->waveNumber = this->sceneState.water->waveNumber.get();
+    waveDataBuffer->angularVelocity =
+        this->sceneState.water->angularVelocity.get();
+    waveDataBuffer->init(this->sceneState.graphicsManager);
+    this->sceneState.waveDataBuffer = std::move(waveDataBuffer);
+
+    this->initSceneStateMesh<PlaneMesh>(
+        &this->shaderManagerState.waveDataShaderStack,
+        this->sceneState.textureManager->state->defaultTexture.get(),
+        this->sceneState.clampSampler.get(), nullptr, nullptr,
+        XMMatrixIdentity(), XMMatrixIdentity(),
+        XMMatrixTranslation(0.f, -125.f, 0.f)
+    );
+
+    this->sceneState.meshes.back()->isWave = true;
+}
+
 void State::initSceneState(
     D3D *graphicsManager, ShaderManager *shaderManager,
     TextureManager *textureManager
@@ -341,6 +402,7 @@ void State::initSceneState(
     this->initSceneStatePointLights();
     this->initSceneStateDirectionalLights();
     this->initSceneStateCamera();
+    this->initSceneStateWater();
 }
 
 void State::initAppInputState(Window *window, Scene *scene)
@@ -348,7 +410,7 @@ void State::initAppInputState(Window *window, Scene *scene)
     spdlog::debug("Initialising app input state");
     this->appInputState.window = window;
     this->appInputState.scene = scene;
-    this->appInputState.cameraMoveSpeed = 5.f;
+    this->appInputState.cameraMoveSpeed = 100.f;
     this->appInputState.cameraRotateSensitivity = 0.1f;
 }
 
@@ -361,7 +423,8 @@ void State::initAppState(AppInput *appInput)
 void State::initDebugSceneState(
     D3D *graphicsManager, float *fps, AmbientLight *ambientLight,
     std::vector<std::unique_ptr<PointLight>> *pointLights,
-    std::vector<std::unique_ptr<DirectionalLight>> *directionalLights
+    std::vector<std::unique_ptr<DirectionalLight>> *directionalLights,
+    Water *water
 )
 {
     spdlog::debug("Initialising debug scene state");
@@ -371,4 +434,5 @@ void State::initDebugSceneState(
     this->debugSceneState.ambientLight = ambientLight;
     this->debugSceneState.pointLights = pointLights;
     this->debugSceneState.directionalLights = directionalLights;
+    this->debugSceneState.water = water;
 }

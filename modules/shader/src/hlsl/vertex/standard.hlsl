@@ -10,7 +10,7 @@ cbuffer MatrixBuffer : register(b0)
 
 cbuffer CameraBuffer : register(b1)
 {
-	CameraBuffer cameraData;
+	CameraBufferType cameraData;
 };
 
 struct InputType

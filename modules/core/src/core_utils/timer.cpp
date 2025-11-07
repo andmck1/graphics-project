@@ -32,4 +32,5 @@ void Timer::frame()
     }
 
     this->previousCurrentTime = currentTime;
+    this->totalTime += deltaTime;
 }

@@ -20,6 +20,52 @@ struct InputType
     float3 viewVector : TEXCOORD2;
 };
 
+float GetHeight(float2 uv)
+{
+    float4 textureColour = objectTexture.SampleLevel(textureSampler, uv, 0);
+    return textureColour.r * 500;
+}
+
+// Lab 5 code
+// Use neighbouring texels to calculate surface normals
+float3 calculateNormalUsingNeighbouringTexels(float2 uv, float3 posCentre)
+{
+    uint height;
+    uint width;
+    
+    // Calculate uv coordinate step lengths as a function of texture resolution
+    objectTexture.GetDimensions(width, height);
+    float uvStepResolution = 1.0f;
+    float uvStepX = uvStepResolution * 1.0f / width;
+    float uvStepY = uvStepResolution * 1.0f / height;
+    
+    // Heights from height map of centre and two neighbours
+    float heightCentre = GetHeight(uv);
+    float heightWorldScaling = posCentre.y / heightCentre;
+    float heightNorth = GetHeight(uv + float2(0.0f, uvStepY));
+    float heightWest = GetHeight(uv - float2(uvStepX, 0.0f));
+    float heightSouth = GetHeight(uv - float2(0.0f, uvStepY));
+    float heightEast = GetHeight(uv + float2(uvStepX, 0.0f));
+    
+    // Position vectors
+    float3 posCentreUV = float3(uv.x * width, posCentre.y, uv.y * height);
+    float3 posNorthUV = float3(uv.x * width, heightNorth * heightWorldScaling, (uv.y + uvStepY) * height);
+    float3 posWestUV = float3((uv.x - uvStepX) * width, heightWest * heightWorldScaling, uv.y * height);
+    float3 posSouthUV = float3(uv.x * width, heightSouth * heightWorldScaling, (uv.y - uvStepY) * height);
+    float3 posEastUV = float3((uv.x + uvStepX) * width, heightEast * heightWorldScaling, uv.y * height);
+    
+    // Tangent and bitangent
+    float3 tangent = posCentreUV - posNorthUV;
+    float3 bitangent = posCentreUV - posWestUV;
+    float3 tangent2 = posCentreUV - posSouthUV;
+    float3 bitangent2 = posCentreUV - posEastUV;
+    
+    // Cross product
+    float3 normal = normalize(cross(tangent, bitangent)) + normalize(cross(bitangent, tangent2)) + normalize(cross(tangent2, bitangent2)) + normalize(cross(bitangent2, tangent));
+    
+    return -normal * 0.25;
+}
+
 float3 calculateSpecularLighting(
 	float3 specularColour, 
 	float specularPower,
@@ -196,13 +242,14 @@ float4 getTextureColour(Texture2D _objectTexture, SamplerState _textureSampler, 
 	return _objectTexture.Sample(_textureSampler, uv);
 }
 
-
 float4 main(InputType input) : SV_TARGET
 {
 	float4 textureColour;
 	float4 lightColour = 0.f;
+	float3 newNormal;
 	textureColour = getTextureColour(objectTexture, textureSampler, input.tex);
-	lightColour = calculateLighting(input.worldPosition.xyz, input.normal.xyz, input.viewVector.xyz).rgbb;
+	newNormal = calculateNormalUsingNeighbouringTexels(input.tex, input.position.xyz);
+	lightColour = calculateLighting(input.worldPosition.xyz, newNormal.xyz, input.viewVector.xyz).rgbb;
 	lightColour[3] = 1.f;
 	
     return textureColour * lightColour;

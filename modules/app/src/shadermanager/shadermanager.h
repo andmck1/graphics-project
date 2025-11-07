@@ -8,6 +8,8 @@ class ShaderManagerState : public BaseShaderManagerState
     public:
     ShaderStack defaultShaderStack;
     ShaderStack lightSourceShaderStack;
+    ShaderStack heightMappedObjectShaderStack;
+    ShaderStack waveDataShaderStack;
 };
 
 class ShaderManager : public BaseShaderManager

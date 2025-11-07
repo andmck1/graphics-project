@@ -53,7 +53,8 @@ int main()
     spdlog::info("Creating debug scene");
     state.initDebugSceneState(
         &graphicsManager, &app.timer.fps, state.sceneState.ambientLight.get(),
-        &state.sceneState.pointLights, &state.sceneState.directionalLights
+        &state.sceneState.pointLights, &state.sceneState.directionalLights,
+        state.sceneState.water.get()
     );
     DebugScene debugScene = DebugScene(&state.debugSceneState);
 
@@ -63,6 +64,7 @@ int main()
     while (window.frame())
     {
         app.timer.frame();
+        scene.state->timer.frame();
         app.state->appInput->handleInputs();
         scene.state->camera.update();
         scene.render();

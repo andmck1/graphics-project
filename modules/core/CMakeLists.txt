@@ -16,8 +16,11 @@ add_library(
   src/core_graphics/shader/shader.cpp
   src/core_graphics/shadermanager/base.cpp
   src/core_graphics/sampler/base.cpp
-  src/core_graphics/sampler/default.cpp
-  src/core_graphics/texture/texture.cpp
+  src/core_graphics/sampler/clamp.cpp
+  src/core_graphics/sampler/wrap.cpp
+  src/core_graphics/texture/base.cpp
+  src/core_graphics/texture/default.cpp
+  src/core_graphics/texture/file.cpp
   src/core_graphics/mesh/base.cpp
   src/core_graphics/mesh/triangle.cpp
   src/core_graphics/mesh/sphere.cpp
