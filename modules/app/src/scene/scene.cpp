@@ -37,13 +37,16 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
     if (!this->state->pointLightsBuffer->setPixelShader(1, 1))
         return false;
 
+    if (!this->state->directionalLightsBuffer->setPixelShader(2, 1))
+        return false;
+
     if (!sceneMesh->texture->setPixelShader(0, 1))
         return false;
 
     if (!sceneMesh->sampler->setPixelShader(this->state->graphicsManager))
         return false;
 
-    for (BaseShader* shaderPtr : sceneMesh->shaderStack->shaders)
+    for (BaseShader *shaderPtr : sceneMesh->shaderStack->shaders)
     {
         if (shaderPtr->inputElementDescription)
         {
@@ -75,8 +78,7 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
         }
         case ShaderType::PIXEL:
         {
-            PixelShader *pixelShader =
-                dynamic_cast<PixelShader *>(shaderPtr);
+            PixelShader *pixelShader = dynamic_cast<PixelShader *>(shaderPtr);
             if (!pixelShader)
             {
                 spdlog::error("Pixel shader not loaded.");
@@ -131,6 +133,7 @@ void Scene::updateMeshPositions()
                                      pointLight->worldPosition.get()[2]
                                  );
     }
+
 }
 
 bool Scene::render()

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core_graphics/light/directional.h"
 #include "core_graphics/shader/shader.h"
 #include "core_window/window.h"
 #include "core_graphics/d3d/d3d.h"
@@ -35,7 +36,8 @@ class State
     void initAppState(AppInput *appInput);
     void initDebugSceneState(
         D3D *graphicsManager, float *fps, AmbientLight *ambientLight,
-        std::vector<std::unique_ptr<PointLight>> *pointLights
+        std::vector<std::unique_ptr<PointLight>> *pointLights,
+        std::vector<std::unique_ptr<DirectionalLight>> *directionalLights
     );
 
     private:
@@ -50,12 +52,20 @@ class State
     );
     void initSceneStateMeshes();
     void initSceneStateAmbientLight();
+    void initSceneStatePointLights();
     void initSceneStatePointLight(
         XMFLOAT3 initDiffuseColour, XMFLOAT3 initSpecularColour,
         float initSpecularPower, XMFLOAT3 initWorldPosition,
         XMFLOAT3 initAttenuationCoefficients, bool initIsDiffuseEnabled,
         bool initIsSpecularEnabled, bool initIsAttenuationEnabled
     );
-    void initSceneStatePointLights();
+    void initSceneStateDirectionalLights();
+    void initSceneStateDirectionalLight(
+        XMFLOAT3 initDiffuseColour, XMFLOAT3 initSpecularColour,
+        float initSpecularPower, XMFLOAT3 initWorldPosition,
+        XMFLOAT3 initDirectionVector, XMFLOAT3 initAttenuationCoefficients,
+        bool initIsDiffuseEnabled, bool initIsSpecularEnabled,
+        bool initIsAttenuationEnabled
+    );
     void initSceneStateCamera();
 };

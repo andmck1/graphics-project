@@ -12,6 +12,7 @@
 #include <core_graphics/mesh/sphere.h>
 #include <core_graphics/light/ambient.h>
 #include <core_graphics/light/point.h>
+#include <core_graphics/light/directional.h>
 #include <core_graphics/mesh/quad.h>
 #include <core_graphics/mesh/plane.h>
 #include <core_graphics/mesh/ortho.h>
@@ -25,6 +26,7 @@
 #include "../buffer/cameraBuffer.h"
 #include "../buffer/ambientLightBuffer.h"
 #include "../buffer/pointLightBuffer.h"
+#include "../buffer/directionalLightBuffer.h"
 #include "../texture/textureManager.h"
 
 struct SceneMesh : BaseSceneMesh
@@ -50,6 +52,9 @@ struct SceneState
 
     std::vector<std::unique_ptr<PointLight>> pointLights;
     std::unique_ptr<PointLightsBuffer> pointLightsBuffer;
+
+    std::vector<std::unique_ptr<DirectionalLight>> directionalLights;
+    std::unique_ptr<DirectionalLightsBuffer> directionalLightsBuffer;
 
     std::unique_ptr<CameraBuffer> cameraBuffer;
 };

@@ -2,10 +2,12 @@
 #include "core_graphics/light/ambient.h"
 #include "core_graphics/texture/texture.h"
 
+#include <spdlog/spdlog.h>
 #include <filesystem>
 
 void State::initWindowState()
 {
+    spdlog::debug("Initialising window state");
     this->windowState.height = 1080;
     this->windowState.width = 1920;
     this->windowState.windowName = "Graphics Project";
@@ -13,11 +15,13 @@ void State::initWindowState()
 
 void State::initD3DAppState(Window *window)
 {
+    spdlog::debug("Initialising d3d app state");
     this->d3dAppState.window = window;
 }
 
 void State::initShaderManagerState(D3D *graphicsManager)
 {
+    spdlog::debug("Initialising shader manager state");
     this->shaderManagerState.graphicsManager = graphicsManager;
     this->shaderManagerState.vertexShaderDirectory =
         std::filesystem::absolute("./build/hlsl/vertex").string();
@@ -67,6 +71,7 @@ void State::initShaderManagerState(D3D *graphicsManager)
 
 void State::initTextureManagerState(D3D *graphicsManager)
 {
+    spdlog::debug("Initialising texture manager state");
     static const uint32_t texturePixelColour = 0x01234567;
     this->textureManagerState.defaultTexture =
         std::make_unique<DefaultTexture>(graphicsManager, texturePixelColour);
@@ -90,6 +95,7 @@ void State::initTextureManagerState(D3D *graphicsManager)
 
 void State::initSceneStateSampler()
 {
+    spdlog::debug("Initialising scene state sampler.");
     DefaultSampler _defaultSampler = DefaultSampler();
     _defaultSampler.init(this->sceneState.graphicsManager);
     this->sceneState.defaultSampler =
@@ -102,6 +108,8 @@ void State::initSceneStateMesh(
     XMMATRIX initScaling, XMMATRIX initRotation, XMMATRIX initTranslation
 )
 {
+    spdlog::debug("Initialising scene state mesh");
+
     // TODO - handle bool returns
     MeshType mesh = MeshType(this->sceneState.graphicsManager);
     std::unique_ptr<SceneMesh> sceneMesh = std::make_unique<SceneMesh>();
@@ -116,6 +124,7 @@ void State::initSceneStateMesh(
 
 void State::initSceneStateMeshes()
 {
+    spdlog::debug("Initialising scene state meshes");
     this->initSceneStateMesh<TriangleMesh>(
         &this->shaderManagerState.defaultShaderStack,
         this->sceneState.textureManager->state->defaultTexture.get(),
@@ -146,6 +155,7 @@ void State::initSceneStateMeshes()
 
 void State::initSceneStateAmbientLight()
 {
+    spdlog::debug("Initialising scene state ambient light");
     std::unique_ptr<AmbientLight> ambientLight =
         std::make_unique<AmbientLight>();
     std::unique_ptr<AmbientLightBuffer> ambientLightBuffer =
@@ -171,6 +181,7 @@ void State::initSceneStatePointLight(
     bool initIsSpecularEnabled, bool initIsAttenuationEnabled
 )
 {
+    spdlog::debug("Initialising scene state point light");
     std::unique_ptr<PointLight> pointLight = std::make_unique<PointLight>();
     std::unique_ptr<PointLightsBuffer> pointLightsBuffer =
         std::make_unique<PointLightsBuffer>();
@@ -215,15 +226,16 @@ void State::initSceneStatePointLight(
 
 void State::initSceneStatePointLights()
 {
+    spdlog::debug("Initialising scene state point lights");
     this->initSceneStatePointLight(
         XMFLOAT3(1.f, 1.f, 1.f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
-        XMFLOAT3(0.f, 0.f, 0.f), XMFLOAT3(.432f, .00056f, .000010f), true, true,
+        XMFLOAT3(0.f, 0.f, 5.f), XMFLOAT3(.432f, .00056f, .000010f), true, true,
         true
     );
     this->initSceneStatePointLight(
         XMFLOAT3(1.f, 1.f, 1.f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
-        XMFLOAT3(0.f, 100.f, 100.f), XMFLOAT3(.432f, .00056f, .000010f), true,
-        true, true
+        XMFLOAT3(0.f, 5.f, 5.f), XMFLOAT3(.432f, .00056f, .000010f), true, true,
+        true
     );
 
     std::unique_ptr<PointLightsBuffer> pointLightsBuffer =
@@ -233,8 +245,78 @@ void State::initSceneStatePointLights()
     this->sceneState.pointLightsBuffer = std::move(pointLightsBuffer);
 }
 
+void State::initSceneStateDirectionalLight(
+    XMFLOAT3 initDiffuseColour, XMFLOAT3 initSpecularColour,
+    float initSpecularPower, XMFLOAT3 initWorldPosition,
+    XMFLOAT3 initDirectionVector, XMFLOAT3 initAttenuationCoefficients,
+    bool initIsDiffuseEnabled, bool initIsSpecularEnabled,
+    bool initIsAttenuationEnabled
+)
+{
+    spdlog::debug("Initialising scene state directional light");
+    std::unique_ptr<DirectionalLight> directionalLight =
+        std::make_unique<DirectionalLight>();
+    std::unique_ptr<DirectionalLightsBuffer> directionalLightsBuffer =
+        std::make_unique<DirectionalLightsBuffer>();
+
+    this->initSceneStateMesh<SphereMesh>(
+        &this->shaderManagerState.lightSourceShaderStack,
+        this->sceneState.textureManager->state->lightDebugTexture.get(),
+        this->sceneState.defaultSampler.get(), XMMatrixScaling(.1f, .1f, .1f),
+        XMMatrixIdentity(),
+        XMMatrixTranslation(
+            initWorldPosition.x, initWorldPosition.y, initWorldPosition.z
+        )
+    );
+
+    directionalLight->diffuseColour = std::make_unique<float[]>(3);
+    directionalLight->diffuseColour[0] = initDiffuseColour.x;
+    directionalLight->diffuseColour[1] = initDiffuseColour.y;
+    directionalLight->diffuseColour[2] = initDiffuseColour.z;
+    directionalLight->specularColour = std::make_unique<float[]>(3);
+    directionalLight->specularColour[0] = initSpecularColour.x;
+    directionalLight->specularColour[1] = initSpecularColour.y;
+    directionalLight->specularColour[2] = initSpecularColour.z;
+    directionalLight->specularPower = std::make_unique<float>();
+    *directionalLight->specularPower = initSpecularPower;
+    directionalLight->directionVector = std::make_unique<float[]>(3);
+    directionalLight->directionVector[0] = initDirectionVector.x;
+    directionalLight->directionVector[1] = initDirectionVector.y;
+    directionalLight->directionVector[2] = initDirectionVector.z;
+    directionalLight->isDiffuseEnabled =
+        std::make_unique<bool>(initIsDiffuseEnabled);
+    directionalLight->isSpecularEnabled =
+        std::make_unique<bool>(initIsSpecularEnabled);
+
+    this->sceneState.directionalLights.push_back(std::move(directionalLight));
+}
+
+void State::initSceneStateDirectionalLights()
+{
+    spdlog::debug("Initialising scene state directional lights");
+    this->initSceneStateDirectionalLight(
+        XMFLOAT3(1.f, 1.f, 1.f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
+        XMFLOAT3(5.f, 0.f, 5.f), XMFLOAT3(-1.f, 0.f, 0.f),
+        XMFLOAT3(.432f, .00056f, .000010f), true, true, true
+    );
+    this->initSceneStateDirectionalLight(
+        XMFLOAT3(1.f, 1.f, 1.f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
+        XMFLOAT3(5.f, 0.f, -5.f), XMFLOAT3(-1.f, 0.f, 0.f),
+        XMFLOAT3(.432f, .00056f, .000010f), true, true, true
+    );
+
+    std::unique_ptr<DirectionalLightsBuffer> directionalLightsBuffer =
+        std::make_unique<DirectionalLightsBuffer>();
+    directionalLightsBuffer->directionalLights =
+        &this->sceneState.directionalLights;
+    directionalLightsBuffer->init(this->sceneState.graphicsManager);
+    this->sceneState.directionalLightsBuffer =
+        std::move(directionalLightsBuffer);
+}
+
 void State::initSceneStateCamera()
 {
+    spdlog::debug("Initialising scene state camera");
     std::unique_ptr<CameraBuffer> cameraBuffer =
         std::make_unique<CameraBuffer>();
     cameraBuffer->camera = &this->sceneState.camera;
@@ -247,6 +329,7 @@ void State::initSceneState(
     TextureManager *textureManager
 )
 {
+    spdlog::debug("Initialising scene state");
     this->sceneState.graphicsManager = graphicsManager;
     this->sceneState.shaderManager = shaderManager;
     this->sceneState.textureManager = textureManager;
@@ -256,11 +339,13 @@ void State::initSceneState(
     this->initSceneStateMeshes();
     this->initSceneStateAmbientLight();
     this->initSceneStatePointLights();
+    this->initSceneStateDirectionalLights();
     this->initSceneStateCamera();
 }
 
 void State::initAppInputState(Window *window, Scene *scene)
 {
+    spdlog::debug("Initialising app input state");
     this->appInputState.window = window;
     this->appInputState.scene = scene;
     this->appInputState.cameraMoveSpeed = 5.f;
@@ -269,17 +354,21 @@ void State::initAppInputState(Window *window, Scene *scene)
 
 void State::initAppState(AppInput *appInput)
 {
+    spdlog::debug("Initialising app state");
     this->appState.appInput = appInput;
 }
 
 void State::initDebugSceneState(
     D3D *graphicsManager, float *fps, AmbientLight *ambientLight,
-    std::vector<std::unique_ptr<PointLight>> *pointLights
+    std::vector<std::unique_ptr<PointLight>> *pointLights,
+    std::vector<std::unique_ptr<DirectionalLight>> *directionalLights
 )
 {
+    spdlog::debug("Initialising debug scene state");
     this->debugSceneState.graphicsManager = graphicsManager;
     this->debugSceneState.fps = fps;
 
     this->debugSceneState.ambientLight = ambientLight;
     this->debugSceneState.pointLights = pointLights;
+    this->debugSceneState.directionalLights = directionalLights;
 }

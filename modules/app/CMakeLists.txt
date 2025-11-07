@@ -10,8 +10,8 @@ add_executable(
   src/app/app.cpp
   src/buffer/ambientLightBuffer.cpp
   src/buffer/pointLightBuffer.cpp
-  src/buffer/cameraBuffer.cpp
-  )
+  src/buffer/directionalLightBuffer.cpp
+  src/buffer/cameraBuffer.cpp)
 
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR}
                                         ${imgui_SOURCE_DIR}/backends)

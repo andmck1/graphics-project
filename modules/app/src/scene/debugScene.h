@@ -2,6 +2,7 @@
 
 #include "core_graphics/light/ambient.h"
 #include "core_graphics/light/point.h"
+#include "core_graphics/light/directional.h"
 #include <core_graphics/d3d/d3d.h>
 #include <memory>
 #include <vector>
@@ -11,8 +12,9 @@ struct DebugSceneState
     D3D *graphicsManager;
     float *fps;
 
-    AmbientLight* ambientLight;
+    AmbientLight *ambientLight;
     std::vector<std::unique_ptr<PointLight>> *pointLights;
+    std::vector<std::unique_ptr<DirectionalLight>> *directionalLights;
 };
 
 class DebugScene

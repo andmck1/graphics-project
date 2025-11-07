@@ -9,6 +9,7 @@ cbuffer AmbientLightBuffer: register(b0)
 }
 
 StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t1);
+StructuredBuffer<DirectionalLightBufferType> DirectionalLightBuffer : register(t2);
 
 struct InputType
 {
@@ -36,20 +37,50 @@ float3 calculateSpecularLighting(
 float3 calculateDiffuseLighting(float3 diffuseColour, float3 normal, float3 lightVector)
 {
 	float3 diffuseLighting;
-    float diffuseIntensity = dot(normal, lightVector);
+    float diffuseIntensity = max(dot(normal, lightVector), 0.f);
     diffuseLighting = diffuseColour * diffuseIntensity;
 	return diffuseLighting;
 }
 
+float3 calculateDirectionalLighting(
+	DirectionalLightBufferType directionalLightData,
+	float3 fragmentWorldPosition, 
+	float3 fragmentNormal, 
+	float3 viewWorldPosition
+)
+{
+	float3 directionalLighting;
+	float3 diffuse = {0.f, 0.f, 0.f};
+	float3 specular = {0.f, 0.f, 0.f};
+	float distance;
+	float attenuation = 1.f;
+
+	if ((bool) directionalLightData.isDiffuseEnabled.r)
+	{
+		diffuse = calculateDiffuseLighting(
+			directionalLightData.diffuseColour.rgb, 
+			fragmentNormal, 
+			directionalLightData.directionVector.xyz
+		);
+	}
+	if ((bool) directionalLightData.isSpecularEnabled)
+	{
+		specular = calculateSpecularLighting(
+			directionalLightData.specularColour.rgb,
+			directionalLightData.specularPower.r,
+			viewWorldPosition,
+			directionalLightData.directionVector.xyz,
+			fragmentNormal	
+		);
+	}
+
+	directionalLighting = diffuse + specular;
+	directionalLighting *= attenuation;
+	return directionalLighting;
+}
+
 float3 calculatePointLighting(
-	float3 diffuseLightColour, 
-	float3 specularLightColour, 
-	float specularLightPower,
-	float3 pointLightWorldPosition, 
-	float3 pointLightAttenuationCoefficients,
-	bool isDiffuseEnabled,
-	bool isSpecularEnabled,
-	bool isAttenuationEnabled,
+	PointLightBufferType pointLightData,
 	float3 fragmentWorldPosition, 
 	float3 fragmentNormal, 
 	float3 lightVector,
@@ -62,32 +93,32 @@ float3 calculatePointLighting(
 	float distance;
 	float attenuation = 1.f;
 
-	if (isDiffuseEnabled)
+	if ((bool) pointLightData.isDiffuseEnabled.r)
 	{
 		diffuse = calculateDiffuseLighting(
-			diffuseLightColour, 
+			pointLightData.diffuseColour.rgb, 
 			fragmentNormal, 
 			lightVector
 		);
 	}
-	if (isSpecularEnabled)
+	if ((bool) pointLightData.isSpecularEnabled.r)
 	{
 		specular = calculateSpecularLighting(
-			specularLightColour,
-			specularLightPower,
+			pointLightData.specularColour.rgb,
+			pointLightData.specularPower.r,
 			viewWorldPosition,
 			lightVector,
 			fragmentNormal	
 		);
 	}
 
-	if (isAttenuationEnabled)
+	if ((bool) pointLightData.isAttenuationEnabled.r)
 	{
-		distance = length(pointLightWorldPosition - fragmentWorldPosition);
+		distance = length(pointLightData.worldPosition.xyz - fragmentWorldPosition);
 		attenuation = 1.0f / (
-			pointLightAttenuationCoefficients[0] + 
-			(pointLightAttenuationCoefficients[1] * distance) + 
-			(pointLightAttenuationCoefficients[2] * distance * distance)
+			pointLightData.attenuationCoefficients[0] + 
+			(pointLightData.attenuationCoefficients[1] * distance) + 
+			(pointLightData.attenuationCoefficients[2] * distance * distance)
 		);
 	}
 
@@ -98,53 +129,66 @@ float3 calculatePointLighting(
 
 float3 calculateAmbientLighting(float3 colour)
 {
-	return colour;
+	return max(colour, float3(0.f, 0.f, 0.f));
 }
 
 float3 calculateLighting(
-	float3 ambientColour, 
-	bool isAmbientEnabled,
-	float3 pointDiffuseLightColour,
-	float3 pointSpecularLightColour, 
-	float pointSpecularLightPower,
-	float3 pointLightWorldPosition, 
-	float3 pointLightAttenuationCoefficients,
-	bool isPointLightDiffuseEnabled,
-	bool isPointLightSpecularEnabled,
-	bool isPointLightAttenuationEnabled,
 	float3 fragmentWorldPosition, 
 	float3 fragmentNormal,
 	float3 viewWorldPosition
 )
 {
-	float3 calculatedLightColour;
+	float3 lightColourTotal = {0.f, 0.f, 0.f};
 	float3 ambientLighting = {0.f, 0.f, 0.f}; 
-	float3 pointLighting;
+	float3 pointLighting = {0.f, 0.f, 0.f};
+	float3 directionalLighting = {0.f, 0.f, 0.f};
 	float3 lightVector;
+	int totalNPointLights = 0;
+	int totalNDirectionalLights = 0;
+	int i;
 
-	lightVector = normalize(pointLightWorldPosition - fragmentWorldPosition);
 
-	if (isAmbientEnabled)
+	if ((bool) ambientLightData.isEnabled)
 	{
-		ambientLighting = calculateAmbientLighting(ambientColour);
+		ambientLighting = calculateAmbientLighting(ambientLightData.colour.rgb);
 	}
-	pointLighting = calculatePointLighting(
-		pointDiffuseLightColour, 
-		pointSpecularLightColour, 
-		pointSpecularLightPower,
-		pointLightWorldPosition, 
-		pointLightAttenuationCoefficients,
-		isPointLightDiffuseEnabled,
-		isPointLightSpecularEnabled,
-		isPointLightAttenuationEnabled,
-		fragmentWorldPosition, 
-		fragmentNormal, 
-		lightVector,
-		viewWorldPosition
-	);
+	lightColourTotal += ambientLighting;
 
-	calculatedLightColour = saturate(ambientLighting + pointLighting);
-	return calculatedLightColour;
+	PointLightBufferType firstPointLightData = PointLightBuffer[0];
+	totalNPointLights = firstPointLightData.nLights.x;
+	for(i=0; i<totalNPointLights; i++)
+	{
+		float3 lightColourContribution;
+		PointLightBufferType pointLightData = PointLightBuffer[i];
+		lightVector = normalize(pointLightData.worldPosition.xyz - fragmentWorldPosition.xyz).xyz;
+
+		lightColourContribution = calculatePointLighting(
+			pointLightData,
+			fragmentWorldPosition, 
+			fragmentNormal, 
+			lightVector,
+			viewWorldPosition
+		);
+		lightColourTotal += lightColourContribution;
+	}
+
+	DirectionalLightBufferType firstDirectionalLightData = DirectionalLightBuffer[0];
+	totalNDirectionalLights = firstDirectionalLightData.nLights.x;
+	for(i=0; i<totalNDirectionalLights; i++)
+	{
+		float3 lightColourContribution;
+		DirectionalLightBufferType directionalLightData = DirectionalLightBuffer[i];
+
+		lightColourContribution = calculateDirectionalLighting(
+			directionalLightData,
+			fragmentWorldPosition,
+			fragmentNormal,
+			viewWorldPosition
+		);
+		lightColourTotal += lightColourContribution;
+	}
+
+	return lightColourTotal;
 }
 
 float4 getTextureColour(Texture2D _objectTexture, SamplerState _textureSampler, float2 uv)
@@ -156,36 +200,10 @@ float4 getTextureColour(Texture2D _objectTexture, SamplerState _textureSampler, 
 float4 main(InputType input) : SV_TARGET
 {
 	float4 textureColour;
-	float4 lightColourTotal = 0.f;
-	int totalNPointLights = 0;
-
+	float4 lightColour = 0.f;
 	textureColour = getTextureColour(objectTexture, textureSampler, input.tex);
-
-	PointLightBufferType firstPointLightData = PointLightBuffer[0];
-	totalNPointLights = firstPointLightData.nLights.x;
-	for(int i=0; i<totalNPointLights; i++)
-	{
-		float4 lightColour;
-		PointLightBufferType pointLightData = PointLightBuffer[i];
-
-		lightColour = calculateLighting(
-			ambientLightData.colour.rgb,
-			ambientLightData.isEnabled.r,
-			pointLightData.diffuseColour.rgb,
-			pointLightData.specularColour.rgb,
-			pointLightData.specularPower.r,
-			pointLightData.worldPosition.xyz,
-			pointLightData.attenuationCoefficients.xyz,
-			pointLightData.isDiffuseEnabled.r,
-			pointLightData.isSpecularEnabled.r,
-			pointLightData.isAttenuationEnabled.r,
-			input.worldPosition,
-			input.normal,
-			input.viewVector
-		).rgbb;
-		lightColour[3] = 1.f;
-		lightColourTotal += lightColour;
-	}
+	lightColour = calculateLighting(input.worldPosition.xyz, input.normal.xyz, input.viewVector.xyz).rgbb;
+	lightColour[3] = 1.f;
 	
-    return textureColour * lightColourTotal;
+    return textureColour * lightColour;
 }
