@@ -1,39 +1,46 @@
 #pragma once
 
+#include "core_graphics/buffer/buffer.h"
 #include <optional>
 
 #include <core_graphics/d3d/d3d.h>
 
-enum class ShaderType
+enum class EnumShaderType
 {
     VERTEX,
     PIXEL
 };
 
-struct BaseShader
+class BaseShader
 {
+    public:
     virtual ~BaseShader() = default;
 
     std::string filepath;
-    ShaderType type;
+    EnumShaderType type;
     std::optional<std::vector<D3D11_INPUT_ELEMENT_DESC>>
         inputElementDescription = std::nullopt;
     ComPtr<ID3DBlob> blob;
+    std::vector<Buffer> bufferStack;
 
     bool loadBlob(D3D *graphicsManager);
 };
 
-struct VertexShader : BaseShader
+class VertexShader : public BaseShader
 {
+    public:
     ComPtr<ID3D11VertexShader> shader;
 };
 
-struct PixelShader : BaseShader
+class PixelShader : public BaseShader
 {
+    public:
     ComPtr<ID3D11PixelShader> shader;
+    std::vector<PixelBuffer> bufferStack;
 };
 
-struct ShaderStack
+class ShaderStack
 {
-    std::vector<BaseShader*> shaders;
+    public:
+    std::vector<BaseShader *> shaders;
 };

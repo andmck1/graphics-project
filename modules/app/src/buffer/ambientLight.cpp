@@ -38,7 +38,7 @@ bool AmbientLightBuffer::setPixelShader(int bufferSlot, int numberOfBuffers)
         this->ambientLight->colour[2], 0.f
     );
     bufferData->isEnabled =
-        XMINT4((int) *this->ambientLight->isEnabled, 0, 0, 0);
+        XMINT4((int) this->ambientLight->isEnabled, 0, 0, 0);
 
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->PSSetConstantBuffers(

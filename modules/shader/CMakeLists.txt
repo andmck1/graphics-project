@@ -1,22 +1,20 @@
-# TODO - make this not hardcoded
+# :TODO - make this not hardcoded
 set(FXC_PATH
     "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/fxc.exe")
 # set(FXC_PATH "C:/Program Files (x86)/Windows
 # Kits/10/bin/10.0.22621.0/x86/fxc.exe")
 
-add_library(
-  shared_shader STATIC
-  src/shared_shader/lightingBuffer.cpp src/shared_shader/lightingBuffer.h
-  src/shared_shader/standardVertexBuffer.cpp
-  src/shared_shader/standardVertexBuffer.h)
+add_library(shared_shader STATIC src/shared_shader/sharedbuffertypes.h
+                                 src/shared_shader/sharedbuffertypes.cpp)
 target_link_libraries(shared_shader d3d11 D3DCompiler)
 target_include_directories(shared_shader PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # Help from copilot here and
 # https://stackoverflow.com/questions/71299716/how-to-compile-hlsl-shaders-during-build-with-cmake
-set(VERTEX_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/standard.hlsl"
-                   "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/heightMap.hlsl"
-                   "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/wave.hlsl")
+set(VERTEX_SHADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/standard.hlsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/heightMap.hlsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/wave.hlsl")
 set(PIXEL_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/lighting.hlsl"
                   "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/lightSource.hlsl")
 set(HLSL_SHADER_FILES ${VERTEX_SHADERS} ${PIXEL_SHADERS})

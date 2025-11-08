@@ -5,7 +5,6 @@
 #include "core_graphics/light/directional.h"
 #include "core_graphics/water/water.h"
 #include <core_graphics/d3d/d3d.h>
-#include <memory>
 #include <vector>
 
 struct DebugSceneState
@@ -14,8 +13,8 @@ struct DebugSceneState
     float *fps;
 
     AmbientLight *ambientLight;
-    std::vector<std::unique_ptr<PointLight>> *pointLights;
-    std::vector<std::unique_ptr<DirectionalLight>> *directionalLights;
+    std::vector<PointLight *> *pointLights;
+    std::vector<DirectionalLight *> *directionalLights;
     Water *water;
 };
 

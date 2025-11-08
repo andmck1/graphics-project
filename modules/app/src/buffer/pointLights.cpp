@@ -1,4 +1,4 @@
-#include "pointLightBuffer.h"
+#include "pointLightsBuffer.h"
 #include <core_utils/graphics.h>
 
 bool PointLightsBuffer::init(D3D *graphicsManager)
@@ -74,7 +74,7 @@ bool PointLightsBuffer::setPixelShader(int bufferSlot, int numberOfBuffers)
             (*this->pointLights)[i]->specularColour[2], 0.f
         );
         bufferData[i].specularPower =
-            XMFLOAT4(*(*this->pointLights)[i]->specularPower, 0.f, 0.f, 0.f);
+            XMFLOAT4((*this->pointLights)[i]->specularPower, 0.f, 0.f, 0.f);
         bufferData[i].worldPosition = XMFLOAT4(
             (*this->pointLights)[i]->worldPosition[0],
             (*this->pointLights)[i]->worldPosition[1],
@@ -86,11 +86,11 @@ bool PointLightsBuffer::setPixelShader(int bufferSlot, int numberOfBuffers)
             (*this->pointLights)[i]->attenuationCoefficients[2], 0.f
         );
         bufferData[i].isDiffuseEnabled =
-            XMINT4((int) *(*this->pointLights)[i]->isDiffuseEnabled, 0, 0, 0);
+            XMINT4((int) (*this->pointLights)[i]->isDiffuseEnabled, 0, 0, 0);
         bufferData[i].isSpecularEnabled =
-            XMINT4((int) *(*this->pointLights)[i]->isSpecularEnabled, 0, 0, 0);
+            XMINT4((int) (*this->pointLights)[i]->isSpecularEnabled, 0, 0, 0);
         bufferData[i].isAttenuationEnabled = XMINT4(
-            (int) *(*this->pointLights)[i]->isAttenuationEnabled, 0, 0, 0
+            (int) (*this->pointLights)[i]->isAttenuationEnabled, 0, 0, 0
         );
         bufferData[i].nLights =
             XMINT4{(int) this->pointLights->size(), 0, 0, 0};

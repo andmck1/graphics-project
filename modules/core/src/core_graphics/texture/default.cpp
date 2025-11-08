@@ -2,14 +2,6 @@
 #include "core_utils/graphics.h"
 #include <spdlog/spdlog.h>
 
-DefaultTexture::DefaultTexture(
-    D3D *graphicsManager, uint32_t texturePixelColour
-)
-{
-    this->graphicsManager = graphicsManager;
-    this->texturePixelColour = texturePixelColour;
-}
-
 // Some help from lab here
 bool DefaultTexture::loadTexture()
 {

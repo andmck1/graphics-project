@@ -5,12 +5,12 @@
 
 struct TextureManagerState
 {
-    std::unique_ptr<DefaultTexture> defaultTexture;
-    std::unique_ptr<FileTexture> moonTexture;
-    std::unique_ptr<FileTexture> ukHeightMap;
-    std::unique_ptr<FileTexture> mountainsHeightMap;
-    std::unique_ptr<FileTexture> mountainsTexture;
-    std::unique_ptr<FileTexture> lightDebugTexture;
+    TextureManagerState();
+    DefaultTexture defaultTexture;
+    FileTexture moonTexture;
+    FileTexture mountainsHeightMap;
+    FileTexture mountainsTexture;
+    FileTexture lightDebugTexture;
 };
 
 class TextureManager

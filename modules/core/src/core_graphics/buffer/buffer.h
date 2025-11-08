@@ -5,6 +5,7 @@
 class Buffer
 {
     public:
+    virtual ~Buffer() = default;
     virtual bool init(D3D *graphicsManager) = 0;
     ComPtr<ID3D11Buffer> buffer;
     D3D11_BUFFER_DESC bufferDesc;

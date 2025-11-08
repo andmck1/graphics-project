@@ -1,4 +1,5 @@
 #include "state.h"
+
 #include "core_graphics/light/ambient.h"
 #include "core_graphics/texture/default.h"
 #include "core_graphics/texture/file.h"
@@ -23,134 +24,151 @@ void State::initD3DAppState(Window *window)
     this->d3dAppState.window = window;
 }
 
+template <typename ShaderType>
+ShaderType State::initShaderManagerStateShader(
+    std::string filepath, EnumShaderType type,
+    std::optional<std::vector<D3D11_INPUT_ELEMENT_DESC>> inputElementDescription
+)
+{
+    ShaderType shader = ShaderType();
+    shader.filepath = filepath;
+    shader.type = type;
+    shader.inputElementDescription = inputElementDescription;
+    return shader;
+}
+
+void State::initShaderManagerStateShaders()
+{
+    std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDescription = {
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
+         D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
+         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
+         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+    };
+    this->shaderManagerState.standardVertexShader =
+        this->initShaderManagerStateShader<VertexShader>(
+            "./build/hlsl/vertex/standard.cso", EnumShaderType::VERTEX,
+            inputElementDescription
+        );
+
+    this->shaderManagerState.heightMapVertexShader =
+        this->initShaderManagerStateShader<VertexShader>(
+            "./build/hlsl/vertex/heightMap.cso", EnumShaderType::VERTEX,
+            inputElementDescription
+        );
+
+    this->shaderManagerState.waveVertexShader =
+        this->initShaderManagerStateShader<VertexShader>(
+            "./build/hlsl/vertex/wave.cso", EnumShaderType::VERTEX,
+            inputElementDescription
+        );
+
+    this->shaderManagerState.lightingPixelShader =
+        this->initShaderManagerStateShader<PixelShader>(
+            "./build/hlsl/pixel/lighting.cso", EnumShaderType::PIXEL
+        );
+
+    this->shaderManagerState.lightSourcePixelShader =
+        this->initShaderManagerStateShader<PixelShader>(
+            "./build/hlsl/pixel/lightSource.cso", EnumShaderType::PIXEL
+        );
+}
+
+void State::initShaderManagerStateShaderStacks()
+{
+    this->shaderManagerState.defaultShaderStack.shaders =
+        std::vector<BaseShader *>(
+            {&this->shaderManagerState.standardVertexShader,
+             &this->shaderManagerState.lightingPixelShader}
+        );
+    this->shaderManagerState.lightSourceShaderStack.shaders =
+        std::vector<BaseShader *>(
+            {&this->shaderManagerState.standardVertexShader,
+             &this->shaderManagerState.lightSourcePixelShader}
+        );
+    this->shaderManagerState.heightMappedObjectShaderStack.shaders =
+        std::vector<BaseShader *>(
+            {&this->shaderManagerState.heightMapVertexShader,
+             &this->shaderManagerState.lightingPixelShader}
+        );
+    this->shaderManagerState.waveDataShaderStack.shaders =
+        std::vector<BaseShader *>(
+            {&this->shaderManagerState.waveVertexShader,
+             &this->shaderManagerState.lightingPixelShader}
+        );
+}
+
+void State::initShaderManagerStateShaderBuffers()
+{
+    this->shaderManagerState.standardVertexShader.bufferStack = {
+        this->shaderManagerState.standardVertexShader.matrixBuffer
+    };
+}
+
 void State::initShaderManagerState(D3D *graphicsManager)
 {
     spdlog::debug("Initialising shader manager state");
     this->shaderManagerState.graphicsManager = graphicsManager;
-    this->shaderManagerState.vertexShaderDirectory =
-        std::filesystem::absolute("./build/hlsl/vertex").string();
-    shaderManagerState.pixelShaderDirectory =
-        std::filesystem::absolute("./build/hlsl/pixel").string();
 
-    VertexShader standardVertexShader = VertexShader();
-    standardVertexShader.filepath = "./build/hlsl/vertex/standard.cso";
-    standardVertexShader.type = ShaderType::VERTEX;
-    standardVertexShader.inputElementDescription = {
-        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
-         D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
-         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
-         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
-    };
-    this->shaderManagerState.shaders.push_back(
-        std::make_unique<VertexShader>(standardVertexShader)
-    );
-    BaseShader *standardVertexShaderPtr =
-        this->shaderManagerState.shaders.back().get();
-
-    VertexShader waveVertexShader = VertexShader();
-    waveVertexShader.filepath = "./build/hlsl/vertex/wave.cso";
-    waveVertexShader.type = ShaderType::VERTEX;
-    waveVertexShader.inputElementDescription = {
-        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
-         D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
-         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
-         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
-    };
-    this->shaderManagerState.shaders.push_back(
-        std::make_unique<VertexShader>(waveVertexShader)
-    );
-    BaseShader *waveVertexShaderPtr =
-        this->shaderManagerState.shaders.back().get();
-
-    VertexShader heightMapVertexShader = VertexShader();
-    heightMapVertexShader.filepath = "./build/hlsl/vertex/heightMap.cso";
-    heightMapVertexShader.type = ShaderType::VERTEX;
-    heightMapVertexShader.inputElementDescription = {
-        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
-         D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
-         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
-         D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
-    };
-    this->shaderManagerState.shaders.push_back(
-        std::make_unique<VertexShader>(heightMapVertexShader)
-    );
-    BaseShader *heightMapVertexShaderPtr =
-        this->shaderManagerState.shaders.back().get();
-
-    PixelShader lightingPixelShader = PixelShader();
-    lightingPixelShader.filepath = "./build/hlsl/pixel/lighting.cso";
-    lightingPixelShader.type = ShaderType::PIXEL;
-    this->shaderManagerState.shaders.push_back(
-        std::make_unique<PixelShader>(lightingPixelShader)
-    );
-    BaseShader *lightingPixelShaderPtr =
-        this->shaderManagerState.shaders.back().get();
-
-    PixelShader lightSourcePixelShader = PixelShader();
-    lightSourcePixelShader.filepath = "./build/hlsl/pixel/lightSource.cso";
-    lightSourcePixelShader.type = ShaderType::PIXEL;
-    this->shaderManagerState.shaders.push_back(
-        std::make_unique<PixelShader>(lightSourcePixelShader)
-    );
-    BaseShader *lightSourcePixelShaderPtr =
-        this->shaderManagerState.shaders.back().get();
-
-    this->shaderManagerState.defaultShaderStack.shaders =
-        std::vector({standardVertexShaderPtr, lightingPixelShaderPtr});
-    this->shaderManagerState.lightSourceShaderStack.shaders =
-        std::vector({standardVertexShaderPtr, lightSourcePixelShaderPtr});
-    this->shaderManagerState.heightMappedObjectShaderStack.shaders =
-        std::vector({heightMapVertexShaderPtr, lightingPixelShaderPtr});
-    this->shaderManagerState.waveDataShaderStack.shaders =
-        std::vector({waveVertexShaderPtr, lightingPixelShaderPtr});
+    this->initShaderManagerStateShaders();
+    this->initShaderManagerStateShaderStacks();
+    this->initShaderManagerStateShaderBuffers();
 }
 
 void State::initTextureManagerState(D3D *graphicsManager)
 {
     spdlog::debug("Initialising texture manager state");
     static const uint32_t texturePixelColour = 0xFF0000;
-    this->textureManagerState.defaultTexture =
-        std::make_unique<DefaultTexture>(graphicsManager, texturePixelColour);
-    this->textureManagerState.moonTexture = std::make_unique<FileTexture>(
-        graphicsManager, "./textures/moon_heightmap.jpg"
+    this->textureManagerState.defaultTexture = DefaultTexture();
+    this->textureManagerState.defaultTexture.graphicsManager = graphicsManager;
+    this->textureManagerState.defaultTexture.texturePixelColour =
+        texturePixelColour;
+
+    this->textureManagerState.moonTexture = FileTexture();
+    this->textureManagerState.moonTexture.graphicsManager = graphicsManager;
+    this->textureManagerState.moonTexture.filepath = std::filesystem::absolute(
+        std::filesystem::path("./textures/moon_heightmap.jpg")
     );
-    this->textureManagerState.ukHeightMap = std::make_unique<FileTexture>(
-        graphicsManager, "./textures/uk_heightmap.jpg"
-    );
-    this->textureManagerState.mountainsHeightMap =
-        std::make_unique<FileTexture>(
-            graphicsManager, "./textures/mountains_heightmap.png"
+
+    this->textureManagerState.mountainsHeightMap = FileTexture();
+    this->textureManagerState.mountainsHeightMap.graphicsManager =
+        graphicsManager;
+    this->textureManagerState.mountainsHeightMap.filepath =
+        std::filesystem::absolute(
+            std::filesystem::path("./textures/mountains_heightmap.png")
         );
-    this->textureManagerState.mountainsTexture = std::make_unique<FileTexture>(
-        graphicsManager, "./textures/mountains.png"
-    );
-    this->textureManagerState.lightDebugTexture = std::make_unique<FileTexture>(
-        graphicsManager, "./textures/light_debug.jpg"
-    );
+
+    this->textureManagerState.mountainsTexture = FileTexture();
+    this->textureManagerState.mountainsTexture.graphicsManager =
+        graphicsManager;
+    this->textureManagerState.mountainsTexture.filepath =
+        std::filesystem::absolute(
+            std::filesystem::path("./textures/mountains.png")
+        );
+
+    this->textureManagerState.lightDebugTexture = FileTexture();
+    this->textureManagerState.lightDebugTexture.graphicsManager =
+        graphicsManager;
+    this->textureManagerState.lightDebugTexture.filepath =
+        std::filesystem::absolute(
+            std::filesystem::path("./textures/light_debug.png")
+        );
 }
 
 void State::initSceneStateSampler()
 {
     spdlog::debug("Initialising scene state samplers.");
-    ClampSampler _clampSampler = ClampSampler();
-    _clampSampler.init(this->sceneState.graphicsManager);
-    this->sceneState.clampSampler =
-        std::move(std::make_unique<ClampSampler>(_clampSampler));
+    this->sceneState.clampSampler = ClampSampler();
+    this->sceneState.clampSampler.init(this->sceneState.graphicsManager);
 
-    WrapSampler _wrapSampler = WrapSampler();
-    _wrapSampler.init(this->sceneState.graphicsManager);
-    this->sceneState.wrapSampler =
-        std::move(std::make_unique<WrapSampler>(_wrapSampler));
+    this->sceneState.wrapSampler = WrapSampler();
+    this->sceneState.wrapSampler.init(this->sceneState.graphicsManager);
 }
 
 template <typename MeshType>
-void State::initSceneStateMesh(
+void State::initSceneStateActor(
     ShaderStack *shaderStack, BaseTexture *texture, BaseSampler *sampler,
     BaseTexture *heightMap, BaseSampler *heightMapSampler, XMMATRIX initScaling,
     XMMATRIX initRotation, XMMATRIX initTranslation
@@ -160,58 +178,52 @@ void State::initSceneStateMesh(
 
     // TODO - handle bool returns
     MeshType mesh = MeshType(this->sceneState.graphicsManager);
-    std::unique_ptr<SceneMesh> sceneMesh = std::make_unique<SceneMesh>();
-    sceneMesh->mesh = std::make_unique<MeshType>(mesh);
-    sceneMesh->worldMatrix =
-        XMMatrixIdentity() * initScaling * initRotation * initTranslation;
-    sceneMesh->shaderStack = shaderStack;
-    sceneMesh->texture = texture;
-    sceneMesh->textureSampler = sampler;
-    sceneMesh->heightMap = heightMap;
-    sceneMesh->heightMapSampler = heightMapSampler;
-    this->sceneState.meshes.push_back(std::move(sceneMesh));
+    std::unique_ptr<SceneActor> sceneActor = std::make_unique<SceneActor>();
+    sceneActor->mesh = std::make_unique<MeshType>(mesh);
+    sceneActor->shaderStack = shaderStack;
+    sceneActor->texture = texture;
+    sceneActor->textureSampler = sampler;
+    sceneActor->heightMap = heightMap;
+    sceneActor->heightMapSampler = heightMapSampler;
+    this->sceneState.actors.push_back(std::move(sceneActor));
 }
 
-void State::initSceneStateMeshes()
+void State::initSceneStateActors()
 {
     spdlog::debug("Initialising scene state meshes");
-    this->initSceneStateMesh<SphereMesh>(
+    this->initSceneStateActor<SphereMesh>(
         &this->shaderManagerState.defaultShaderStack,
         this->sceneState.textureManager->state->moonTexture.get(),
-        this->sceneState.clampSampler.get(), nullptr, nullptr,
-        XMMatrixIdentity(), XMMatrixIdentity(),
-        XMMatrixTranslation(-3.f, 0.f, 0.f)
+        &this->sceneState.clampSampler, nullptr, nullptr, XMMatrixIdentity(),
+        XMMatrixIdentity(), XMMatrixTranslation(-3.f, 0.f, 0.f)
     );
 
-    this->initSceneStateMesh<PlaneMesh>(
+    this->initSceneStateActor<PlaneMesh>(
         &this->shaderManagerState.heightMappedObjectShaderStack,
         this->sceneState.textureManager->state->mountainsHeightMap.get(),
-        this->sceneState.clampSampler.get(),
+        &this->sceneState.clampSampler,
         this->sceneState.textureManager->state->mountainsHeightMap.get(),
-        this->sceneState.wrapSampler.get(), XMMatrixIdentity(),
-        XMMatrixIdentity(), XMMatrixIdentity()
+        &this->sceneState.wrapSampler, XMMatrixIdentity(), XMMatrixIdentity(),
+        XMMatrixIdentity()
     );
 }
 
 void State::initSceneStateAmbientLight()
 {
     spdlog::debug("Initialising scene state ambient light");
-    std::unique_ptr<AmbientLight> ambientLight =
-        std::make_unique<AmbientLight>();
-    std::unique_ptr<AmbientLightBuffer> ambientLightBuffer =
-        std::make_unique<AmbientLightBuffer>();
+    this->sceneState.ambientLight = AmbientLight();
+    this->sceneState.ambientLightBuffer = AmbientLightBuffer();
 
-    ambientLight->colour = std::make_unique<float[]>(3);
-    ambientLight->colour[0] = 0.1f;
-    ambientLight->colour[1] = 0.1f;
-    ambientLight->colour[2] = 0.1f;
-    ambientLight->isEnabled = std::make_unique<bool>(true);
+    this->sceneState.ambientLight.colour = std::array<float, 3>();
+    this->sceneState.ambientLight.colour[0] = 0.1f;
+    this->sceneState.ambientLight.colour[1] = 0.1f;
+    this->sceneState.ambientLight.colour[2] = 0.1f;
+    this->sceneState.ambientLight.isEnabled = true;
 
-    ambientLightBuffer->init(this->sceneState.graphicsManager);
+    this->sceneState.ambientLightBuffer.init(this->sceneState.graphicsManager);
 
-    this->sceneState.ambientLight = std::move(ambientLight);
-    ambientLightBuffer->ambientLight = this->sceneState.ambientLight.get();
-    this->sceneState.ambientLightBuffer = std::move(ambientLightBuffer);
+    this->sceneState.ambientLightBuffer.ambientLight =
+        &this->sceneState.ambientLight;
 }
 
 void State::initSceneStatePointLight(
@@ -222,46 +234,18 @@ void State::initSceneStatePointLight(
 )
 {
     spdlog::debug("Initialising scene state point light");
-    std::unique_ptr<PointLight> pointLight = std::make_unique<PointLight>();
-    std::unique_ptr<PointLightsBuffer> pointLightsBuffer =
-        std::make_unique<PointLightsBuffer>();
+    this->sceneState.actors.push_back(PointLight());
+    PointLight *pointLightPtr =
+        dynamic_cast<PointLight *>(&this->sceneState.actors.back());
+    pointLightPtr->mesh = SphereMesh(this->sceneState.graphicsManager);
 
-    this->initSceneStateMesh<SphereMesh>(
-        &this->shaderManagerState.lightSourceShaderStack,
-        this->sceneState.textureManager->state->lightDebugTexture.get(),
-        this->sceneState.clampSampler.get(), nullptr, nullptr,
-        XMMatrixScaling(.1f, .1f, .1f), XMMatrixIdentity(),
-        XMMatrixTranslation(
-            initWorldPosition.x, initWorldPosition.y, initWorldPosition.z
-        )
-    );
+    pointLightPtr->shaderStack =
+        &this->shaderManagerState.lightSourceShaderStack;
+    pointLightPtr->texture =
+        this->sceneState.textureManager->state->lightDebugTexture.get();
+    pointLightPtr->textureSampler = &this->sceneState.clampSampler;
 
-    pointLight->diffuseColour = std::make_unique<float[]>(3);
-    pointLight->diffuseColour[0] = initDiffuseColour.x;
-    pointLight->diffuseColour[1] = initDiffuseColour.y;
-    pointLight->diffuseColour[2] = initDiffuseColour.z;
-    pointLight->specularColour = std::make_unique<float[]>(3);
-    pointLight->specularColour[0] = initSpecularColour.x;
-    pointLight->specularColour[1] = initSpecularColour.y;
-    pointLight->specularColour[2] = initSpecularColour.z;
-    pointLight->specularPower = std::make_unique<float>();
-    *pointLight->specularPower = initSpecularPower;
-    pointLight->worldPosition = std::make_unique<float[]>(3);
-    pointLight->worldPosition[0] = initWorldPosition.x;
-    pointLight->worldPosition[1] = initWorldPosition.y;
-    pointLight->worldPosition[2] = initWorldPosition.z;
-    pointLight->attenuationCoefficients = std::make_unique<float[]>(3);
-    pointLight->attenuationCoefficients[0] = initAttenuationCoefficients.x;
-    pointLight->attenuationCoefficients[1] = initAttenuationCoefficients.y;
-    pointLight->attenuationCoefficients[2] = initAttenuationCoefficients.z;
-    pointLight->isDiffuseEnabled = std::make_unique<bool>(initIsDiffuseEnabled);
-    pointLight->isSpecularEnabled =
-        std::make_unique<bool>(initIsSpecularEnabled);
-    pointLight->isAttenuationEnabled =
-        std::make_unique<bool>(initIsAttenuationEnabled);
-    pointLight->sceneMesh = this->sceneState.meshes.back().get();
-
-    this->sceneState.pointLights.push_back(std::move(pointLight));
+    this->sceneState.pointLights.push_back(pointLightPtr);
 }
 
 void State::initSceneStatePointLights()
@@ -282,7 +266,9 @@ void State::initSceneStatePointLights()
         std::make_unique<PointLightsBuffer>();
     pointLightsBuffer->pointLights = &this->sceneState.pointLights;
     pointLightsBuffer->init(this->sceneState.graphicsManager);
-    this->sceneState.pointLightsBuffer = std::move(pointLightsBuffer);
+    this->sceneState.pointLightsBuffer = PointLightsBuffer();
+    this->sceneState.pointLightsBuffer.pointLights =
+        &this->sceneState.pointLights;
 }
 
 void State::initSceneStateDirectionalLight(
@@ -294,31 +280,26 @@ void State::initSceneStateDirectionalLight(
 )
 {
     spdlog::debug("Initialising scene state directional light");
-    std::unique_ptr<DirectionalLight> directionalLight =
-        std::make_unique<DirectionalLight>();
-    std::unique_ptr<DirectionalLightsBuffer> directionalLightsBuffer =
-        std::make_unique<DirectionalLightsBuffer>();
 
-    directionalLight->diffuseColour = std::make_unique<float[]>(3);
-    directionalLight->diffuseColour[0] = initDiffuseColour.x;
-    directionalLight->diffuseColour[1] = initDiffuseColour.y;
-    directionalLight->diffuseColour[2] = initDiffuseColour.z;
-    directionalLight->specularColour = std::make_unique<float[]>(3);
-    directionalLight->specularColour[0] = initSpecularColour.x;
-    directionalLight->specularColour[1] = initSpecularColour.y;
-    directionalLight->specularColour[2] = initSpecularColour.z;
-    directionalLight->specularPower = std::make_unique<float>();
-    *directionalLight->specularPower = initSpecularPower;
-    directionalLight->directionVector = std::make_unique<float[]>(3);
-    directionalLight->directionVector[0] = initDirectionVector.x;
-    directionalLight->directionVector[1] = initDirectionVector.y;
-    directionalLight->directionVector[2] = initDirectionVector.z;
-    directionalLight->isDiffuseEnabled =
-        std::make_unique<bool>(initIsDiffuseEnabled);
-    directionalLight->isSpecularEnabled =
-        std::make_unique<bool>(initIsSpecularEnabled);
+    this->sceneState.directionalLights.push_back(DirectionalLight());
+    DirectionalLight *directionalLightPtr =
+        &this->sceneState.directionalLights.back();
 
-    this->sceneState.directionalLights.push_back(std::move(directionalLight));
+    directionalLightPtr->diffuseColour = std::array<float, 3>();
+    directionalLightPtr->diffuseColour[0] = initDiffuseColour.x;
+    directionalLightPtr->diffuseColour[1] = initDiffuseColour.y;
+    directionalLightPtr->diffuseColour[2] = initDiffuseColour.z;
+    directionalLightPtr->specularColour = std::array<float, 3>();
+    directionalLightPtr->specularColour[0] = initSpecularColour.x;
+    directionalLightPtr->specularColour[1] = initSpecularColour.y;
+    directionalLightPtr->specularColour[2] = initSpecularColour.z;
+    directionalLightPtr->specularPower = initSpecularPower;
+    directionalLightPtr->directionVector = std::array<float, 3>();
+    directionalLightPtr->directionVector[0] = initDirectionVector.x;
+    directionalLightPtr->directionVector[1] = initDirectionVector.y;
+    directionalLightPtr->directionVector[2] = initDirectionVector.z;
+    directionalLightPtr->isDiffuseEnabled = initIsDiffuseEnabled;
+    directionalLightPtr->isSpecularEnabled = initIsSpecularEnabled;
 }
 
 void State::initSceneStateDirectionalLights()
@@ -334,9 +315,7 @@ void State::initSceneStateDirectionalLights()
         XMFLOAT3(5.f, 0.f, -5.f), XMFLOAT3(-1.f, 0.f, 0.f),
         XMFLOAT3(.432f, .00056f, .000010f), true, true, true
     );
-
-    std::unique_ptr<DirectionalLightsBuffer> directionalLightsBuffer =
-        std::make_unique<DirectionalLightsBuffer>();
+    for (int i=0; i<direction
     directionalLightsBuffer->directionalLights =
         &this->sceneState.directionalLights;
     directionalLightsBuffer->init(this->sceneState.graphicsManager);
@@ -374,7 +353,7 @@ void State::initSceneStateWater()
     waveDataBuffer->init(this->sceneState.graphicsManager);
     this->sceneState.waveDataBuffer = std::move(waveDataBuffer);
 
-    this->initSceneStateMesh<PlaneMesh>(
+    this->initSceneStateActor<PlaneMesh>(
         &this->shaderManagerState.waveDataShaderStack,
         this->sceneState.textureManager->state->defaultTexture.get(),
         this->sceneState.clampSampler.get(), nullptr, nullptr,
@@ -382,7 +361,7 @@ void State::initSceneStateWater()
         XMMatrixTranslation(0.f, -125.f, 0.f)
     );
 
-    this->sceneState.meshes.back()->isWave = true;
+    this->sceneState.actors.back()->isWave = true;
 }
 
 void State::initSceneState(
@@ -397,7 +376,7 @@ void State::initSceneState(
     this->sceneState.clearColour = {0.392f, 0.584f, 0.929f, 1.0f};
 
     this->initSceneStateSampler();
-    this->initSceneStateMeshes();
+    this->initSceneStateActors();
     this->initSceneStateAmbientLight();
     this->initSceneStatePointLights();
     this->initSceneStateDirectionalLights();
@@ -422,9 +401,8 @@ void State::initAppState(AppInput *appInput)
 
 void State::initDebugSceneState(
     D3D *graphicsManager, float *fps, AmbientLight *ambientLight,
-    std::vector<std::unique_ptr<PointLight>> *pointLights,
-    std::vector<std::unique_ptr<DirectionalLight>> *directionalLights,
-    Water *water
+    std::vector<PointLight *> *pointLights,
+    std::vector<DirectionalLight *> *directionalLights, Water *water
 )
 {
     spdlog::debug("Initialising debug scene state");

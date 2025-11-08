@@ -12,6 +12,7 @@
 #include "../scene/debugScene.h"
 #include "../app/app.h"
 #include <DirectXMathMatrix.inl>
+#include <optional>
 
 class State
 {
@@ -37,25 +38,34 @@ class State
     void initAppState(AppInput *appInput);
     void initDebugSceneState(
         D3D *graphicsManager, float *fps, AmbientLight *ambientLight,
-        std::vector<std::unique_ptr<PointLight>> *pointLights,
-        std::vector<std::unique_ptr<DirectionalLight>> *directionalLights,
-        Water *water
+        std::vector<PointLight *> *pointLights,
+        std::vector<DirectionalLight *> *directionalLights, Water *water
     );
 
     private:
+    template <typename ShaderType>
+    ShaderType initShaderManagerStateShader(
+        std::string filepath, EnumShaderType type,
+        std::optional<std::vector<D3D11_INPUT_ELEMENT_DESC>>
+            inputElementDescription = std::nullopt
+    );
+
+    void initShaderManagerStateShaders();
+    void initShaderManagerStateShaderBuffers();
     void initShaderManagerStateShaderStacks();
     void initSceneStateSampler();
+
     template <typename MeshType>
-    void initSceneStateMesh(
+    void initSceneStateActor(
         ShaderStack *shaderStack, BaseTexture *texture, BaseSampler *sampler,
         BaseTexture *heightMap = nullptr,
         BaseSampler *heightMapSampler = nullptr,
         XMMATRIX initScaling = XMMatrixIdentity(),
         XMMATRIX initRotation = XMMatrixIdentity(),
         XMMATRIX initTranslation = XMMatrixIdentity()
-
     );
-    void initSceneStateMeshes();
+
+    void initSceneStateActors();
     void initSceneStateAmbientLight();
     void initSceneStatePointLights();
     void initSceneStatePointLight(

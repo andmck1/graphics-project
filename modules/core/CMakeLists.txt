@@ -27,8 +27,8 @@ add_library(
   src/core_graphics/mesh/quad.cpp
   src/core_graphics/mesh/plane.cpp
   src/core_graphics/mesh/ortho.cpp
+  src/core_graphics/actor/base.cpp
   src/core_graphics/camera/camera.cpp
-  src/core_graphics/scene/base.cpp
   )
 target_link_libraries(core_graphics PRIVATE spdlog imgui dxtk)
 target_include_directories(core_graphics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

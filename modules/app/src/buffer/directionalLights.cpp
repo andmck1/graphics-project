@@ -1,4 +1,4 @@
-#include "directionalLightBuffer.h"
+#include "directionalLightsBuffer.h"
 #include <core_utils/graphics.h>
 
 bool DirectionalLightsBuffer::init(D3D *graphicsManager)
@@ -83,7 +83,7 @@ bool DirectionalLightsBuffer::setPixelShader(
             (*this->directionalLights)[i]->specularColour[2], 0.f
         );
         bufferData[i].specularPower = XMFLOAT4(
-            *(*this->directionalLights)[i]->specularPower, 0.f, 0.f, 0.f
+            (*this->directionalLights)[i]->specularPower, 0.f, 0.f, 0.f
         );
         bufferData[i].directionVector = XMFLOAT4(
             (*this->directionalLights)[i]->directionVector[0],
@@ -91,10 +91,10 @@ bool DirectionalLightsBuffer::setPixelShader(
             (*this->directionalLights)[i]->directionVector[2], 0.f
         );
         bufferData[i].isDiffuseEnabled = XMINT4(
-            (int) *(*this->directionalLights)[i]->isDiffuseEnabled, 0, 0, 0
+            (int) (*this->directionalLights)[i]->isDiffuseEnabled, 0, 0, 0
         );
         bufferData[i].isSpecularEnabled = XMINT4(
-            (int) *(*this->directionalLights)[i]->isSpecularEnabled, 0, 0, 0
+            (int) (*this->directionalLights)[i]->isSpecularEnabled, 0, 0, 0
         );
         bufferData[i].nLights =
             XMINT4{(int) this->directionalLights->size(), 0, 0, 0};

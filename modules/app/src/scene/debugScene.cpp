@@ -49,12 +49,12 @@ bool DebugScene::render()
     if (ImGui::CollapsingHeader("Ambient Light Settings"))
     {
         ImGui::ColorPicker3(
-            "Colour", this->state->ambientLight->colour.get(),
+            "Colour", this->state->ambientLight->colour.data(),
             ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
 
         );
         ImGui::Checkbox(
-            "Ambient Enabled?", this->state->ambientLight->isEnabled.get()
+            "Ambient Enabled?", &this->state->ambientLight->isEnabled
         );
     }
 
@@ -65,26 +65,26 @@ bool DebugScene::render()
         std::string pointLightHeading = "Point Light " + iString + " Settings";
         if (ImGui::CollapsingHeader(pointLightHeading.c_str()))
         {
-            PointLight *pointLight = this->state->pointLights->at(i).get();
+            PointLight *pointLight = this->state->pointLights->at(i);
             ImGui::ColorPicker3(
                 ("Diffuse#Point#" + iString).c_str(),
-                pointLight->diffuseColour.get(),
+                pointLight->diffuseColour.data(),
                 ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
 
             );
             ImGui::ColorPicker3(
                 ("Specular#Point#" + iString).c_str(),
-                pointLight->specularColour.get(),
+                pointLight->specularColour.data(),
                 ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
 
             );
             ImGui::SliderFloat(
                 ("Specular Power#Point#" + iString).c_str(),
-                pointLight->specularPower.get(), 0.01f, 50.f, "%.3f", false
+                &pointLight->specularPower, 0.01f, 50.f, "%.3f", false
             );
             ImGui::SliderFloat3(
                 ("World Position#Point#" + iString).c_str(),
-                pointLight->worldPosition.get(), -10.f, 10.f
+                pointLight->worldPosition.data(), -10.f, 10.f
             );
             ImGui::SliderFloat(
                 ("Attenuation Coefficient C0#Point#" + iString).c_str(),
@@ -103,15 +103,15 @@ bool DebugScene::render()
             );
             ImGui::Checkbox(
                 ("Diffuse Enabled?#Point#" + iString).c_str(),
-                pointLight->isDiffuseEnabled.get()
+                &pointLight->isDiffuseEnabled
             );
             ImGui::Checkbox(
                 ("Specular Enabled?#Point#" + iString).c_str(),
-                pointLight->isSpecularEnabled.get()
+                &pointLight->isSpecularEnabled
             );
             ImGui::Checkbox(
                 ("Attenuation Enabled?#Point#" + iString).c_str(),
-                pointLight->isAttenuationEnabled.get()
+                &pointLight->isAttenuationEnabled
             );
         }
     }
@@ -125,48 +125,48 @@ bool DebugScene::render()
         if (ImGui::CollapsingHeader(directionalLightHeading.c_str()))
         {
             DirectionalLight *directionalLight =
-                this->state->directionalLights->at(i).get();
+                this->state->directionalLights->at(i).data();
             ImGui::ColorPicker3(
                 ("Diffuse#Directional#" + iString).c_str(),
-                directionalLight->diffuseColour.get(),
+                directionalLight->diffuseColour.data(),
                 ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
 
             );
             ImGui::ColorPicker3(
                 ("Specular#Directional#" + iString).c_str(),
-                directionalLight->specularColour.get(),
+                directionalLight->specularColour.data(),
                 ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
 
             );
             ImGui::SliderFloat(
                 ("Specular Power#Directional#" + iString).c_str(),
-                directionalLight->specularPower.get(), 0.01f, 50.f, "%.3f",
+                directionalLight->specularPower.data(), 0.01f, 50.f, "%.3f",
                 false
             );
             ImGui::SliderFloat3(
                 ("Direction Vector#Directional#" + iString).c_str(),
-                directionalLight->directionVector.get(), -1.f, 1.f
+                directionalLight->directionVector.data(), -1.f, 1.f
             );
             ImGui::Checkbox(
                 ("Diffuse Enabled?#Directional#" + iString).c_str(),
-                directionalLight->isDiffuseEnabled.get()
+                directionalLight->isDiffuseEnabled.data()
             );
             ImGui::Checkbox(
                 ("Specular Enabled?#Directional#" + iString).c_str(),
-                directionalLight->isSpecularEnabled.get()
+                directionalLight->isSpecularEnabled.data()
             );
         }
     }
 
     ImGui::SliderFloat(
-        "Water Wave Magnitude", this->state->water->magnitude.get(), 0.1f, 10.f
+        "Water Wave Magnitude", this->state->water->magnitude.data(), 0.1f, 10.f
     );
     ImGui::SliderFloat(
-        "Water Wave Number", this->state->water->waveNumber.get(), 0.1f, 1.f
+        "Water Wave Number", this->state->water->waveNumber.data(), 0.1f, 1.f
     );
     ImGui::SliderFloat(
         "Water Wave Angular Velocity",
-        this->state->water->angularVelocity.get(), 0.1f, 10.f
+        this->state->water->angularVelocity.data(), 0.1f, 10.f
     );
 
     ImGui::End();

@@ -11,38 +11,38 @@ Scene::Scene(SceneState *state)
     this->state = state;
 }
 
-bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
+bool Scene::drawMesh(UINT &stride, UINT &offset, SceneActor *sceneActor)
 {
     this->state->graphicsManager->deviceContext->IASetVertexBuffers(
-        0, 1, sceneMesh->mesh->vertexBuffer.GetAddressOf(), &stride, &offset
+        0, 1, sceneActor->mesh->vertexBuffer.GetAddressOf(), &stride, &offset
     );
     this->state->graphicsManager->deviceContext->IASetIndexBuffer(
-        sceneMesh->mesh->vertexIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0
+        sceneActor->mesh->vertexIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0
     );
     this->state->graphicsManager->deviceContext->IASetPrimitiveTopology(
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST
     );
 
     if (!this->state->graphicsManager->updateMatrixBuffer(
-            sceneMesh->worldMatrix, this->state->camera.viewMatrix, 0, 1
+            sceneActor->getWorldMatrix(), this->state->camera.viewMatrix, 0, 1
         ))
         return false;
 
     if (!this->state->cameraBuffer->setVertexShader(1, 1))
         return false;
 
-    if (sceneMesh->heightMap != nullptr)
+    if (sceneActor->heightMap != nullptr)
     {
-        if (!sceneMesh->heightMapSampler->setVertexShader(
+        if (!sceneActor->heightMapSampler->setVertexShader(
                 this->state->graphicsManager
             ))
             return false;
-        if (!sceneMesh->heightMap->setVertexShader(0, 1))
+        if (!sceneActor->heightMap->setVertexShader(0, 1))
             return false;
     }
-    
+
     // TODO - GET RID OF THIS CHECK
-    if (sceneMesh->isWave)
+    if (sceneActor->isWave)
     {
         if (!this->state->waveDataBuffer->setVertexShader(2, 1))
             return false;
@@ -57,15 +57,15 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
     if (!this->state->directionalLightsBuffer->setPixelShader(2, 1))
         return false;
 
-    if (!sceneMesh->texture->setPixelShader(0, 1))
+    if (!sceneActor->texture->setPixelShader(0, 1))
         return false;
 
-    if (!sceneMesh->textureSampler->setPixelShader(
+    if (!sceneActor->textureSampler->setPixelShader(
             this->state->graphicsManager
         ))
         return false;
 
-    for (BaseShader *shaderPtr : sceneMesh->shaderStack->shaders)
+    for (BaseShader *shaderPtr : sceneActor->shaderStack->shaders)
     {
         if (shaderPtr->inputElementDescription)
         {
@@ -117,7 +117,7 @@ bool Scene::drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh)
     }
 
     this->state->graphicsManager->deviceContext->DrawIndexed(
-        sceneMesh->mesh->getVertexIndexCount(), 0, 0
+        sceneActor->mesh->getVertexIndexCount(), 0, 0
     );
 
     return true;
@@ -132,9 +132,9 @@ bool Scene::drawScreen()
         this->state->graphicsManager->depthStencilView.Get()
     );
 
-    for (std::unique_ptr<SceneMesh> &sceneMesh : this->state->meshes)
+    for (std::unique_ptr<SceneActor> &sceneActor : this->state->actors)
     {
-        this->drawMesh(stride, offset, sceneMesh.get());
+        this->drawMesh(stride, offset, sceneActor.get());
     }
 
     return true;
@@ -145,12 +145,10 @@ void Scene::updateMeshPositions()
     for (int i = 0; i < this->state->pointLights.size(); i++)
     {
         PointLight *pointLight = this->state->pointLights[i].get();
-        pointLight->sceneMesh->worldMatrix =
-            XMMatrixIdentity() * XMMatrixTranslation(
-                                     pointLight->worldPosition.get()[0],
-                                     pointLight->worldPosition.get()[1],
-                                     pointLight->worldPosition.get()[2]
-                                 );
+        pointLight->moveTo(
+            pointLight->worldPosition[0], pointLight->worldPosition[1],
+            pointLight->worldPosition[2]
+        );
     }
 }
 

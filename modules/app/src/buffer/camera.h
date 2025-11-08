@@ -4,19 +4,17 @@
 #include <core_graphics/buffer/buffer.h>
 #include <core_graphics/camera/camera.h>
 
-#include <shared_shader/waveBuffer.h>
+#include "shared_shader/sharedbuffertypes.h"
 
-class WaveDataBuffer : public VertexBuffer
+class CameraBuffer : public VertexBuffer
 {
     public:
     bool init(D3D *graphicsManager) override;
     bool setVertexShader(int bufferSlot, int numberOfBuffers) override;
 
-    float *totalTime;
-    float *magnitude;
-    float *waveNumber;
-    float *angularVelocity;
-    struct ShaderBuffer : WaveVertexShader::WaveDataBufferType
+    struct ShaderBuffer : SharedBufferTypes::CameraBufferType
     {
     };
+
+    Camera *camera;
 };

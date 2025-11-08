@@ -1,20 +1,19 @@
 #pragma once
 
-#include <core_graphics/scene/base.h>
-#include <memory>
+#include "core_graphics/actor/scene.h"
 #include <directxmath.h>
 
 using namespace DirectX;
 
-struct PointLight
+class PointLight : public SceneActor
 {
-    std::unique_ptr<float[]> diffuseColour;
-    std::unique_ptr<float[]> specularColour;
-    std::unique_ptr<float> specularPower;
-    std::unique_ptr<float[]> worldPosition;
-    std::unique_ptr<float[]> attenuationCoefficients;
-    std::unique_ptr<bool> isDiffuseEnabled;
-    std::unique_ptr<bool> isSpecularEnabled;
-    std::unique_ptr<bool> isAttenuationEnabled;
-    BaseSceneMesh *sceneMesh;
+    public:
+    std::array<float, 3> diffuseColour;
+    std::array<float, 3> specularColour;
+    float specularPower;
+    std::array<float, 3> attenuationCoefficients;
+    bool isDiffuseEnabled;
+    bool isSpecularEnabled;
+    bool isAttenuationEnabled;
+
 };

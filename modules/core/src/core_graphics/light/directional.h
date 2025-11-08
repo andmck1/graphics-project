@@ -1,17 +1,20 @@
 #pragma once
 
-#include <core_graphics/scene/base.h>
-#include <memory>
+#include "core_graphics/actor/scene.h"
+#include <array>
 #include <directxmath.h>
 
 using namespace DirectX;
 
-struct DirectionalLight
+class DirectionalLight : public SceneActor
 {
-    std::unique_ptr<float[]> diffuseColour;
-    std::unique_ptr<float[]> specularColour;
-    std::unique_ptr<float> specularPower;
-    std::unique_ptr<float[]> directionVector;
-    std::unique_ptr<bool> isDiffuseEnabled;
-    std::unique_ptr<bool> isSpecularEnabled;
+    public:
+    std::array<float, 3> diffuseColour;
+    std::array<float, 3> specularColour;
+    float specularPower;
+    std::array<float, 3> directionVector;
+    bool isDiffuseEnabled;
+    bool isSpecularEnabled;
+
+    bool isDrawEnabled = false;
 };

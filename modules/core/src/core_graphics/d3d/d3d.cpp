@@ -297,35 +297,6 @@ bool D3D::init()
     return true;
 }
 
-bool D3D::updateMatrixBuffer(
-    XMMATRIX worldMatrix, XMMATRIX viewMatrix, int bufferSlot,
-    int numberOfBuffers
-)
-{
-    HRESULT mapHR;
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
-
-    mapHR = this->deviceContext->Map(
-        matrixBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource
-    );
-    if (!TryDXCall(mapHR, "Matrix buffer map failed.\n"))
-    {
-        return false;
-    }
-
-    XMMATRIX *dataPtr = reinterpret_cast<XMMATRIX *>(mappedResource.pData);
-    dataPtr[0] = XMMatrixTranspose(worldMatrix);
-    dataPtr[1] = XMMatrixTranspose(viewMatrix);
-    dataPtr[2] = XMMatrixTranspose(this->projectionMatrix);
-
-    this->deviceContext->Unmap(this->matrixBuffer.Get(), 0);
-    this->deviceContext->VSSetConstantBuffers(
-        bufferSlot, numberOfBuffers, matrixBuffer.GetAddressOf()
-    );
-
-    return true;
-}
-
 bool D3D::clearScreen(const float clearColour[4])
 {
     this->deviceContext->ClearRenderTargetView(

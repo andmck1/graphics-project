@@ -1,4 +1,4 @@
-#include "standardVertexBuffer.h"
+#include "sharedbuffertypes.h"
 
 // My code from lab 5
 Texture2D heightMap : register(t0);
@@ -6,9 +6,7 @@ SamplerState heightSampler : register(s0);
 
 cbuffer MatrixBuffer : register(b0)
 {
-    matrix worldMatrix;
-    matrix viewMatrix;
-    matrix projectionMatrix;
+    MatrixBufferType matrixData;
 };
 
 cbuffer CameraBuffer : register(b1)
@@ -17,21 +15,6 @@ cbuffer CameraBuffer : register(b1)
 };
 
 // TODO - define these structs in buffer.h
-struct InputType
-{
-    float4 position : POSITION;
-    float2 tex : TEXCOORD0;
-    float3 normal : NORMAL;
-};
-
-struct OutputType
-{
-    float4 position : SV_POSITION;
-    float2 tex : TEXCOORD0;
-    float3 normal : NORMAL;
-    float3 worldPosition : TEXCOORD1;
-    float3 viewVector : TEXCOORD2;
-};
 
 float GetHeight(float2 uv)
 {

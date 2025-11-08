@@ -4,7 +4,7 @@
 #include <core_graphics/buffer/buffer.h>
 #include <core_graphics/light/point.h>
 
-#include <shared_shader/lightingBuffer.h>
+#include <shared_shader/sharedbuffertypes.h>
 
 class PointLightsBuffer : public StructuredPixelBuffer
 {
@@ -12,8 +12,8 @@ class PointLightsBuffer : public StructuredPixelBuffer
     bool init(D3D *graphicsManager) override;
     bool setPixelShader(int bufferSlot, int numberOfBuffers) override;
 
-    std::vector<std::unique_ptr<PointLight>> *pointLights;
-    struct ShaderBuffer : LightingShader::PointLightBufferType
+    std::vector<PointLight *> *pointLights;
+    struct ShaderBuffer : SharedBufferTypes::PointLightBufferType
     {
     };
 };

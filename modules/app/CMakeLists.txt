@@ -8,11 +8,12 @@ add_executable(
   src/scene/debugScene.cpp
   src/input/input.cpp
   src/app/app.cpp
-  src/buffer/ambientLightBuffer.cpp
-  src/buffer/pointLightBuffer.cpp
-  src/buffer/directionalLightBuffer.cpp
-  src/buffer/waveDataBuffer.cpp
-  src/buffer/cameraBuffer.cpp)
+  src/buffer/matrix.cpp
+  src/buffer/ambientLight.cpp
+  src/buffer/pointLights.cpp
+  src/buffer/directionalLights.cpp
+  src/buffer/waveData.cpp
+  src/buffer/camera.cpp)
 
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR}
                                         ${imgui_SOURCE_DIR}/backends)

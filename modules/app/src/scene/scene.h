@@ -19,24 +19,15 @@
 #include <core_graphics/mesh/base.h>
 #include <core_graphics/texture/default.h>
 #include <core_graphics/texture/file.h>
-#include <core_graphics/scene/base.h>
+#include <core_graphics/actor/scene.h>
 #include <core_graphics/sampler/base.h>
 #include <core_graphics/sampler/clamp.h>
 #include <core_graphics/sampler/wrap.h>
 #include <core_utils/timer.h>
 
 #include "../shadermanager/shadermanager.h"
-#include "../buffer/cameraBuffer.h"
-#include "../buffer/ambientLightBuffer.h"
-#include "../buffer/pointLightBuffer.h"
-#include "../buffer/directionalLightBuffer.h"
-#include "../buffer/waveDataBuffer.h"
 #include "../texture/textureManager.h"
 #include "core_graphics/water/water.h"
-
-struct SceneMesh : BaseSceneMesh
-{
-};
 
 struct SceneState
 {
@@ -48,35 +39,26 @@ struct SceneState
     std::array<float, 4> clearColour = {0.f, 0.f, 0.f, 0.f};
 
     Camera camera = Camera();
-    // TODO - link up to app timer
-    Timer timer = Timer();
 
-    std::unique_ptr<ClampSampler> clampSampler;
-    std::unique_ptr<WrapSampler> wrapSampler;
-    std::vector<std::unique_ptr<SceneMesh>> meshes;
+    ClampSampler clampSampler = ClampSampler();
+    WrapSampler wrapSampler = WrapSampler();
 
-    std::unique_ptr<AmbientLight> ambientLight;
-    std::unique_ptr<AmbientLightBuffer> ambientLightBuffer;
+    std::vector<SceneActor> actors;
 
-    std::vector<std::unique_ptr<PointLight>> pointLights;
-    std::unique_ptr<PointLightsBuffer> pointLightsBuffer;
+    AmbientLight ambientLight = AmbientLight();
+    std::vector<PointLight *> pointLights;
+    std::vector<DirectionalLight *> directionalLights;
 
-    std::vector<std::unique_ptr<DirectionalLight>> directionalLights;
-    std::unique_ptr<DirectionalLightsBuffer> directionalLightsBuffer;
-    
-    std::unique_ptr<Water> water;
-    std::unique_ptr<WaveDataBuffer> waveDataBuffer;
-
-    std::unique_ptr<CameraBuffer> cameraBuffer;
+    Water water = Water();
 };
 
-class Scene : BaseScene
+class Scene
 {
     public:
     Scene(SceneState *state);
     SceneState *state;
 
-    bool drawMesh(UINT &stride, UINT &offset, SceneMesh *sceneMesh);
+    bool drawMesh(UINT &stride, UINT &offset, SceneActor *sceneActor);
     void updateMeshPositions();
     bool drawScreen();
     bool render();

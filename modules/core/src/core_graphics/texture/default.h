@@ -9,15 +9,15 @@
 class DefaultTexture : public BaseTexture
 {
     public:
-    DefaultTexture(D3D *graphicsManager, uint32_t texturePixelColour);
+    D3D *graphicsManager;
+    uint32_t texturePixelColour;
     ComPtr<ID3D11ShaderResourceView> textureResource;
+
     bool load() override;
     bool setVertexShader(int startSlot, int numberView) override;
     bool setPixelShader(int startSlot, int numberView) override;
 
     private:
-    D3D *graphicsManager;
-    uint32_t texturePixelColour;
     ComPtr<ID3D11Texture2D> texture;
 
     bool loadTexture();

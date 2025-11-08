@@ -10,18 +10,16 @@
 class FileTexture : public BaseTexture
 {
     public:
-    FileTexture(D3D *graphicsManager, std::string filepath);
+    D3D *graphicsManager;
+    std::filesystem::path filepath;
+
     ComPtr<ID3D11ShaderResourceView> textureResource;
     bool load() override;
     bool setVertexShader(int startSlot, int numberView) override;
     bool setPixelShader(int startSlot, int numberView) override;
 
     private:
-    D3D *graphicsManager;
-    uint32_t texturePixelColour;
     ComPtr<ID3D11Texture2D> texture;
 
     bool loadAndCreateTextureResource();
-
-    std::filesystem::path filepath;
 };

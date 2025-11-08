@@ -41,10 +41,6 @@ class D3D
         std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDescription,
         ComPtr<ID3DBlob> shaderBlob
     );
-    bool updateMatrixBuffer(
-        XMMATRIX worldMatrix, XMMATRIX viewMatrix, int bufferSlot,
-        int numberOfBuffers
-    );
     bool clearScreen(const float clearColour[4]);
     bool presentScreen();
 

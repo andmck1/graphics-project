@@ -4,12 +4,6 @@
 #include <spdlog/spdlog.h>
 #include "WICTextureLoader.h"
 
-FileTexture::FileTexture(D3D *graphicsManager, std::string filepath)
-{
-    this->graphicsManager = graphicsManager;
-    this->filepath = std::filesystem::absolute(std::filesystem::path(filepath));
-}
-
 // Some help from lab here
 bool FileTexture::loadAndCreateTextureResource()
 {
