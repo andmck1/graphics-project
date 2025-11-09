@@ -1,9 +1,9 @@
-#include "ambientLightBuffer.h"
+#include "ambientLight.h"
 #include <core_utils/graphics.h>
 
 bool AmbientLightBuffer::init(D3D *graphicsManager)
 {
-    spdlog::debug("Initialising point lights buffer");
+    spdlog::debug("Initialising ambient light buffer");
     HRESULT createBufferHR;
 
     this->graphicsManager = graphicsManager;
@@ -21,11 +21,19 @@ bool AmbientLightBuffer::init(D3D *graphicsManager)
     return true;
 }
 
-bool AmbientLightBuffer::setPixelShader(int bufferSlot, int numberOfBuffers)
+void AmbientLightBuffer::setData(AmbientLight *ambientLight)
+{
+    this->ambientLight = ambientLight;
+}
+
+bool AmbientLightBuffer::setShader(
+    BufferSlots *slotCounters, int numberOfBuffers
+)
 {
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     AmbientLightBuffer::ShaderBuffer *bufferData;
     HRESULT mapHR;
+    int bufferSlot = slotCounters->pixelShaderCounters.constantSlot;
 
     mapHR = graphicsManager->deviceContext->Map(
         this->buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource
@@ -39,10 +47,13 @@ bool AmbientLightBuffer::setPixelShader(int bufferSlot, int numberOfBuffers)
     );
     bufferData->isEnabled =
         XMINT4((int) this->ambientLight->isEnabled, 0, 0, 0);
-
+    
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->PSSetConstantBuffers(
         bufferSlot, numberOfBuffers, this->buffer.GetAddressOf()
     );
+
+    slotCounters->pixelShaderCounters.constantSlot++;
+    
     return true;
 }

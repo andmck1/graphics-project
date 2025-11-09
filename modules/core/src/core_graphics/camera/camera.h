@@ -1,13 +1,13 @@
 #pragma once
 
-#include "core_graphics/actor/base.h"
+#include "core_graphics/actor/scene.h"
 
 #include <d3d11.h>
 #include <directxmath.h>
 
 using namespace DirectX;
 
-class Camera : public BaseActor
+class Camera : public SceneActor
 {
     public:
     Camera();

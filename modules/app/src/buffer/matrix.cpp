@@ -5,6 +5,7 @@ bool MatrixBuffer::init(D3D *graphicsManager)
 {
     HRESULT createBufferHR;
 
+    spdlog::debug("Initialising matrix buffer");
     this->graphicsManager = graphicsManager;
     this->bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
     this->bufferDesc.ByteWidth = sizeof(MatrixBuffer::ShaderBuffer);
@@ -20,11 +21,22 @@ bool MatrixBuffer::init(D3D *graphicsManager)
     return true;
 }
 
-bool MatrixBuffer::setVertexShader(int bufferSlot, int numberOfBuffers)
+void MatrixBuffer::setData(
+    XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix
+)
+{
+    this->worldMatrix = worldMatrix;
+    this->viewMatrix = viewMatrix;
+    this->projectionMatrix = projectionMatrix;
+}
+
+bool MatrixBuffer::setShader(BufferSlots *slotCounters, int numberOfBuffers)
 {
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     MatrixBuffer::ShaderBuffer *bufferData;
     HRESULT mapHR;
+
+    int bufferSlot = slotCounters->vertexShaderCounters.constantSlot;
 
     mapHR = graphicsManager->deviceContext->Map(
         this->buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource
@@ -32,12 +44,14 @@ bool MatrixBuffer::setVertexShader(int bufferSlot, int numberOfBuffers)
     if (!TryDXCall(mapHR, "Matrix buffer map failed.\n"))
         return false;
     bufferData = (MatrixBuffer::ShaderBuffer *) mappedResource.pData;
-    bufferData->worldMatrix = *this->worldMatrix;
-    bufferData->projectionMatrix = *this->projectionMatrix;
-    bufferData->viewMatrix = *this->viewMatrix;
+    bufferData->worldMatrix = XMMatrixTranspose(this->worldMatrix);
+    bufferData->projectionMatrix = XMMatrixTranspose(this->projectionMatrix);
+    bufferData->viewMatrix = XMMatrixTranspose(this->viewMatrix);
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->VSSetConstantBuffers(
         bufferSlot, numberOfBuffers, this->buffer.GetAddressOf()
     );
+
+    slotCounters->vertexShaderCounters.constantSlot++;
     return true;
 }

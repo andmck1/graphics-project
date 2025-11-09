@@ -27,20 +27,25 @@ bool FileTexture::load()
     return true;
 }
 
-bool FileTexture::setPixelShader(int startSlot, int numViews)
+bool FileTexture::setVertexShader(BufferSlots *slotCounters, int numViews)
 {
+    int startSlot = slotCounters->vertexShaderCounters.textureSlot;
+    this->graphicsManager->deviceContext->VSSetShaderResources(
+        startSlot, numViews, this->textureResource.GetAddressOf()
+    );
+    slotCounters->vertexShaderCounters.textureSlot++;
+
+    return true;
+}
+
+bool FileTexture::setPixelShader(BufferSlots *slotCounters, int numViews)
+{
+    int startSlot = slotCounters->pixelShaderCounters.textureSlot;
     this->graphicsManager->deviceContext->PSSetShaderResources(
         startSlot, numViews, this->textureResource.GetAddressOf()
     );
 
+    slotCounters->pixelShaderCounters.textureSlot++;
     return true;
 }
 
-bool FileTexture::setVertexShader(int startSlot, int numViews)
-{
-    this->graphicsManager->deviceContext->VSSetShaderResources(
-        startSlot, numViews, this->textureResource.GetAddressOf()
-    );
-
-    return true;
-}

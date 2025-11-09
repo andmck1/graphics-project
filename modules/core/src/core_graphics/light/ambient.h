@@ -6,11 +6,9 @@
 
 using namespace DirectX;
 
-class AmbientLight : SceneActor
+class AmbientLight : public SceneActor
 {
     public:
-    std::array<float, 3> colour;
+    std::array<float, 3> colour = {0.f, 0.f, 0.f};
     bool isEnabled;
-
-    bool isDrawEnabled = false;
 };

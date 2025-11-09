@@ -6,7 +6,7 @@
 #include "core_window/window.h"
 #include "core_graphics/d3d/d3d.h"
 #include "../shadermanager/shadermanager.h"
-#include "../texture/textureManager.h"
+#include "../texturemanager/texturemanager.h"
 #include "../scene/scene.h"
 #include "../input/input.h"
 #include "../scene/debugScene.h"
@@ -31,11 +31,11 @@ class State
     void initShaderManagerState(D3D *graphicsManager);
     void initTextureManagerState(D3D *graphicsManager);
     void initSceneState(
-        D3D *graphicsManager, ShaderManager *shaderManager,
-        TextureManager *textureManager
+        D3D *graphicsManager, ShaderManagerState *shaderManagerState
     );
-    void initAppInputState(Window *window, Scene *scene);
-    void initAppState(AppInput *appInput);
+    void setShaderManagerStateShaderBufferData();
+    void initAppInputState(Window *window, Scene *scene, Timer *timer);
+    void initAppState();
     void initDebugSceneState(
         D3D *graphicsManager, float *fps, AmbientLight *ambientLight,
         std::vector<PointLight *> *pointLights,
@@ -45,7 +45,7 @@ class State
     private:
     template <typename ShaderType>
     ShaderType initShaderManagerStateShader(
-        std::string filepath, EnumShaderType type,
+        std::string filepath,
         std::optional<std::vector<D3D11_INPUT_ELEMENT_DESC>>
             inputElementDescription = std::nullopt
     );
@@ -55,14 +55,14 @@ class State
     void initShaderManagerStateShaderStacks();
     void initSceneStateSampler();
 
-    template <typename MeshType>
+    template <typename MeshType, typename SceneActorType>
     void initSceneStateActor(
         ShaderStack *shaderStack, BaseTexture *texture, BaseSampler *sampler,
         BaseTexture *heightMap = nullptr,
         BaseSampler *heightMapSampler = nullptr,
-        XMMATRIX initScaling = XMMatrixIdentity(),
-        XMMATRIX initRotation = XMMatrixIdentity(),
-        XMMATRIX initTranslation = XMMatrixIdentity()
+        std::array<float, 3> initScaling = {1.f, 1.f, 1.f},
+        std::array<float, 3> initRotation = {0.f, 0.f, 0.f},
+        std::array<float, 3> initTranslation = {0.f, 0.f, 0.f}
     );
 
     void initSceneStateActors();

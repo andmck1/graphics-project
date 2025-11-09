@@ -16,9 +16,9 @@ cbuffer WaveBuffer : register(b2)
 	WaveDataBufferType waveData;
 };
 
-OutputType main(InputType input)
+VertexOutputType main(VertexInputType input)
 {
-	OutputType output;
+	VertexOutputType output;
 
 	// WAVE
 	// Move wave through position
@@ -64,9 +64,9 @@ OutputType main(InputType input)
     input.position.xyz += input.normal.xyz;	
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
-    output.position = mul(input.position, worldMatrix);
-    output.position = mul(output.position, viewMatrix);
-    output.position = mul(output.position, projectionMatrix);
+    output.position = mul(input.position, matrixData.worldMatrix);
+    output.position = mul(output.position, matrixData.viewMatrix);
+    output.position = mul(output.position, matrixData.projectionMatrix);
 	
 	// Store the texture coordinates for the pixel shader.
     output.tex = input.tex;
@@ -74,10 +74,10 @@ OutputType main(InputType input)
 	output.normal = input.normal;
     
 	// Calculate the normal vector against the world matrix only and normalise.
-    output.normal = mul(output.normal, (float3x3) worldMatrix);
+    output.normal = mul(output.normal, (float3x3) matrixData.worldMatrix);
     output.normal = normalize(output.normal);
 	
-    float4 worldPosition = mul(input.position, worldMatrix);
+    float4 worldPosition = mul(input.position, matrixData.worldMatrix);
     output.worldPosition = worldPosition.xyz;
 	
     output.viewVector = normalize(cameraData.worldPosition.xyz - worldPosition.xyz);

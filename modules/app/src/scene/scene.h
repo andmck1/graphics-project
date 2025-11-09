@@ -24,32 +24,29 @@
 #include <core_graphics/sampler/clamp.h>
 #include <core_graphics/sampler/wrap.h>
 #include <core_utils/timer.h>
+#include "core_graphics/water/water.h"
 
 #include "../shadermanager/shadermanager.h"
-#include "../texture/textureManager.h"
-#include "core_graphics/water/water.h"
 
 struct SceneState
 {
     D3D *graphicsManager;
-    ShaderManager *shaderManager;
-    TextureManager *textureManager;
+    ShaderManagerState *shaderManagerState;
     std::string vertexShaderDirectory;
     std::string pixelShaderDirectory;
     std::array<float, 4> clearColour = {0.f, 0.f, 0.f, 0.f};
 
-    Camera camera = Camera();
-
     ClampSampler clampSampler = ClampSampler();
     WrapSampler wrapSampler = WrapSampler();
 
-    std::vector<SceneActor> actors;
+    std::vector<std::unique_ptr<SceneActor>> actors;
 
-    AmbientLight ambientLight = AmbientLight();
+    AmbientLight *ambientLight;
     std::vector<PointLight *> pointLights;
     std::vector<DirectionalLight *> directionalLights;
 
-    Water water = Water();
+    Camera *camera;
+    Water *water;
 };
 
 class Scene
@@ -58,8 +55,5 @@ class Scene
     Scene(SceneState *state);
     SceneState *state;
 
-    bool drawMesh(UINT &stride, UINT &offset, SceneActor *sceneActor);
-    void updateMeshPositions();
-    bool drawScreen();
-    bool render();
+    bool updateAndDraw();
 };

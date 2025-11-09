@@ -15,8 +15,8 @@ class FileTexture : public BaseTexture
 
     ComPtr<ID3D11ShaderResourceView> textureResource;
     bool load() override;
-    bool setVertexShader(int startSlot, int numberView) override;
-    bool setPixelShader(int startSlot, int numberView) override;
+    bool setVertexShader(BufferSlots *slotCounters, int numberView) override;
+    bool setPixelShader(BufferSlots *slotCounters, int numberView) override;
 
     private:
     ComPtr<ID3D11Texture2D> texture;

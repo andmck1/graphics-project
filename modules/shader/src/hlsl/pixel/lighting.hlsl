@@ -8,8 +8,8 @@ cbuffer AmbientLightBuffer: register(b0)
 	AmbientLightBufferType ambientLightData;
 }
 
-StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t1);
 StructuredBuffer<DirectionalLightBufferType> DirectionalLightBuffer : register(t2);
+StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t3);
 
 float GetHeight(float2 uv)
 {
@@ -233,7 +233,7 @@ float4 getTextureColour(Texture2D _objectTexture, SamplerState _textureSampler, 
 	return _objectTexture.Sample(_textureSampler, uv);
 }
 
-float4 main(InputType input) : SV_TARGET
+float4 main(PixelInputType input) : SV_TARGET
 {
 	float4 textureColour;
 	float4 lightColour = 0.f;

@@ -3,5 +3,5 @@
 App::App(AppState *state)
 {
     this->state = state;
-    this->state->appInput->deltaTime = &this->timer.deltaTime;
+    this->state->timer = &this->timer;
 }

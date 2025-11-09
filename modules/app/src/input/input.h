@@ -9,6 +9,7 @@ struct AppInputState
     Scene *scene;
     float cameraMoveSpeed;
     float cameraRotateSensitivity;
+    Timer *timer;
 };
 
 class AppInput
@@ -16,7 +17,6 @@ class AppInput
     public:
     AppInput(AppInputState *state);
     void handleInputs();
-    float *deltaTime;
 
     private:
     AppInputState *state;

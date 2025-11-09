@@ -1,10 +1,11 @@
-#include "cameraBuffer.h"
+#include "camera.h"
 #include <core_utils/graphics.h>
 
 bool CameraBuffer::init(D3D *graphicsManager)
 {
     HRESULT createBufferHR;
 
+    spdlog::debug("Initialising camera buffer");
     this->graphicsManager = graphicsManager;
     this->bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
     this->bufferDesc.ByteWidth = sizeof(CameraBuffer::ShaderBuffer);
@@ -15,16 +16,23 @@ bool CameraBuffer::init(D3D *graphicsManager)
     createBufferHR = this->graphicsManager->device->CreateBuffer(
         &(this->bufferDesc), NULL, this->buffer.GetAddressOf()
     );
-    if (!TryDXCall(createBufferHR, "Failed to create ambient light buffer."))
+    if (!TryDXCall(createBufferHR, "Failed to create camera buffer."))
         return false;
     return true;
 }
 
-bool CameraBuffer::setVertexShader(int bufferSlot, int numberOfBuffers)
+void CameraBuffer::setData(Camera *camera)
+{
+    this->camera = camera;
+}
+
+bool CameraBuffer::setShader(BufferSlots *slotCounters, int numberOfBuffers)
 {
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     CameraBuffer::ShaderBuffer *bufferData;
     HRESULT mapHR;
+
+    int bufferSlot = slotCounters->vertexShaderCounters.constantSlot;
 
     mapHR = graphicsManager->deviceContext->Map(
         this->buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource
@@ -41,5 +49,7 @@ bool CameraBuffer::setVertexShader(int bufferSlot, int numberOfBuffers)
     graphicsManager->deviceContext->VSSetConstantBuffers(
         bufferSlot, numberOfBuffers, this->buffer.GetAddressOf()
     );
+
+    slotCounters->vertexShaderCounters.constantSlot++;
     return true;
 }

@@ -22,18 +22,26 @@ bool ClampSampler::init(D3D *graphicsManager)
     return TryDXCall(createSamplerStateHR, "Failed to create sampler state");
 }
 
-bool ClampSampler::setVertexShader(D3D *graphicsManager)
+bool ClampSampler::setVertexShader(
+    D3D *graphicsManager, BufferSlots *slotCounters
+)
 {
-    graphicsManager->deviceContext->VSGetSamplers(
-        0, 1, this->samplerState.GetAddressOf()
+    int startSlot = slotCounters->vertexShaderCounters.samplerSlot;
+    graphicsManager->deviceContext->VSSetSamplers(
+        startSlot, 1, this->samplerState.GetAddressOf()
     );
+    slotCounters->vertexShaderCounters.samplerSlot++;
     return true;
 }
 
-bool ClampSampler::setPixelShader(D3D *graphicsManager)
+bool ClampSampler::setPixelShader(
+    D3D *graphicsManager, BufferSlots *slotCounters
+)
 {
+    int startSlot = slotCounters->pixelShaderCounters.samplerSlot;
     graphicsManager->deviceContext->PSSetSamplers(
-        0, 1, this->samplerState.GetAddressOf()
+        startSlot, 1, this->samplerState.GetAddressOf()
     );
+    slotCounters->pixelShaderCounters.samplerSlot++;
     return true;
 }

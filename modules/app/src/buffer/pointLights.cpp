@@ -1,4 +1,4 @@
-#include "pointLightsBuffer.h"
+#include "pointLights.h"
 #include <core_utils/graphics.h>
 
 bool PointLightsBuffer::init(D3D *graphicsManager)
@@ -44,12 +44,19 @@ bool PointLightsBuffer::init(D3D *graphicsManager)
     return true;
 }
 
+void PointLightsBuffer::setData(std::vector<PointLight *> *pointLights)
+{
+    this->pointLights = pointLights;
+}
+
 // Copilot help here
-bool PointLightsBuffer::setPixelShader(int bufferSlot, int numberOfBuffers)
+bool PointLightsBuffer::setShader(BufferSlots *slotCounters, int numberOfBuffers)
 {
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     PointLightsBuffer::ShaderBuffer *bufferData;
     HRESULT mapHR;
+
+    int bufferSlot = slotCounters->pixelShaderCounters.textureSlot;
 
     mapHR = graphicsManager->deviceContext->Map(
         this->buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource
@@ -100,5 +107,8 @@ bool PointLightsBuffer::setPixelShader(int bufferSlot, int numberOfBuffers)
     graphicsManager->deviceContext->PSSetShaderResources(
         bufferSlot, numberOfBuffers, this->shaderResourceView.GetAddressOf()
     );
+    
+    slotCounters->pixelShaderCounters.textureSlot++;
+
     return true;
 }

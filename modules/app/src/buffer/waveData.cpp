@@ -1,10 +1,11 @@
-#include "waveDataBuffer.h"
+#include "waveData.h"
 #include <core_utils/graphics.h>
 
 bool WaveDataBuffer::init(D3D *graphicsManager)
 {
     HRESULT createBufferHR;
-
+    
+    spdlog::debug("Initialising wave data buffer");
     this->graphicsManager = graphicsManager;
     this->bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
     this->bufferDesc.ByteWidth = sizeof(WaveDataBuffer::ShaderBuffer);
@@ -20,11 +21,24 @@ bool WaveDataBuffer::init(D3D *graphicsManager)
     return true;
 }
 
-bool WaveDataBuffer::setVertexShader(int bufferSlot, int numberOfBuffers)
+void WaveDataBuffer::setData(
+    float *totalTime, float *magnitude, float *waveNumber,
+    float *angularVelocity
+)
+{
+    this->totalTime = totalTime;
+    this->magnitude = magnitude;
+    this->waveNumber = waveNumber;
+    this->angularVelocity = angularVelocity;
+}
+
+bool WaveDataBuffer::setShader(BufferSlots *slotCounters, int numberOfBuffers)
 {
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     WaveDataBuffer::ShaderBuffer *bufferData;
     HRESULT mapHR;
+
+    int bufferSlot = slotCounters->vertexShaderCounters.constantSlot;
 
     mapHR = graphicsManager->deviceContext->Map(
         this->buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource
@@ -42,5 +56,7 @@ bool WaveDataBuffer::setVertexShader(int bufferSlot, int numberOfBuffers)
     graphicsManager->deviceContext->VSSetConstantBuffers(
         bufferSlot, numberOfBuffers, this->buffer.GetAddressOf()
     );
+
+    slotCounters->vertexShaderCounters.constantSlot++;
     return true;
 }

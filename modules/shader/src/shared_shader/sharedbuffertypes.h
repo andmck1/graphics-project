@@ -14,7 +14,14 @@ using matrix = XMMATRIX;
 #endif
 
 #ifndef __cplusplus
-struct InputType
+struct VertexInputType
+{
+    float3 position : POSITION;
+    float2 tex : TEXCOORD0;
+    float3 normal : NORMAL;
+};
+
+struct PixelInputType
 {
     float4 position : SV_POSITION;
     float2 tex : TEXCOORD0;
@@ -23,7 +30,7 @@ struct InputType
     float3 viewVector : TEXCOORD2;
 };
 
-struct OutputType
+struct VertexOutputType
 {
     float4 position : SV_POSITION;
     float2 tex : TEXCOORD0;

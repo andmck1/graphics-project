@@ -125,7 +125,7 @@ bool DebugScene::render()
         if (ImGui::CollapsingHeader(directionalLightHeading.c_str()))
         {
             DirectionalLight *directionalLight =
-                this->state->directionalLights->at(i).data();
+                this->state->directionalLights->at(i);
             ImGui::ColorPicker3(
                 ("Diffuse#Directional#" + iString).c_str(),
                 directionalLight->diffuseColour.data(),
@@ -140,8 +140,7 @@ bool DebugScene::render()
             );
             ImGui::SliderFloat(
                 ("Specular Power#Directional#" + iString).c_str(),
-                directionalLight->specularPower.data(), 0.01f, 50.f, "%.3f",
-                false
+                &directionalLight->specularPower, 0.01f, 50.f, "%.3f", false
             );
             ImGui::SliderFloat3(
                 ("Direction Vector#Directional#" + iString).c_str(),
@@ -149,24 +148,24 @@ bool DebugScene::render()
             );
             ImGui::Checkbox(
                 ("Diffuse Enabled?#Directional#" + iString).c_str(),
-                directionalLight->isDiffuseEnabled.data()
+                &directionalLight->isDiffuseEnabled
             );
             ImGui::Checkbox(
                 ("Specular Enabled?#Directional#" + iString).c_str(),
-                directionalLight->isSpecularEnabled.data()
+                &directionalLight->isSpecularEnabled
             );
         }
     }
 
     ImGui::SliderFloat(
-        "Water Wave Magnitude", this->state->water->magnitude.data(), 0.1f, 10.f
+        "Water Wave Magnitude", &this->state->water->magnitude, 0.1f, 10.f
     );
     ImGui::SliderFloat(
-        "Water Wave Number", this->state->water->waveNumber.data(), 0.1f, 1.f
+        "Water Wave Number", &this->state->water->waveNumber, 0.1f, 1.f
     );
     ImGui::SliderFloat(
-        "Water Wave Angular Velocity",
-        this->state->water->angularVelocity.data(), 0.1f, 10.f
+        "Water Wave Angular Velocity", &this->state->water->angularVelocity,
+        0.1f, 10.f
     );
 
     ImGui::End();

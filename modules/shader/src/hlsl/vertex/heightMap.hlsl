@@ -47,18 +47,19 @@ float3 CalculateTangentBitangetNormal(float2 uv, float3 posCentre)
     return normal;
 }
 
-OutputType main(InputType input)
+VertexOutputType main(VertexInputType input)
 {
-    OutputType output;
+    VertexOutputType output;
 
 	// TERRAIN HEIGHT
-    float4 displacedPosition = input.position;
+    float4 displacedPosition = input.position.xyzz;
+    displacedPosition.w = 1.f;
     displacedPosition.y += GetHeight(input.tex);
 	
 	// Calculate the position of the vertex against the world, view, and projection matrices.
-    output.position = mul(displacedPosition, worldMatrix);
-    output.position = mul(output.position, viewMatrix);
-    output.position = mul(output.position, projectionMatrix);
+    output.position = mul(displacedPosition, matrixData.worldMatrix);
+    output.position = mul(output.position, matrixData.viewMatrix);
+    output.position = mul(output.position, matrixData.projectionMatrix);
 	
 	// Store the texture coordinates for the pixel shader.
     output.tex = input.tex;
@@ -68,10 +69,10 @@ OutputType main(InputType input)
     output.normal = CalculateTangentBitangetNormal(input.tex, displacedPosition.xyz);
     
 	// Calculate the normal vector against the world matrix only and normalise.
-    output.normal = mul(output.normal, (float3x3) worldMatrix);
+    output.normal = mul(output.normal, (float3x3) matrixData.worldMatrix);
     output.normal = normalize(output.normal);
 
-    float4 worldPosition = mul(input.position, worldMatrix);
+    float4 worldPosition = mul(input.position, matrixData.worldMatrix);
     output.worldPosition = worldPosition.xyz;
 	
     output.viewVector = normalize(cameraData.worldPosition.xyz - worldPosition.xyz);

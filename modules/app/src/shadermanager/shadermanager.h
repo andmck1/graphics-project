@@ -14,12 +14,15 @@ class ShaderManagerState : public BaseShaderManagerState
     ShaderStack waveDataShaderStack;
 
     StandardVertexShader standardVertexShader;
-    VertexShader waveVertexShader;
-    VertexShader heightMapVertexShader;
-    PixelShader lightingPixelShader;
-    PixelShader lightSourcePixelShader;
-};
+    WaveVertexShader waveVertexShader;
+    HeightMapVertexShader heightMapVertexShader;
+    LightingPixelShader lightingPixelShader;
+    LightSourcePixelShader lightSourcePixelShader;
 
-class ShaderManager : public BaseShaderManager
-{
+    MatrixBuffer matrixBuffer = MatrixBuffer();
+    CameraBuffer cameraBuffer = CameraBuffer();
+    WaveDataBuffer waveDataBuffer = WaveDataBuffer();
+    AmbientLightBuffer ambientLightBuffer = AmbientLightBuffer();
+    DirectionalLightsBuffer directionalLightsBuffer = DirectionalLightsBuffer();
+    PointLightsBuffer pointLightsBuffer = PointLightsBuffer();
 };

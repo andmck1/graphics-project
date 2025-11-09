@@ -22,18 +22,24 @@ bool WrapSampler::init(D3D *graphicsManager)
     return TryDXCall(createSamplerStateHR, "Failed to create sampler state");
 }
 
-bool WrapSampler::setVertexShader(D3D *graphicsManager)
+bool WrapSampler::setVertexShader(
+    D3D *graphicsManager, BufferSlots *slotCounter
+)
 {
-    graphicsManager->deviceContext->VSGetSamplers(
-        0, 1, this->samplerState.GetAddressOf()
+    int startSlot = slotCounter->vertexShaderCounters.samplerSlot;
+    graphicsManager->deviceContext->VSSetSamplers(
+        startSlot, 1, this->samplerState.GetAddressOf()
     );
+    slotCounter->vertexShaderCounters.samplerSlot++;
     return true;
 }
 
-bool WrapSampler::setPixelShader(D3D *graphicsManager)
+bool WrapSampler::setPixelShader(D3D *graphicsManager, BufferSlots *slotCounter)
 {
+    int startSlot = slotCounter->pixelShaderCounters.samplerSlot;
     graphicsManager->deviceContext->PSSetSamplers(
-        0, 1, this->samplerState.GetAddressOf()
+        startSlot, 1, this->samplerState.GetAddressOf()
     );
+    slotCounter->pixelShaderCounters.samplerSlot++;
     return true;
 }

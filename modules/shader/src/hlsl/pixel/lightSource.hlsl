@@ -8,7 +8,7 @@ float4 getTextureColour(Texture2D _objectTexture, SamplerState _textureSampler, 
 	return _objectTexture.Sample(_textureSampler, uv);
 }
 
-float4 main(InputType input) : SV_TARGET
+float4 main(PixelInputType input) : SV_TARGET
 {
 	float4 textureColour;
 	textureColour = getTextureColour(objectTexture, textureSampler, input.tex);

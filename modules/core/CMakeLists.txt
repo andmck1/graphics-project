@@ -14,7 +14,6 @@ add_library(
   core_graphics STATIC
   src/core_graphics/d3d/d3d.cpp
   src/core_graphics/shader/shader.cpp
-  src/core_graphics/shadermanager/base.cpp
   src/core_graphics/sampler/base.cpp
   src/core_graphics/sampler/clamp.cpp
   src/core_graphics/sampler/wrap.cpp
@@ -28,6 +27,7 @@ add_library(
   src/core_graphics/mesh/plane.cpp
   src/core_graphics/mesh/ortho.cpp
   src/core_graphics/actor/base.cpp
+  src/core_graphics/actor/scene.cpp
   src/core_graphics/camera/camera.cpp
   )
 target_link_libraries(core_graphics PRIVATE spdlog imgui dxtk)

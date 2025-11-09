@@ -57,20 +57,24 @@ bool DefaultTexture::load()
     return true;
 }
 
-bool DefaultTexture::setPixelShader(int startSlot, int numViews)
+bool DefaultTexture::setVertexShader(BufferSlots *slotCounters, int numViews)
 {
-    this->graphicsManager->deviceContext->PSSetShaderResources(
+    int startSlot = slotCounters->vertexShaderCounters.textureSlot;
+    this->graphicsManager->deviceContext->VSSetShaderResources(
         startSlot, numViews, this->textureResource.GetAddressOf()
     );
+    slotCounters->vertexShaderCounters.textureSlot++;
 
     return true;
 }
 
-bool DefaultTexture::setVertexShader(int startSlot, int numViews)
+bool DefaultTexture::setPixelShader(BufferSlots *slotCounters, int numViews)
 {
-    this->graphicsManager->deviceContext->VSSetShaderResources(
+    int startSlot = slotCounters->pixelShaderCounters.textureSlot;
+    this->graphicsManager->deviceContext->PSSetShaderResources(
         startSlot, numViews, this->textureResource.GetAddressOf()
     );
+    slotCounters->pixelShaderCounters.textureSlot++;
 
     return true;
 }

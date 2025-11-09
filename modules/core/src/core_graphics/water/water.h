@@ -1,6 +1,8 @@
 #pragma once
 
-class Water
+#include "core_graphics/actor/scene.h"
+
+class Water : public SceneActor
 {
     public:
     float magnitude;

@@ -11,20 +11,20 @@ cbuffer CameraBuffer : register(b1)
 	CameraBufferType cameraData;
 };
 
-OutputType main(InputType input)
+VertexOutputType main(VertexInputType input)
 {
-	OutputType output;
+	VertexOutputType output;
 
-	output.position = mul(input.position, worldMatrix);
-	output.position = mul(output.position, viewMatrix);
-	output.position = mul(output.position, projectionMatrix);
+	output.position = mul(input.position, matrixData.worldMatrix);
+	output.position = mul(output.position, matrixData.viewMatrix);
+	output.position = mul(output.position, matrixData.projectionMatrix);
 
 	output.tex = input.tex;
 
-	output.normal = mul(input.normal, (float3x3)worldMatrix);
+	output.normal = mul(input.normal, (float3x3)matrixData.worldMatrix);
 	output.normal = normalize(output.normal);
 	
-    float4 worldPosition = mul(input.position, worldMatrix);
+    float4 worldPosition = mul(input.position, matrixData.worldMatrix);
     output.worldPosition = worldPosition.xyz;
 	
     output.viewVector = normalize(cameraData.worldPosition - worldPosition.xyz);

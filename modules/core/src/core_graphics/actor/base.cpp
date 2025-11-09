@@ -2,6 +2,13 @@
 #include <DirectXMathMatrix.inl>
 #include <algorithm>
 
+BaseActor::BaseActor()
+{
+    this->worldPosition = {0.f, 0.f, 0.f};
+    this->scaling = {1.f, 1.f, 1.f};
+    this->rotation = {0.f, 0.f, 0.f};
+}
+
 XMMATRIX BaseActor::getWorldMatrix()
 {
     XMMATRIX worldMatrix = this->getScalingMatrix() *

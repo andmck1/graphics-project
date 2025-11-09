@@ -9,12 +9,10 @@ using namespace DirectX;
 class DirectionalLight : public SceneActor
 {
     public:
-    std::array<float, 3> diffuseColour;
-    std::array<float, 3> specularColour;
+    std::array<float, 3> diffuseColour = {0.f, 0.f, 0.f};
+    std::array<float, 3> specularColour = {0.f, 0.f, 0.f};
     float specularPower;
-    std::array<float, 3> directionVector;
+    std::array<float, 3> directionVector = {0.f, 0.f, 0.f};
     bool isDiffuseEnabled;
     bool isSpecularEnabled;
-
-    bool isDrawEnabled = false;
 };

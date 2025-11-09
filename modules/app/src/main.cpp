@@ -3,7 +3,7 @@
 #include <core_window/window.h>
 #include <core_graphics/d3d/d3d.h>
 
-#include "texture/textureManager.h"
+#include "texturemanager/texturemanager.h"
 #include "state/state.h"
 #include "scene/scene.h"
 #include "app/app.h"
@@ -14,6 +14,11 @@ int main()
 
     spdlog::info("Starting app");
     State state = State();
+
+    // App
+    spdlog::info("Creating app");
+    state.initAppState();
+    App app = App(&state.appState);
 
     // Window
     spdlog::info("Creating window");
@@ -26,35 +31,33 @@ int main()
     D3D graphicsManager = D3D(&state.d3dAppState);
     graphicsManager.init();
 
-    // Shader manager
+    // Shaders
     spdlog::info("Creating shaders");
     state.initShaderManagerState(&graphicsManager);
-    ShaderManager shaderManager = ShaderManager(&state.shaderManagerState);
 
     // Texture manager
-    spdlog::info("Creating texture manager");
     state.initTextureManagerState(&graphicsManager);
     TextureManager textureManager = TextureManager(&state.textureManagerState);
+    spdlog::info("Creating texture manager");
     textureManager.loadAll();
 
     // Scene
     spdlog::info("Creating scene");
-    state.initSceneState(&graphicsManager, &shaderManager, &textureManager);
+    state.initSceneState(&graphicsManager, &state.shaderManagerState);
     Scene scene = Scene(&state.sceneState);
+    state.setShaderManagerStateShaderBufferData();
 
-    // App
-    spdlog::info("Creating app");
-    state.initAppInputState(&window, &scene);
+    // App Input
+    spdlog::info("Creating app input");
+    state.initAppInputState(&window, &scene, &app.timer);
     AppInput appInput = AppInput(&state.appInputState);
-    state.initAppState(&appInput);
-    App app = App(&state.appState);
 
     // Debug Scene
     spdlog::info("Creating debug scene");
     state.initDebugSceneState(
-        &graphicsManager, &app.timer.fps, state.sceneState.ambientLight.get(),
+        &graphicsManager, &app.timer.fps, state.sceneState.ambientLight,
         &state.sceneState.pointLights, &state.sceneState.directionalLights,
-        state.sceneState.water.get()
+        state.sceneState.water
     );
     DebugScene debugScene = DebugScene(&state.debugSceneState);
 
@@ -64,10 +67,8 @@ int main()
     while (window.frame())
     {
         app.timer.frame();
-        scene.state->timer.frame();
-        app.state->appInput->handleInputs();
-        scene.state->camera.update();
-        scene.render();
+        appInput.handleInputs();
+        scene.updateAndDraw();
         debugScene.render();
         graphicsManager.presentScreen();
     }

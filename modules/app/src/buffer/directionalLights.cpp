@@ -1,4 +1,4 @@
-#include "directionalLightsBuffer.h"
+#include "directionalLights.h"
 #include <core_utils/graphics.h>
 
 bool DirectionalLightsBuffer::init(D3D *graphicsManager)
@@ -49,14 +49,23 @@ bool DirectionalLightsBuffer::init(D3D *graphicsManager)
     return true;
 }
 
+void DirectionalLightsBuffer::setData(
+    std::vector<DirectionalLight *> *directionalLights
+)
+{
+    this->directionalLights = directionalLights;
+}
+
 // Copilot help here
-bool DirectionalLightsBuffer::setPixelShader(
-    int bufferSlot, int numberOfBuffers
+bool DirectionalLightsBuffer::setShader(
+    BufferSlots *slotCounters, int numberOfBuffers
 )
 {
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     DirectionalLightsBuffer::ShaderBuffer *bufferData;
     HRESULT mapHR;
+
+    int bufferSlot = slotCounters->pixelShaderCounters.textureSlot;
 
     mapHR = graphicsManager->deviceContext->Map(
         this->buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource
@@ -104,5 +113,7 @@ bool DirectionalLightsBuffer::setPixelShader(
     graphicsManager->deviceContext->PSSetShaderResources(
         bufferSlot, numberOfBuffers, this->shaderResourceView.GetAddressOf()
     );
+
+    slotCounters->pixelShaderCounters.textureSlot++;
     return true;
 }

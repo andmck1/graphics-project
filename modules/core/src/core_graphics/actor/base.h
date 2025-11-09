@@ -10,11 +10,13 @@ constexpr float g_ROTATION_LIMIT = XM_PIDIV2 - 0.01f;
 class BaseActor
 {
     public:
+    BaseActor();
     virtual ~BaseActor() = default;
 
     std::array<float, 3> worldPosition = {0.f, 0.f, 0.f};
     std::array<float, 3> rotation = {0.f, 0.f, 0.f};
     std::array<float, 3> scaling = {0.f, 0.f, 0.f};
+    bool isUpdateEnabled = true;
     bool isDrawEnabled = true;
 
     XMMATRIX getWorldMatrix();
