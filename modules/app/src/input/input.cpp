@@ -21,7 +21,7 @@ void AppInput::handleInputs()
         if (this->state->window->getKeyState(Input::Key::W) ==
             Input::KeyState::PRESSED)
         {
-            this->state->scene->state->camera->moveBy(
+            this->state->scene->state->camera->moveRelativeToForwardVectorBy(
                 0.f, 0.f,
                 1.f * this->state->cameraMoveSpeed *
                     this->state->timer->deltaTime
@@ -30,7 +30,7 @@ void AppInput::handleInputs()
         if (this->state->window->getKeyState(Input::Key::S) ==
             Input::KeyState::PRESSED)
         {
-            this->state->scene->state->camera->moveBy(
+            this->state->scene->state->camera->moveRelativeToForwardVectorBy(
                 0.f, 0.f,
                 -1.f * this->state->cameraMoveSpeed *
                     this->state->timer->deltaTime
@@ -39,7 +39,7 @@ void AppInput::handleInputs()
         if (this->state->window->getKeyState(Input::Key::A) ==
             Input::KeyState::PRESSED)
         {
-            this->state->scene->state->camera->moveBy(
+            this->state->scene->state->camera->moveRelativeToForwardVectorBy(
                 1.f * -this->state->cameraMoveSpeed *
                     this->state->timer->deltaTime,
                 0.f, 0.f
@@ -48,7 +48,7 @@ void AppInput::handleInputs()
         if (this->state->window->getKeyState(Input::Key::D) ==
             Input::KeyState::PRESSED)
         {
-            this->state->scene->state->camera->moveBy(
+            this->state->scene->state->camera->moveRelativeToForwardVectorBy(
                 1.f * this->state->cameraMoveSpeed *
                     this->state->timer->deltaTime,
                 0.f, 0.f
@@ -57,7 +57,7 @@ void AppInput::handleInputs()
         if (this->state->window->getKeyState(Input::Key::Q) ==
             Input::KeyState::PRESSED)
         {
-            this->state->scene->state->camera->moveBy(
+            this->state->scene->state->camera->moveRelativeToForwardVectorBy(
                 0.f,
                 1.f * this->state->cameraMoveSpeed *
                     this->state->timer->deltaTime,
@@ -67,7 +67,7 @@ void AppInput::handleInputs()
         if (this->state->window->getKeyState(Input::Key::E) ==
             Input::KeyState::PRESSED)
         {
-            this->state->scene->state->camera->moveBy(
+            this->state->scene->state->camera->moveRelativeToForwardVectorBy(
                 0.f,
                 -1.f * this->state->cameraMoveSpeed *
                     this->state->timer->deltaTime,

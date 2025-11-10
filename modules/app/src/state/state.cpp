@@ -222,7 +222,7 @@ void State::initSceneStateActor(
     sceneActorPtr->isUpdateEnabled = true;
     sceneActorPtr->isDrawEnabled = true;
 
-    sceneActorPtr->moveBy(
+    sceneActorPtr->moveTo(
         initTranslation[0], initTranslation[1], initTranslation[2]
     );
     sceneActorPtr->scaleBy(initScaling[0], initScaling[1], initScaling[2]);
@@ -390,7 +390,7 @@ void State::initSceneStateWater()
     Water *waterPtr =
         dynamic_cast<Water *>(this->sceneState.actors.back().get());
     this->sceneState.water = waterPtr;
-    
+
     waterPtr->isDrawEnabled = true;
     waterPtr->magnitude = 2.f;
     waterPtr->waveNumber = 0.1f;

@@ -19,6 +19,8 @@ class SceneActor : public BaseActor
     BaseSampler *textureSampler = nullptr;
     BaseTexture *heightMap = nullptr;
     BaseSampler *heightMapSampler = nullptr;
+    bool isUpdateEnabled = true;
+    bool isDrawEnabled = true;
 
     void update() override;
     bool drawMesh(D3D *graphicsManager);

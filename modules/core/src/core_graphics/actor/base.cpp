@@ -1,6 +1,7 @@
 #include "base.h"
 #include <DirectXMathMatrix.inl>
 #include <algorithm>
+#include <cstdlib>
 
 BaseActor::BaseActor()
 {
@@ -44,8 +45,10 @@ void BaseActor::clampRotation()
 {
     for (int i = 0; i < 2; i++)
     {
-        this->rotation[i] =
-            std::clamp(this->rotation[i], -g_ROTATION_LIMIT, g_ROTATION_LIMIT);
+        if (std::abs(rotation[i]) > g_ROTATION_LIMIT)
+        {
+            rotation[i] = 0;
+        }
     }
 }
 
@@ -73,12 +76,35 @@ void BaseActor::moveBy(float xOffset, float yOffset, float zOffset)
     this->worldPosition[2] += zOffset;
 }
 
+void BaseActor::moveRelativeToForwardVectorBy(
+    float xOffset, float yOffset, float zOffset
+)
+{
+    XMVECTOR _offsetVector = {xOffset, yOffset, zOffset};
+
+    XMVECTOR _newWorldPosition =
+        XMVector3TransformNormal(_offsetVector, this->getRotationMatrix());
+
+    this->worldPosition[0] += _newWorldPosition[0];
+    this->worldPosition[1] += _newWorldPosition[1];
+    this->worldPosition[2] += _newWorldPosition[2];
+}
+
 void BaseActor::rotateTo(float pitch, float yaw, float roll)
 {
     this->rotation[0] = pitch;
     this->rotation[1] = yaw;
     this->rotation[2] = roll;
     this->clampRotation();
+
+    XMVECTOR _initialForwardVector = {1.f, 0.f, 0.f};
+    XMVECTOR _forwardVector = XMVector3TransformNormal(
+        _initialForwardVector, XMMatrixRotationRollPitchYaw(pitch, yaw, roll)
+    );
+
+    this->forwardVector[0] = _forwardVector[0];
+    this->forwardVector[1] = _forwardVector[1];
+    this->forwardVector[2] = _forwardVector[2];
 }
 
 void BaseActor::rotateBy(float pitchOffset, float yawOffset, float rollOffset)
@@ -87,6 +113,20 @@ void BaseActor::rotateBy(float pitchOffset, float yawOffset, float rollOffset)
     this->rotation[1] += yawOffset;
     this->rotation[2] += rollOffset;
     this->clampRotation();
+
+    XMVECTOR _initialForwardVector = {
+        this->forwardVector[0], this->forwardVector[1], this->forwardVector[2]
+    };
+    XMVECTOR _forwardVector = XMVector3TransformNormal(
+        _initialForwardVector,
+        XMMatrixRotationRollPitchYaw(
+            this->rotation[0], this->rotation[1], this->rotation[2]
+        )
+    );
+
+    this->forwardVector[0] = _forwardVector[0];
+    this->forwardVector[1] = _forwardVector[1];
+    this->forwardVector[2] = _forwardVector[2];
 }
 
 void BaseActor::scaleTo(float xFactor, float yFactor, float zFactor)
