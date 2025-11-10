@@ -38,21 +38,19 @@ bool D3D::createDeviceAndSwapChain()
     );
 }
 
-bool D3D::initProjectionMatrix()
+void D3D::initProjectionMatrix()
 {
     float aspectRatio = static_cast<float>(this->state->window->state->width) /
                         static_cast<float>(this->state->window->state->height);
     this->projectionMatrix =
         XMMatrixPerspectiveFovLH(XM_PIDIV4, aspectRatio, 0.1f, 5000.0f);
-
-    return true;
 }
 
-bool D3D::setRenderTargetView()
+bool D3D::createBackBufferRenderTargetView()
 {
+    ComPtr<ID3D11Texture2D> backBuffer;
     HRESULT getBufferHR;
     HRESULT createRenderTargetViewHR;
-    ComPtr<ID3D11Texture2D> backBuffer;
 
     getBufferHR = this->swapChain->GetBuffer(
         0, __uuidof(ID3D11Texture2D),
@@ -64,11 +62,33 @@ bool D3D::setRenderTargetView()
     }
 
     createRenderTargetViewHR = this->device->CreateRenderTargetView(
-        backBuffer.Get(), nullptr, this->renderTargetView.GetAddressOf()
+        backBuffer.Get(), nullptr,
+        this->backBufferRenderTargetView.GetAddressOf()
     );
 
+    if (!TryDXCall(
+            createRenderTargetViewHR, "Failed to create render target view."
+        ))
+        return false;
+
+    return true;
+}
+
+bool D3D::setRenderTargetView(
+    ComPtr<ID3D11RenderTargetView> renderTargetView,
+    ComPtr<ID3D11DepthStencilView> depthStencilView
+)
+{
     this->deviceContext->OMSetRenderTargets(
-        1, renderTargetView.GetAddressOf(), nullptr
+        1, renderTargetView.GetAddressOf(), depthStencilView.Get()
+    );
+    return true;
+}
+
+bool D3D::setRenderTargetViewToBackBuffer()
+{
+    this->setRenderTargetView(
+        this->backBufferRenderTargetView, this->backBufferDepthStencilView
     );
     return true;
 }
@@ -92,19 +112,22 @@ bool D3D::setRasterizerState()
     return true;
 }
 
-bool D3D::setViewport()
+void D3D::initDefaultViewport()
 {
     // TODO - move to a config file
-    this->viewport.TopLeftX = 0;
-    this->viewport.TopLeftY = 0;
-    this->viewport.Width =
+    this->defaultViewport.TopLeftX = 0;
+    this->defaultViewport.TopLeftY = 0;
+    this->defaultViewport.Width =
         static_cast<FLOAT>(this->state->window->state->width);
-    this->viewport.Height =
+    this->defaultViewport.Height =
         static_cast<FLOAT>(this->state->window->state->height);
-    this->viewport.MinDepth = 0.0f;
-    this->viewport.MaxDepth = 1.0f;
+    this->defaultViewport.MinDepth = 0.0f;
+    this->defaultViewport.MaxDepth = 1.0f;
+}
 
-    this->deviceContext->RSSetViewports(1, &viewport);
+bool D3D::setViewport(D3D11_VIEWPORT *viewport)
+{
+    this->deviceContext->RSSetViewports(1, viewport);
     return true;
 }
 
@@ -225,54 +248,72 @@ bool D3D::setDepthBuffer()
     return TryDXCall(createDepthBufferHR, "Failed to create depth buffer.\n");
 }
 
-// TODO Lab code
-bool D3D::setStencilBuffer()
+bool D3D::createDepthStencilState()
+{
+    D3D11_DEPTH_STENCIL_DESC depthStencilStateDescription = {};
+    HRESULT createDepthStencilStateHR;
+
+    depthStencilStateDescription.DepthEnable = true;
+    depthStencilStateDescription.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+    depthStencilStateDescription.DepthFunc = D3D11_COMPARISON_LESS;
+    depthStencilStateDescription.StencilEnable = true;
+    depthStencilStateDescription.StencilReadMask = 0xFF;
+    depthStencilStateDescription.StencilWriteMask = 0xFF;
+    depthStencilStateDescription.FrontFace.StencilFailOp =
+        D3D11_STENCIL_OP_KEEP;
+    depthStencilStateDescription.FrontFace.StencilDepthFailOp =
+        D3D11_STENCIL_OP_INCR;
+    depthStencilStateDescription.FrontFace.StencilPassOp =
+        D3D11_STENCIL_OP_KEEP;
+    depthStencilStateDescription.FrontFace.StencilFunc =
+        D3D11_COMPARISON_ALWAYS;
+    depthStencilStateDescription.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilStateDescription.BackFace.StencilDepthFailOp =
+        D3D11_STENCIL_OP_DECR;
+    depthStencilStateDescription.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilStateDescription.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+    createDepthStencilStateHR = this->device->CreateDepthStencilState(
+        &depthStencilStateDescription, &this->depthStencilState
+    );
+    if (!TryDXCall(
+            createDepthStencilStateHR,
+            "Failed to create depth stencil state view."
+        ))
+        return false;
+
+    return true;
+}
+
+bool D3D::setDepthStencilState()
+{
+    this->deviceContext->OMSetDepthStencilState(
+        this->depthStencilState.Get(), 1
+    );
+    return true;
+}
+
+void D3D::initDefaultDepthStencilDescription()
+{
+    this->defaultDepthStencilViewDescription.Format =
+        DXGI_FORMAT_D24_UNORM_S8_UINT;
+    this->defaultDepthStencilViewDescription.ViewDimension =
+        D3D11_DSV_DIMENSION_TEXTURE2D;
+    this->defaultDepthStencilViewDescription.Texture2D.MipSlice = 0;
+}
+
+bool D3D::createBackBufferStencilView()
 {
     HRESULT createDepthStencilViewHR;
-    D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-    // Initialize the description of the stencil state.
-    ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
-    depthStencilDesc.DepthEnable = true;
-    depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-    depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-    depthStencilDesc.StencilEnable = true;
-    depthStencilDesc.StencilReadMask = 0xFF;
-    depthStencilDesc.StencilWriteMask = 0xFF;
-    depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-    depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-    depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-    depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-    depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-    depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-    depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-    depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-    // Create the depth stencil state.
-    this->device->CreateDepthStencilState(
-        &depthStencilDesc, &depthStencilState
-    );
-    this->deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 1);
-
-    // Initialise the depth stencil view.
-    D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-    ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
-    depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-    depthStencilViewDesc.Texture2D.MipSlice = 0;
-
-    // Create the depth stencil view.
     createDepthStencilViewHR = this->device->CreateDepthStencilView(
-        this->depthStencilBuffer.Get(), &depthStencilViewDesc,
-        this->depthStencilView.GetAddressOf()
+        this->depthStencilBuffer.Get(), &defaultDepthStencilViewDescription,
+        this->backBufferDepthStencilView.GetAddressOf()
     );
     if (!TryDXCall(
             createDepthStencilViewHR, "Failed to create depth stencil view\n"
         ))
         return false;
-    this->deviceContext->OMSetRenderTargets(
-        1, this->renderTargetView.GetAddressOf(), this->depthStencilView.Get()
-    );
-
     return true;
 }
 
@@ -280,17 +321,24 @@ bool D3D::init()
 {
     if (!this->createDeviceAndSwapChain())
         return false;
-    if (!this->initProjectionMatrix())
-        return false;
-    if (!this->setRenderTargetView())
+    this->initProjectionMatrix();
+    if (!this->createBackBufferRenderTargetView())
         return false;
     if (!this->setDepthBuffer())
         return false;
-    if (!this->setStencilBuffer())
+    this->initDefaultDepthStencilDescription();
+    if (!this->createDepthStencilState())
+        return false;
+    if (!this->setDepthStencilState())
+        return false;
+    if (!this->createBackBufferStencilView())
+        return false;
+    if (!this->setRenderTargetViewToBackBuffer())
         return false;
     if (!this->setRasterizerState())
         return false;
-    if (!this->setViewport())
+    this->initDefaultViewport();
+    if (!this->setViewport(&this->defaultViewport))
         return false;
     if (!this->createMatrixBuffer())
         return false;
@@ -300,10 +348,10 @@ bool D3D::init()
 bool D3D::clearScreen(const float clearColour[4])
 {
     this->deviceContext->ClearRenderTargetView(
-        this->renderTargetView.Get(), clearColour
+        this->backBufferRenderTargetView.Get(), clearColour
     );
     this->deviceContext->ClearDepthStencilView(
-        this->depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0
+        this->backBufferDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0
     );
     return true;
 }

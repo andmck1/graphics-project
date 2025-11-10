@@ -1,5 +1,4 @@
 #include "scene.h"
-
 #include <spdlog/spdlog.h>
 #include <d3d11.h>
 #include <wrl/client.h>
@@ -9,13 +8,24 @@ Scene::Scene(SceneState *state)
     this->state = state;
 }
 
+bool Scene::firstPass()
+{
+    this->state->graphicsManager->clearScreen(this->state->clearColour.data());
+    // this->state->graphicsManager->deviceContext->OMSetRenderTargets(
+    //     1, this->state->graphicsManager->renderTargetView.GetAddressOf(),
+    //     this->state->graphicsManager->depthStencilView.Get()
+    // );
+    return true;
+}
+
+bool Scene::finalPass()
+{
+    return true;
+}
+
 bool Scene::updateAndDraw()
 {
     this->state->graphicsManager->clearScreen(this->state->clearColour.data());
-    this->state->graphicsManager->deviceContext->OMSetRenderTargets(
-        1, this->state->graphicsManager->renderTargetView.GetAddressOf(),
-        this->state->graphicsManager->depthStencilView.Get()
-    );
 
     for (int i = 0; i < this->state->actors.size(); i++)
     {

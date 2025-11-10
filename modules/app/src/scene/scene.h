@@ -54,6 +54,8 @@ class Scene
     public:
     Scene(SceneState *state);
     SceneState *state;
-
+    
+    bool firstPass();
+    bool finalPass(); 
     bool updateAndDraw();
 };

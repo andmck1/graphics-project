@@ -21,16 +21,17 @@ class D3D
     ComPtr<ID3D11Device> device;
     ComPtr<ID3D11DeviceContext> deviceContext;
     ComPtr<IDXGISwapChain> swapChain;
-    ComPtr<ID3D11RenderTargetView> renderTargetView;
+    ComPtr<ID3D11RenderTargetView> backBufferRenderTargetView;
     XMMATRIX projectionMatrix;
-    D3D11_VIEWPORT viewport = {};
+    D3D11_VIEWPORT defaultViewport = {};
+    D3D11_DEPTH_STENCIL_VIEW_DESC defaultDepthStencilViewDescription = {};
     ComPtr<ID3D11RasterizerState> rasterizerState;
     D3D11_RASTERIZER_DESC rasterizerDesc = {};
     ComPtr<ID3DBlob> errorBlob;
     ComPtr<ID3D11Buffer> matrixBuffer;
     ComPtr<ID3D11Texture2D> depthStencilBuffer;
     ComPtr<ID3D11DepthStencilState> depthStencilState;
-    ComPtr<ID3D11DepthStencilView> depthStencilView;
+    ComPtr<ID3D11DepthStencilView> backBufferDepthStencilView;
 
     D3D(D3DAppState *state);
 
@@ -46,13 +47,23 @@ class D3D
 
     static ComPtr<ID3DBlob> loadShader(std::string shaderFilepath);
 
+    bool setRenderTargetViewToBackBuffer();
+    bool setRenderTargetView(
+        ComPtr<ID3D11RenderTargetView> renderTargetView,
+        ComPtr<ID3D11DepthStencilView> depthStencilView
+    );
+    bool setViewport(D3D11_VIEWPORT *viewport);
+
     private:
     bool createDeviceAndSwapChain();
-    bool initProjectionMatrix();
-    bool setRenderTargetView();
+    void initProjectionMatrix();
+    bool createBackBufferRenderTargetView();
     bool setDepthBuffer();
-    bool setStencilBuffer();
+    bool createDepthStencilState();
+    bool setDepthStencilState();
+    void initDefaultDepthStencilDescription();
+    bool createBackBufferStencilView();
     bool setRasterizerState();
-    bool setViewport();
+    void initDefaultViewport();
     bool createMatrixBuffer();
 };
