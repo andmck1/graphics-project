@@ -13,6 +13,7 @@ target_include_directories(core_utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_library(
   core_graphics STATIC
   src/core_graphics/d3d/d3d.cpp
+  src/core_graphics/d3d/renderTexture.cpp
   src/core_graphics/shader/shader.cpp
   src/core_graphics/sampler/base.cpp
   src/core_graphics/sampler/clamp.cpp

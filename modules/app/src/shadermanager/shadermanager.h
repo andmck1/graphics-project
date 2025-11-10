@@ -9,7 +9,7 @@ class ShaderManagerState : public BaseShaderManagerState
 {
     public:
     ShaderStack defaultShaderStack;
-    ShaderStack lightSourceShaderStack;
+    ShaderStack textureOnlyShaderStack;
     ShaderStack heightMappedObjectShaderStack;
     ShaderStack waveDataShaderStack;
 
@@ -17,7 +17,7 @@ class ShaderManagerState : public BaseShaderManagerState
     WaveVertexShader waveVertexShader;
     HeightMapVertexShader heightMapVertexShader;
     LightingPixelShader lightingPixelShader;
-    LightSourcePixelShader lightSourcePixelShader;
+    TextureOnlyPixelShader textureOnlyPixelShader;
 
     MatrixBuffer matrixBuffer = MatrixBuffer();
     CameraBuffer cameraBuffer = CameraBuffer();

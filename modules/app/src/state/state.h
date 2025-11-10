@@ -55,6 +55,7 @@ class State
     void initShaderManagerStateShaderStacks();
     void initSceneStateSampler();
 
+    void initSceneStateRenderStages();
     template <typename MeshType, typename SceneActorType>
     void initSceneStateActor(
         ShaderStack *shaderStack, BaseTexture *texture, BaseSampler *sampler,
@@ -84,4 +85,7 @@ class State
     );
     void initSceneStateCamera();
     void initSceneStateWater();
+    void createRenderTexture(
+        int textureWidth, int textureHeight, float screenNear, float screenFar
+    );
 };

@@ -12,6 +12,7 @@ class Camera : public SceneActor
     public:
     Camera();
     XMMATRIX viewMatrix;
+    XMMATRIX orthoViewMatrix;
 
     void update() override;
 };

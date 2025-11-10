@@ -24,9 +24,11 @@
 #include <core_graphics/sampler/clamp.h>
 #include <core_graphics/sampler/wrap.h>
 #include <core_utils/timer.h>
+#include "core_graphics/d3d/renderTexture.h"
 #include "core_graphics/water/water.h"
 
 #include "../shadermanager/shadermanager.h"
+#include "renderstage.h"
 
 struct SceneState
 {
@@ -47,6 +49,9 @@ struct SceneState
 
     Camera *camera;
     Water *water;
+
+    std::vector<std::unique_ptr<RenderTexture>> renderTextures;
+    std::vector<std::unique_ptr<RenderStage>> renderStages;
 };
 
 class Scene
@@ -54,8 +59,8 @@ class Scene
     public:
     Scene(SceneState *state);
     SceneState *state;
-    
+
     bool firstPass();
-    bool finalPass(); 
+    bool finalPass();
     bool updateAndDraw();
 };

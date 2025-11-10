@@ -1,5 +1,6 @@
 #include "state.h"
 
+#include "core_graphics/mesh/ortho.h"
 #include "core_graphics/light/ambient.h"
 #include "core_graphics/texture/default.h"
 #include "core_graphics/texture/file.h"
@@ -68,9 +69,9 @@ void State::initShaderManagerStateShaders()
             "./build/hlsl/pixel/lighting.cso"
         );
 
-    this->shaderManagerState.lightSourcePixelShader =
-        this->initShaderManagerStateShader<LightSourcePixelShader>(
-            "./build/hlsl/pixel/lightSource.cso"
+    this->shaderManagerState.textureOnlyPixelShader =
+        this->initShaderManagerStateShader<TextureOnlyPixelShader>(
+            "./build/hlsl/pixel/textureOnly.cso"
         );
 }
 
@@ -81,10 +82,10 @@ void State::initShaderManagerStateShaderStacks()
             {&this->shaderManagerState.standardVertexShader,
              &this->shaderManagerState.lightingPixelShader}
         );
-    this->shaderManagerState.lightSourceShaderStack.shaders =
+    this->shaderManagerState.textureOnlyShaderStack.shaders =
         std::vector<BaseShader *>(
             {&this->shaderManagerState.standardVertexShader,
-             &this->shaderManagerState.lightSourcePixelShader}
+             &this->shaderManagerState.textureOnlyPixelShader}
         );
     this->shaderManagerState.heightMappedObjectShaderStack.shaders =
         std::vector<BaseShader *>(
@@ -118,7 +119,7 @@ void State::initShaderManagerStateShaderBuffers()
         &this->shaderManagerState.directionalLightsBuffer,
         &this->shaderManagerState.pointLightsBuffer
     };
-    this->shaderManagerState.lightSourcePixelShader.bufferStack = {};
+    this->shaderManagerState.textureOnlyPixelShader.bufferStack = {};
 }
 
 void State::setShaderManagerStateShaderBufferData()
@@ -278,7 +279,7 @@ void State::initSceneStatePointLight(
 
     pointLightPtr->mesh = SphereMesh(this->sceneState.graphicsManager);
     pointLightPtr->shaderStack =
-        &this->shaderManagerState.lightSourceShaderStack;
+        &this->shaderManagerState.textureOnlyShaderStack;
     pointLightPtr->texture = &this->textureManagerState.lightDebugTexture;
     pointLightPtr->textureSampler = &this->sceneState.clampSampler;
 
@@ -397,6 +398,53 @@ void State::initSceneStateWater()
     waterPtr->angularVelocity = 0.5f;
 }
 
+void State::createRenderTexture(
+    int textureWidth, int textureHeight, float screenNear, float screenFar
+)
+{
+    this->sceneState.renderTextures.push_back(
+        std::make_unique<RenderTexture>()
+    );
+    RenderTexture *renderTexturePtr =
+        this->sceneState.renderTextures.back().get();
+    renderTexturePtr->graphicsManager = this->sceneState.graphicsManager;
+    renderTexturePtr->textureWidth = textureWidth;
+    renderTexturePtr->textureHeight = textureHeight;
+    renderTexturePtr->screenNear = screenNear;
+    renderTexturePtr->screenFar = screenFar;
+    renderTexturePtr->init();
+}
+
+void State::initSceneStateRenderStages()
+{
+    this->sceneState.renderStages.push_back(std::make_unique<RenderStage>());
+    RenderStage *renderStagePtr = this->sceneState.renderStages.back().get();
+
+    this->createRenderTexture(
+        this->windowState.width, this->windowState.height, 0.1f, 5000.f
+    );
+    RenderTexture *initialRenderTexturePtr =
+        this->sceneState.renderTextures.back().get();
+
+    this->createRenderTexture(
+        this->windowState.width, this->windowState.height, 0.1f, 5000.f
+    );
+    RenderTexture *nextRenderTexturePtr =
+        this->sceneState.renderTextures.back().get();
+
+    renderStagePtr->inputRenderTexture = initialRenderTexturePtr;
+    // renderStagePtr->outputRenderTexture = nextRenderTexturePtr;
+    renderStagePtr->outputRenderTexture = std::nullopt;
+    renderStagePtr->textureSampler = &this->sceneState.clampSampler;
+    renderStagePtr->mesh = OrthoMesh(
+        this->sceneState.graphicsManager, this->windowState.height,
+        this->windowState.width, 0, 0
+    );
+    renderStagePtr->clearColour = this->sceneState.clearColour;
+    renderStagePtr->camera = this->sceneState.camera;
+    renderStagePtr->shaderManagerState = &shaderManagerState;
+}
+
 void State::initSceneState(
     D3D *graphicsManager, ShaderManagerState *shaderManagerState
 )
@@ -414,6 +462,7 @@ void State::initSceneState(
     this->initSceneStateDirectionalLights();
     this->initSceneStateCamera();
     this->initSceneStateWater();
+    this->initSceneStateRenderStages();
 
     this->setShaderManagerStateShaderBufferData();
 

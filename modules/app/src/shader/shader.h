@@ -39,6 +39,6 @@ class LightingPixelShader : public PixelShader
     DirectionalLightsBuffer directionalLightsBuffer = DirectionalLightsBuffer();
 };
 
-class LightSourcePixelShader : public PixelShader
+class TextureOnlyPixelShader : public PixelShader
 {
 };

@@ -5,6 +5,7 @@ add_executable(
   src/texturemanager/texturemanager.cpp
   src/shadermanager/shadermanager.cpp
   src/scene/scene.cpp
+  src/scene/renderstage.cpp
   src/scene/debugScene.cpp
   src/input/input.cpp
   src/app/app.cpp
