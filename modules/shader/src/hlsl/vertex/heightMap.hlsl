@@ -52,8 +52,7 @@ VertexOutputType main(VertexInputType input)
     VertexOutputType output;
 
 	// TERRAIN HEIGHT
-    float4 displacedPosition = input.position.xyzz;
-    displacedPosition.w = 1.f;
+    float4 displacedPosition = input.position;
     displacedPosition.y += GetHeight(input.tex);
 	
 	// Calculate the position of the vertex against the world, view, and projection matrices.

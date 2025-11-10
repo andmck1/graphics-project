@@ -8,8 +8,8 @@ cbuffer AmbientLightBuffer: register(b0)
 	AmbientLightBufferType ambientLightData;
 }
 
-StructuredBuffer<DirectionalLightBufferType> DirectionalLightBuffer : register(t2);
-StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t3);
+StructuredBuffer<DirectionalLightBufferType> DirectionalLightBuffer : register(t1);
+StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t2);
 
 float GetHeight(float2 uv)
 {

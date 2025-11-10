@@ -27,7 +27,7 @@ VertexOutputType main(VertexInputType input)
     float4 worldPosition = mul(input.position, matrixData.worldMatrix);
     output.worldPosition = worldPosition.xyz;
 	
-    output.viewVector = normalize(cameraData.worldPosition - worldPosition.xyz);
+    output.viewVector = normalize(cameraData.worldPosition.xyz - worldPosition.xyz);
 
 	return output;
 }

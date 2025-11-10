@@ -16,7 +16,7 @@ using matrix = XMMATRIX;
 #ifndef __cplusplus
 struct VertexInputType
 {
-    float3 position : POSITION;
+    float4 position : POSITION;
     float2 tex : TEXCOORD0;
     float3 normal : NORMAL;
 };

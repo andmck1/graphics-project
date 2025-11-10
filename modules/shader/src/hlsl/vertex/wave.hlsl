@@ -84,3 +84,4 @@ VertexOutputType main(VertexInputType input)
 
 	return output;
 }
+

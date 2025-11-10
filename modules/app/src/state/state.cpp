@@ -115,8 +115,8 @@ void State::initShaderManagerStateShaderBuffers()
     };
     this->shaderManagerState.lightingPixelShader.bufferStack = {
         &this->shaderManagerState.ambientLightBuffer,
-        &this->shaderManagerState.pointLightsBuffer,
-        &this->shaderManagerState.directionalLightsBuffer
+        &this->shaderManagerState.directionalLightsBuffer,
+        &this->shaderManagerState.pointLightsBuffer
     };
     this->shaderManagerState.lightSourcePixelShader.bufferStack = {};
 }
@@ -385,7 +385,7 @@ void State::initSceneStateWater()
         &this->shaderManagerState.waveDataShaderStack,
         &this->textureManagerState.defaultTexture,
         &this->sceneState.clampSampler, nullptr, nullptr, {1.f, 1.f, 1.f},
-        {0.f, 0.f, 0.f}, {-3.f, 0.f, 0.f}
+        {0.f, 0.f, 0.f}, {0.f, -250.f, 0.f}
     );
     Water *waterPtr =
         dynamic_cast<Water *>(this->sceneState.actors.back().get());
