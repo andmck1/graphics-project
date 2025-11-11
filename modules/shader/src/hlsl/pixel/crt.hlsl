@@ -13,21 +13,25 @@ float2 distort(float2 _uv, float curvePower)
 	// We want to mimic the shape of a tv screen!
 	// This means we want to have a lens like distortion on our image.
 	// The closer we are to the edge, distort more.
-	// I'm using Art-Michael's lensing here but this could be much better,
-	// I would want it to fall off more like a vingette.
-	float angle, theta, radius, distanceFromCentre;
-	float2 distortion;
+	// Building on Art-Michaels example I really wanted good falloff
+	// towards the edge so do a linear interpolation between the distortion
+	// and the original coordinates.
+	float angle, theta, radius, distanceFromCentre, falloff;
+	float2 uvDistorted;
 
-	_uv = _uv * 2.f - 1.f;
-	distanceFromCentre = length(_uv);
-	theta = atan2(_uv.y, _uv.x);
+	uvDistorted = _uv * 2.0 - 1.0;
+	distanceFromCentre = length(uvDistorted);
+	theta = atan2(uvDistorted.y, uvDistorted.x);
 	radius = pow(distanceFromCentre, curvePower);
-	_uv.x = radius * cos(theta);
-	_uv.y = radius * sin(theta);
+	uvDistorted.x = radius * cos(theta);
+	uvDistorted.y = radius * sin(theta);
 
-	distortion = _uv * 0.5 + 0.5; 
+	uvDistorted = uvDistorted * 0.5 + 0.5; 
 
-	return distortion;
+	falloff = smoothstep(0.5, 1.0, distanceFromCentre);
+	uvDistorted = lerp(_uv, uvDistorted, falloff);
+
+	return saturate(uvDistorted);
 }
 
 // Help from Copilot for these random functions
@@ -162,7 +166,6 @@ float4 main(PixelInputType input) : SV_TARGET
 		uv.x += vhsWiggleOffset(uv, crtData.totalTime.x, crtData.vhsWiggle.x);
 	}
 
-	// TODO - fix this
 	if ((bool) crtData.isCurvingEnabled.x)
 	{
 		uv = distort(uv, crtData.curvePower.x);
