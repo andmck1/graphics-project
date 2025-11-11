@@ -212,7 +212,7 @@ bool DebugScene::render()
         );
         ImGui::SliderFloat(
             "Grain Strength", &this->state->crtSettings->grainStrength.x, 0.1f,
-            2.0f
+            1.0f
         );
         ImGui::SliderFloat(
             "Curve Power", &this->state->crtSettings->curvePower.x, 0.1f, 2.0f
@@ -238,8 +238,8 @@ bool DebugScene::render()
             &this->state->crtSettings->chromaticAberrationStrength.x, 0.1f, 4.0f
         );
         ImGui::SliderFloat(
-            "VHS Wiggle Amount", &this->state->crtSettings->vhsWiggle.x, 0.1f,
-            0.01f
+            "VHS Wiggle Amount", &this->state->crtSettings->vhsWiggle.x, 0.001f,
+            0.005f
         );
     }
 

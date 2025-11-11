@@ -503,10 +503,10 @@ void State::initSceneStatePostProcessors()
     crtSettingsPtr->isVingetteEnabled = XMINT4(1, 0, 0, 0);
 
     crtSettingsPtr->brightnessMultiplier = XMFLOAT4(1.f, 0.f, 0.f, 0.f);
-    crtSettingsPtr->grainStrength = XMFLOAT4(0.5f, 0.f, 0.f, 0.f);
+    crtSettingsPtr->grainStrength = XMFLOAT4(0.2f, 0.f, 0.f, 0.f);
     crtSettingsPtr->curvePower = XMFLOAT4(1.f, 0.f, 0.f, 0.f);
     crtSettingsPtr->vingetteStrength = XMFLOAT4(0.5f, 0.f, 0.f, 0.f);
-    crtSettingsPtr->scanlinesInterval = XMINT4(1, 0, 0, 0);
+    crtSettingsPtr->scanlinesInterval = XMINT4(2, 0, 0, 0);
     crtSettingsPtr->scanlinesOpacity = XMFLOAT4(1.f, 0.f, 0.f, 0.f);
     crtSettingsPtr->scanlinesThickness = XMINT4(2, 0, 0, 0);
     crtSettingsPtr->chromaticAberrationStrength = XMFLOAT4(2.f, 0.f, 0.f, 0.f);
