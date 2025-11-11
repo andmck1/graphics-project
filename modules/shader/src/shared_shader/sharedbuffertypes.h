@@ -127,5 +127,32 @@ struct WaveDataBufferType
     };
 
 #ifdef __cplusplus
+    struct CRTBufferType : BaseBufferType
+#else
+struct CRTBufferType
+#endif
+    {
+        float4 totalTime;
+
+        int4 isVHSWiggleEnabled;
+        int4 isCurvingEnabled;
+        int4 isChromaticAberrationEnabled;
+        int4 isGrainEnabled;
+        int4 isRGBGridEnabled;
+        int4 isScanlinesEnabled;
+        int4 isVingetteEnabled;
+
+        float4 brightnessMultiplier;
+        float4 grainStrength;
+        float4 curvePower;
+        float4 vingetteStrength;
+        int4 scanlinesInterval;
+        float4 scanlinesOpacity;
+        int4 scanlinesThickness;
+        float4 chromaticAberrationStrength;
+        float4 vhsWiggle;
+    };
+
+#ifdef __cplusplus
 }
 #endif

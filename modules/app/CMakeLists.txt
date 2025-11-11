@@ -5,7 +5,8 @@ add_executable(
   src/texturemanager/texturemanager.cpp
   src/shadermanager/shadermanager.cpp
   src/scene/scene.cpp
-  src/scene/renderstage.cpp
+  src/postprocessors/renderstage.cpp
+  src/postprocessors/crt.cpp
   src/scene/debugScene.cpp
   src/input/input.cpp
   src/app/app.cpp
@@ -14,6 +15,7 @@ add_executable(
   src/buffer/pointLights.cpp
   src/buffer/directionalLights.cpp
   src/buffer/waveData.cpp
+  src/buffer/crt.cpp
   src/buffer/camera.cpp)
 
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR}

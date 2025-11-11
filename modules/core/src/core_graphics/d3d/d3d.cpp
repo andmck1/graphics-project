@@ -21,7 +21,8 @@ bool D3D::createDeviceAndSwapChain()
     scd.Windowed = TRUE;
     scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
-    UINT createDeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+    UINT createDeviceFlags =
+        D3D11_CREATE_DEVICE_BGRA_SUPPORT | D3D11_CREATE_DEVICE_DEBUG;
 
     D3D_FEATURE_LEVEL featureLevel;
     const D3D_FEATURE_LEVEL featureLevels[] = {D3D_FEATURE_LEVEL_11_0};
@@ -119,7 +120,7 @@ bool D3D::setRasterizerState()
 
 bool D3D::setDefaultViewport()
 {
-   // TODO - move to a config file
+    // TODO - move to a config file
     this->viewport.TopLeftX = 0;
     this->viewport.TopLeftY = 0;
     this->viewport.Width =

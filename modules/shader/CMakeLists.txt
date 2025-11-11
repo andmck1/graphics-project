@@ -16,7 +16,8 @@ set(VERTEX_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/heightMap.hlsl"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/wave.hlsl")
 set(PIXEL_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/lighting.hlsl"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/textureOnly.hlsl")
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/textureOnly.hlsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/crt.hlsl")
 set(HLSL_SHADER_FILES ${VERTEX_SHADERS} ${PIXEL_SHADERS})
 set(CMAKE_HLSL_OUTPUT_DIR ${CMAKE_BINARY_DIR}/hlsl)
 

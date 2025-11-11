@@ -57,7 +57,8 @@ int main()
     state.initDebugSceneState(
         &graphicsManager, &app.timer.fps, state.sceneState.ambientLight,
         &state.sceneState.pointLights, &state.sceneState.directionalLights,
-        state.sceneState.water
+        state.sceneState.water, &state.sceneState.crtSettings,
+        &state.sceneState.crtPostProcessor.isEnabled
     );
     DebugScene debugScene = DebugScene(&state.debugSceneState);
 

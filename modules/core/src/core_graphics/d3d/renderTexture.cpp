@@ -132,9 +132,13 @@ bool RenderTexture::set()
 
 bool RenderTexture::setPixelShader(BufferSlots *slotCounters)
 {
+    if (this->shaderResourceView == nullptr)
+        return false;
+
     int startSlot = slotCounters->pixelShaderCounters.textureSlot;
     this->graphicsManager->deviceContext->PSSetShaderResources(
         startSlot, 1, this->shaderResourceView.GetAddressOf()
     );
+    slotCounters->pixelShaderCounters.textureSlot++;
     return true;
 }

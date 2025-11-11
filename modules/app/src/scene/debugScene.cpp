@@ -157,16 +157,91 @@ bool DebugScene::render()
         }
     }
 
-    ImGui::SliderFloat(
-        "Water Wave Magnitude", &this->state->water->magnitude, 0.1f, 10.f
-    );
-    ImGui::SliderFloat(
-        "Water Wave Number", &this->state->water->waveNumber, 0.1f, 1.f
-    );
-    ImGui::SliderFloat(
-        "Water Wave Angular Velocity", &this->state->water->angularVelocity,
-        0.1f, 10.f
-    );
+    if (ImGui::CollapsingHeader("Water settings"))
+    {
+        ImGui::SliderFloat(
+            "Water Wave Magnitude", &this->state->water->magnitude, 0.1f, 10.f
+        );
+        ImGui::SliderFloat(
+            "Water Wave Number", &this->state->water->waveNumber, 0.1f, 1.f
+        );
+        ImGui::SliderFloat(
+            "Water Wave Angular Velocity", &this->state->water->angularVelocity,
+            0.1f, 10.f
+        );
+    }
+
+    if (ImGui::CollapsingHeader("Postprocessor settings"))
+    {
+
+        ImGui::Checkbox("Is CRT Enabled?", this->state->isCRTEnabled);
+
+        ImGui::Checkbox(
+            "Enable VHS Wiggle",
+            (bool *) &this->state->crtSettings->isVHSWiggleEnabled.x
+        );
+        ImGui::Checkbox(
+            "Enable Curving",
+            (bool *) &this->state->crtSettings->isCurvingEnabled.x
+        );
+        ImGui::Checkbox(
+            "Enable Chromatic Aberration",
+            (bool *) &this->state->crtSettings->isChromaticAberrationEnabled.x
+        );
+        ImGui::Checkbox(
+            "Enable Grain", (bool *) &this->state->crtSettings->isGrainEnabled.x
+        );
+        ImGui::Checkbox(
+            "Enable RGB Grid",
+            (bool *) &this->state->crtSettings->isRGBGridEnabled.x
+        );
+        ImGui::Checkbox(
+            "Enable Scanlines",
+            (bool *) &this->state->crtSettings->isScanlinesEnabled.x
+        );
+        ImGui::Checkbox(
+            "Enable Vingette",
+            (bool *) &this->state->crtSettings->isVingetteEnabled.x
+        );
+
+        ImGui::Separator();
+
+        ImGui::SliderFloat(
+            "Brightness Multiplier",
+            &this->state->crtSettings->brightnessMultiplier.x, 0.1f, 3.0f
+        );
+        ImGui::SliderFloat(
+            "Grain Strength", &this->state->crtSettings->grainStrength.x, 0.1f,
+            2.0f
+        );
+        ImGui::SliderFloat(
+            "Curve Power", &this->state->crtSettings->curvePower.x, 0.1f, 2.0f
+        );
+        ImGui::SliderFloat(
+            "Vingette Strength",
+            &this->state->crtSettings->vingetteStrength.x, 0.1f, 2.0f
+        );
+        ImGui::SliderInt(
+            "Scanlines Interval",
+            &this->state->crtSettings->scanlinesInterval.x, 2, 10
+        );
+        ImGui::SliderFloat(
+            "Scanlines Opacity", &this->state->crtSettings->scanlinesOpacity.x,
+            0.1f, 1.0f
+        );
+        ImGui::SliderInt(
+            "Scanlines Thickness",
+            &this->state->crtSettings->scanlinesThickness.x, 1, 5
+        );
+        ImGui::SliderFloat(
+            "Chromatic Aberration Strength",
+            &this->state->crtSettings->chromaticAberrationStrength.x, 0.1f, 4.0f
+        );
+        ImGui::SliderFloat(
+            "VHS Wiggle Amount", &this->state->crtSettings->vhsWiggle.x, 0.1f,
+            0.01f
+        );
+    }
 
     ImGui::End();
     ImGui::Render();

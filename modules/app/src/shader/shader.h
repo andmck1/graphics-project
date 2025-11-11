@@ -8,6 +8,7 @@
 #include "../buffer/pointLights.h"
 #include "../buffer/directionalLights.h"
 #include "../buffer/waveData.h"
+#include "../buffer/crt.h"
 
 class StandardVertexShader : public VertexShader
 {
@@ -41,4 +42,10 @@ class LightingPixelShader : public PixelShader
 
 class TextureOnlyPixelShader : public PixelShader
 {
+};
+
+class CRTPixelShader : public PixelShader
+{
+    public:
+    CRTBuffer crtBuffer = CRTBuffer();
 };

@@ -7,6 +7,7 @@
 
 #include "../shadermanager/shadermanager.h"
 #include "core_graphics/sampler/base.h"
+#include "core_graphics/shader/shader.h"
 
 #include <array>
 
@@ -21,6 +22,7 @@ class RenderStage
     Camera *camera;
 
     ShaderManagerState *shaderManagerState;
+    PixelShader *pixelShader;
 
     bool render(D3D *graphicsManager);
 };

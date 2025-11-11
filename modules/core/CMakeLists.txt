@@ -18,6 +18,8 @@ add_library(
   src/core_graphics/sampler/base.cpp
   src/core_graphics/sampler/clamp.cpp
   src/core_graphics/sampler/wrap.cpp
+  src/core_graphics/sampler/downsampler.cpp
+  src/core_graphics/sampler/upsampler.cpp
   src/core_graphics/texture/base.cpp
   src/core_graphics/texture/default.cpp
   src/core_graphics/texture/file.cpp

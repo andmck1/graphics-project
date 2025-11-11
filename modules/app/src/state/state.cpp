@@ -6,6 +6,7 @@
 #include "core_graphics/texture/file.h"
 #include "core_graphics/water/water.h"
 #include "core_utils/timer.h"
+#include "shared_shader/sharedbuffertypes.h"
 
 #include <DirectXMathMatrix.inl>
 #include <directxmath.h>
@@ -73,6 +74,11 @@ void State::initShaderManagerStateShaders()
         this->initShaderManagerStateShader<TextureOnlyPixelShader>(
             "./build/hlsl/pixel/textureOnly.cso"
         );
+
+    this->shaderManagerState.crtPixelShader =
+        this->initShaderManagerStateShader<CRTPixelShader>(
+            "./build/hlsl/pixel/crt.cso"
+        );
 }
 
 void State::initShaderManagerStateShaderStacks()
@@ -120,10 +126,14 @@ void State::initShaderManagerStateShaderBuffers()
         &this->shaderManagerState.pointLightsBuffer
     };
     this->shaderManagerState.textureOnlyPixelShader.bufferStack = {};
+    this->shaderManagerState.crtPixelShader.bufferStack = {
+        &this->shaderManagerState.crtBuffer
+    };
 }
 
 void State::setShaderManagerStateShaderBufferData()
 {
+    spdlog::debug("Setting shader manager state shader buffer data");
     this->shaderManagerState.cameraBuffer.setData(this->sceneState.camera);
 
     this->shaderManagerState.ambientLightBuffer.setData(
@@ -139,6 +149,9 @@ void State::setShaderManagerStateShaderBufferData()
         &this->appState.timer->totalTime, &this->sceneState.water->magnitude,
         &this->sceneState.water->waveNumber,
         &this->sceneState.water->angularVelocity
+    );
+    this->shaderManagerState.crtBuffer.setData(
+        &this->sceneState.crtSettings, &this->appState.timer->totalTime
     );
 }
 
@@ -200,6 +213,12 @@ void State::initSceneStateSampler()
 
     this->sceneState.wrapSampler = WrapSampler();
     this->sceneState.wrapSampler.init(this->sceneState.graphicsManager);
+
+    this->sceneState.downSampler = DownSampler();
+    this->sceneState.downSampler.init(this->sceneState.graphicsManager);
+
+    this->sceneState.upSampler = UpSampler();
+    this->sceneState.upSampler.init(this->sceneState.graphicsManager);
 }
 
 template <typename MeshType, typename SceneActorType>
@@ -399,14 +418,13 @@ void State::initSceneStateWater()
 }
 
 void State::createRenderTexture(
-    int textureWidth, int textureHeight, float screenNear, float screenFar
+    BasePostProcessor *postProcessor, int textureWidth, int textureHeight,
+    float screenNear, float screenFar
 )
 {
-    this->sceneState.renderTextures.push_back(
-        std::make_unique<RenderTexture>()
-    );
+    postProcessor->renderTextures.push_back(std::make_unique<RenderTexture>());
     RenderTexture *renderTexturePtr =
-        this->sceneState.renderTextures.back().get();
+        postProcessor->renderTextures.back().get();
     renderTexturePtr->graphicsManager = this->sceneState.graphicsManager;
     renderTexturePtr->textureWidth = textureWidth;
     renderTexturePtr->textureHeight = textureHeight;
@@ -415,34 +433,102 @@ void State::createRenderTexture(
     renderTexturePtr->init();
 }
 
-void State::initSceneStateRenderStages()
+void State::addRenderStage(
+    BasePostProcessor *postProcessor, bool isLastStage,
+    PixelShader *pixelShader, BaseSampler *sampler,
+    std::optional<int> inputRenderTextureWidth,
+    std::optional<int> inputRenderTextureHeight,
+    std::optional<int> outputRenderTextureWidth,
+    std::optional<int> outputRenderTextureHeight
+)
 {
-    this->sceneState.renderStages.push_back(std::make_unique<RenderStage>());
-    RenderStage *renderStagePtr = this->sceneState.renderStages.back().get();
+    postProcessor->renderStages.push_back(std::make_unique<RenderStage>());
+    RenderStage *renderStagePtr = postProcessor->renderStages.back().get();
 
-    this->createRenderTexture(
-        this->windowState.width, this->windowState.height, 0.1f, 5000.f
-    );
-    RenderTexture *initialRenderTexturePtr =
-        this->sceneState.renderTextures.back().get();
+    RenderTexture *initialRenderTexturePtr;
+    if (postProcessor->renderStages.size() == 1)
+    {
+        this->createRenderTexture(
+            postProcessor, inputRenderTextureWidth.value(),
+            inputRenderTextureHeight.value(), 0.1f, 5000.f
+        );
+    }
+    initialRenderTexturePtr = postProcessor->renderTextures.back().get();
 
-    this->createRenderTexture(
-        this->windowState.width, this->windowState.height, 0.1f, 5000.f
-    );
-    RenderTexture *nextRenderTexturePtr =
-        this->sceneState.renderTextures.back().get();
+    std::optional<RenderTexture *> nextRenderTexturePtr = std::nullopt;
+    if (!isLastStage)
+    {
+        this->createRenderTexture(
+            postProcessor, outputRenderTextureWidth.value(),
+            outputRenderTextureHeight.value(), 0.1f, 5000.f
+        );
+        nextRenderTexturePtr = postProcessor->renderTextures.back().get();
+        renderStagePtr->mesh = OrthoMesh(
+            this->sceneState.graphicsManager, outputRenderTextureHeight.value(),
+            outputRenderTextureWidth.value(), 0, 0
+        );
+    }
+    else
+    {
+        renderStagePtr->mesh = OrthoMesh(
+            this->sceneState.graphicsManager, this->windowState.height,
+            this->windowState.width, 0, 0
+        );
+    }
 
     renderStagePtr->inputRenderTexture = initialRenderTexturePtr;
-    // renderStagePtr->outputRenderTexture = nextRenderTexturePtr;
-    renderStagePtr->outputRenderTexture = std::nullopt;
-    renderStagePtr->textureSampler = &this->sceneState.clampSampler;
-    renderStagePtr->mesh = OrthoMesh(
-        this->sceneState.graphicsManager, this->windowState.height,
-        this->windowState.width, 0, 0
-    );
+    renderStagePtr->outputRenderTexture = nextRenderTexturePtr;
+    renderStagePtr->textureSampler = sampler;
     renderStagePtr->clearColour = this->sceneState.clearColour;
     renderStagePtr->camera = this->sceneState.camera;
     renderStagePtr->shaderManagerState = &shaderManagerState;
+    renderStagePtr->pixelShader = pixelShader;
+}
+
+void State::initSceneStatePostProcessors()
+{
+    spdlog::debug("Inititalising scene state post processors");
+    this->sceneState.crtPostProcessor = CRTPostProcessor();
+    CRTPostProcessor *crtPostProcessorPtr = &this->sceneState.crtPostProcessor;
+
+    SharedBufferTypes::CRTBufferType *crtSettingsPtr =
+        &this->sceneState.crtSettings;
+
+    crtSettingsPtr->isVHSWiggleEnabled = XMINT4(1, 0, 0, 0);
+    crtSettingsPtr->isCurvingEnabled = XMINT4(1, 0, 0, 0);
+    crtSettingsPtr->isChromaticAberrationEnabled = XMINT4(1, 0, 0, 0);
+    crtSettingsPtr->isGrainEnabled = XMINT4(1, 0, 0, 0);
+    crtSettingsPtr->isRGBGridEnabled = XMINT4(1, 0, 0, 0);
+    crtSettingsPtr->isScanlinesEnabled = XMINT4(0, 0, 0, 0);
+    crtSettingsPtr->isVingetteEnabled = XMINT4(1, 0, 0, 0);
+
+    crtSettingsPtr->brightnessMultiplier = XMFLOAT4(1.f, 0.f, 0.f, 0.f);
+    crtSettingsPtr->grainStrength = XMFLOAT4(0.5f, 0.f, 0.f, 0.f);
+    crtSettingsPtr->curvePower = XMFLOAT4(1.f, 0.f, 0.f, 0.f);
+    crtSettingsPtr->vingetteStrength = XMFLOAT4(0.5f, 0.f, 0.f, 0.f);
+    crtSettingsPtr->scanlinesInterval = XMINT4(1, 0, 0, 0);
+    crtSettingsPtr->scanlinesOpacity = XMFLOAT4(1.f, 0.f, 0.f, 0.f);
+    crtSettingsPtr->scanlinesThickness = XMINT4(2, 0, 0, 0);
+    crtSettingsPtr->chromaticAberrationStrength = XMFLOAT4(2.f, 0.f, 0.f, 0.f);
+    crtSettingsPtr->vhsWiggle = XMFLOAT4(0.002f, 0.f, 0.f, 0.f);
+
+    this->addRenderStage(
+        crtPostProcessorPtr, false,
+        &this->shaderManagerState.textureOnlyPixelShader,
+        &this->sceneState.downSampler, this->windowState.width,
+        this->windowState.height, this->windowState.width / 2,
+        this->windowState.height / 2
+    );
+    this->addRenderStage(
+        crtPostProcessorPtr, false, &this->shaderManagerState.crtPixelShader,
+        &this->sceneState.upSampler, std::nullopt, std::nullopt,
+        this->windowState.width / 2, this->windowState.height / 2
+    );
+    this->addRenderStage(
+        crtPostProcessorPtr, true,
+        &this->shaderManagerState.textureOnlyPixelShader,
+        &this->sceneState.upSampler
+    );
 }
 
 void State::initSceneState(
@@ -462,7 +548,7 @@ void State::initSceneState(
     this->initSceneStateDirectionalLights();
     this->initSceneStateCamera();
     this->initSceneStateWater();
-    this->initSceneStateRenderStages();
+    this->initSceneStatePostProcessors();
 
     this->setShaderManagerStateShaderBufferData();
 
@@ -482,6 +568,9 @@ void State::initSceneState(
         this->shaderManagerState.graphicsManager
     );
     this->shaderManagerState.waveDataBuffer.init(
+        this->shaderManagerState.graphicsManager
+    );
+    this->shaderManagerState.crtBuffer.init(
         this->shaderManagerState.graphicsManager
     );
 }
@@ -504,7 +593,8 @@ void State::initAppState()
 void State::initDebugSceneState(
     D3D *graphicsManager, float *fps, AmbientLight *ambientLight,
     std::vector<PointLight *> *pointLights,
-    std::vector<DirectionalLight *> *directionalLights, Water *water
+    std::vector<DirectionalLight *> *directionalLights, Water *water,
+    SharedBufferTypes::CRTBufferType *crtSettings, bool *isCRTEnabled
 )
 {
     spdlog::debug("Initialising debug scene state");
@@ -515,4 +605,7 @@ void State::initDebugSceneState(
     this->debugSceneState.pointLights = pointLights;
     this->debugSceneState.directionalLights = directionalLights;
     this->debugSceneState.water = water;
+    this->debugSceneState.crtSettings = crtSettings;
+
+    this->debugSceneState.isCRTEnabled = isCRTEnabled;
 }

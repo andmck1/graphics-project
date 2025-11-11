@@ -4,6 +4,7 @@
 #include "core_graphics/light/point.h"
 #include "core_graphics/light/directional.h"
 #include "core_graphics/water/water.h"
+#include "shared_shader/sharedbuffertypes.h"
 #include <core_graphics/d3d/d3d.h>
 #include <vector>
 
@@ -16,6 +17,8 @@ struct DebugSceneState
     std::vector<PointLight *> *pointLights;
     std::vector<DirectionalLight *> *directionalLights;
     Water *water;
+    SharedBufferTypes::CRTBufferType *crtSettings;
+    bool *isCRTEnabled;
 };
 
 class DebugScene

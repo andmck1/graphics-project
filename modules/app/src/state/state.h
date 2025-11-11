@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core_graphics/light/directional.h"
+#include "core_graphics/sampler/base.h"
 #include "core_graphics/shader/shader.h"
 #include "core_graphics/water/water.h"
 #include "core_window/window.h"
@@ -39,7 +40,8 @@ class State
     void initDebugSceneState(
         D3D *graphicsManager, float *fps, AmbientLight *ambientLight,
         std::vector<PointLight *> *pointLights,
-        std::vector<DirectionalLight *> *directionalLights, Water *water
+        std::vector<DirectionalLight *> *directionalLights, Water *water,
+        SharedBufferTypes::CRTBufferType *crtSettings, bool *isCRTEnabled
     );
 
     private:
@@ -55,7 +57,7 @@ class State
     void initShaderManagerStateShaderStacks();
     void initSceneStateSampler();
 
-    void initSceneStateRenderStages();
+    void initSceneStatePostProcessors();
     template <typename MeshType, typename SceneActorType>
     void initSceneStateActor(
         ShaderStack *shaderStack, BaseTexture *texture, BaseSampler *sampler,
@@ -86,6 +88,15 @@ class State
     void initSceneStateCamera();
     void initSceneStateWater();
     void createRenderTexture(
-        int textureWidth, int textureHeight, float screenNear, float screenFar
+        BasePostProcessor *postProcessor, int textureWidth, int textureHeight,
+        float screenNear, float screenFar
+    );
+    void addRenderStage(
+        BasePostProcessor *postProcessor, bool isLastStage,
+        PixelShader *pixelShader, BaseSampler *sampler,
+        std::optional<int> inputRenderTextureWidth = std::nullopt,
+        std::optional<int> inputRenderTextureHeight = std::nullopt,
+        std::optional<int> outputRenderTextureWidth = std::nullopt,
+        std::optional<int> outputRenderTextureHeight = std::nullopt
     );
 };

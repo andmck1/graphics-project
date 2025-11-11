@@ -23,12 +23,14 @@
 #include <core_graphics/sampler/base.h>
 #include <core_graphics/sampler/clamp.h>
 #include <core_graphics/sampler/wrap.h>
+#include <core_graphics/sampler/downsampler.h>
+#include <core_graphics/sampler/upsampler.h>
 #include <core_utils/timer.h>
-#include "core_graphics/d3d/renderTexture.h"
 #include "core_graphics/water/water.h"
 
 #include "../shadermanager/shadermanager.h"
-#include "renderstage.h"
+#include "../postprocessors/crt.h"
+#include "shared_shader/sharedbuffertypes.h"
 
 struct SceneState
 {
@@ -40,6 +42,8 @@ struct SceneState
 
     ClampSampler clampSampler = ClampSampler();
     WrapSampler wrapSampler = WrapSampler();
+    DownSampler downSampler = DownSampler();
+    UpSampler upSampler = UpSampler();
 
     std::vector<std::unique_ptr<SceneActor>> actors;
 
@@ -50,8 +54,9 @@ struct SceneState
     Camera *camera;
     Water *water;
 
-    std::vector<std::unique_ptr<RenderTexture>> renderTextures;
-    std::vector<std::unique_ptr<RenderStage>> renderStages;
+    SharedBufferTypes::CRTBufferType crtSettings =
+        SharedBufferTypes::CRTBufferType();
+    CRTPostProcessor crtPostProcessor;
 };
 
 class Scene

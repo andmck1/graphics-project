@@ -10,20 +10,21 @@ bool RenderStage::render(D3D *graphicsManager)
     XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 
     worldMatrix = XMMatrixIdentity();
+    viewMatrix = this->camera->orthographicViewMatrix;
+
+    graphicsManager->setRenderTargetViewToBackBuffer();
+    graphicsManager->setDefaultViewport();
+
     if (this->outputRenderTexture)
     {
         this->outputRenderTexture.value()->set();
         this->outputRenderTexture.value()->clear(this->clearColour.data());
-        viewMatrix = this->camera->orthoViewMatrix;
         projectionMatrix =
             this->outputRenderTexture.value()->orthographicProjectionMatrix;
     }
     else
     {
-        graphicsManager->setRenderTargetViewToBackBuffer();
-        graphicsManager->setDefaultViewport();
         graphicsManager->clearBackBuffer(this->clearColour.data());
-        viewMatrix = camera->orthoViewMatrix;
         projectionMatrix = graphicsManager->orthographicProjectionMatrix;
     }
 
@@ -46,22 +47,32 @@ bool RenderStage::render(D3D *graphicsManager)
     this->shaderManagerState->matrixBuffer.setData(
         worldMatrix, viewMatrix, projectionMatrix
     );
-    this->shaderManagerState->matrixBuffer.setShader(&slotCounters, 0);
-    this->shaderManagerState->cameraBuffer.setShader(&slotCounters, 0);
-
+    if(!this->shaderManagerState->matrixBuffer.setShader(&slotCounters, 0))
+        return false;
+    if(!this->shaderManagerState->cameraBuffer.setShader(&slotCounters, 0))
+        return false;
+    
     if (!this->inputRenderTexture->setPixelShader(&slotCounters))
         return false;
     if (!this->textureSampler->setPixelShader(graphicsManager, &slotCounters))
         return false;
 
+    for (int bufferIndex = 0;
+         bufferIndex < this->pixelShader->bufferStack.size(); bufferIndex++)
+    {
+        this->pixelShader->bufferStack[bufferIndex]->setShader(
+            &slotCounters, 1
+        );
+    }
+
+
     this->shaderManagerState->standardVertexShader.set(graphicsManager);
-    this->shaderManagerState->textureOnlyPixelShader.set(graphicsManager);
+    this->pixelShader->set(graphicsManager);
 
     graphicsManager->deviceContext->DrawIndexed(
         this->mesh.value().getVertexIndexCount(), 0, 0
     );
 
     graphicsManager->setDepthStencilState(true);
-    graphicsManager->setRenderTargetViewToBackBuffer();
     return true;
 }

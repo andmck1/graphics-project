@@ -7,7 +7,7 @@ Camera::Camera()
     XMVECTOR position = XMVectorSet(0.f, 0.f, -10.f, 1.f);
     XMVECTOR up = XMVectorSet(0.f, 1.f, 0.f, 0.f);
     XMVECTOR at = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-    this->orthoViewMatrix = XMMatrixLookAtLH(position, at, up);
+    this->orthographicViewMatrix = XMMatrixLookAtLH(position, at, up);
     this->update();
 }
 
@@ -27,4 +27,11 @@ void Camera::update()
     XMVECTOR at = XMVectorAdd(eyePosition, forward);
 
     this->viewMatrix = XMMatrixLookAtLH(eyePosition, at, up);
+    
+    this->updatePreviousWorldPosition();
+    this->updatePreviousRotation();
+    this->movementDirectionVector.x =
+        this->previousForwardVector[0] - this->forwardVector[0];
+    this->movementDirectionVector.y =
+        this->previousForwardVector[1] - this->forwardVector[1];
 }

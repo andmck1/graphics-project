@@ -12,7 +12,8 @@ class Camera : public SceneActor
     public:
     Camera();
     XMMATRIX viewMatrix;
-    XMMATRIX orthoViewMatrix;
+    XMMATRIX orthographicViewMatrix;
+    XMFLOAT2 movementDirectionVector = {0.f, 0.f};
 
     void update() override;
 };
