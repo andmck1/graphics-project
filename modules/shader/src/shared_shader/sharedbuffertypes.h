@@ -13,21 +13,13 @@ using int4 = XMINT4;
 using matrix = XMMATRIX;
 #endif
 
+// TODO - repeated structs here
 #ifndef __cplusplus
 struct VertexInputType
 {
     float4 position : POSITION;
     float2 tex : TEXCOORD0;
     float3 normal : NORMAL;
-};
-
-struct PixelInputType
-{
-    float4 position : SV_POSITION;
-    float2 tex : TEXCOORD0;
-    float3 normal : NORMAL;
-    float3 worldPosition : TEXCOORD1;
-    float3 viewVector : TEXCOORD2;
 };
 
 struct VertexOutputType
@@ -37,7 +29,33 @@ struct VertexOutputType
     float3 normal : NORMAL;
     float3 worldPosition : TEXCOORD1;
     float3 viewVector : TEXCOORD2;
+    float4 spotLightViewPos1 : TEXCOORD3;
+    float4 spotLightViewPos2 : TEXCOORD4;
 };
+
+struct DepthVertexOutputType
+{
+    float4 position : SV_POSITION;
+    float4 depthPosition : TEXCOORD0;
+};
+
+struct PixelInputType
+{
+    float4 position : SV_POSITION;
+    float2 tex : TEXCOORD0;
+    float3 normal : NORMAL;
+    float3 worldPosition : TEXCOORD1;
+    float3 viewVector : TEXCOORD2;
+    float4 spotLightViewPos1 : TEXCOORD3;
+    float4 spotLightViewPos2 : TEXCOORD4;
+};
+
+struct DepthPixelInputType
+{
+    float4 position : SV_POSITION;
+    float4 depthPosition: TEXCOORD0;
+};
+
 #endif
 
 #ifdef __cplusplus
@@ -60,6 +78,10 @@ struct MatrixBufferType
         matrix worldMatrix;
         matrix viewMatrix;
         matrix projectionMatrix;
+        matrix spotLightViewMatrix1;
+        matrix spotLightProjectionMatrix1;
+        matrix spotLightViewMatrix2;
+        matrix spotLightProjectionMatrix2;
     };
 
 #ifdef __cplusplus
@@ -98,6 +120,26 @@ struct PointLightBufferType
         int4 isAttenuationEnabled;
         int4 nLights;
     };
+
+#ifdef __cplusplus
+    struct SpotLightBufferType : BaseBufferType
+#else
+struct SpotLightBufferType
+#endif
+    {
+        float4 worldPosition;
+        float4 directionVector;
+        float4 coneAngle;
+        float4 diffuseColour;
+        float4 specularColour;
+        float4 specularPower;
+        float4 attenuationCoefficients;
+        int4 isDiffuseEnabled;
+        int4 isSpecularEnabled;
+        int4 isAttenuationEnabled;
+        int4 nLights;
+    };
+
 
 #ifdef __cplusplus
     struct DirectionalLightBufferType : BaseBufferType

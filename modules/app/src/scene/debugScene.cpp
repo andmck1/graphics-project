@@ -38,6 +38,7 @@ DebugScene::~DebugScene()
 bool DebugScene::render()
 {
     int nPointLights = 0;
+    int nSpotLights = 0;
     int nDirectionalLights = 0;
 
     ImGui_ImplDX11_NewFrame();
@@ -84,7 +85,7 @@ bool DebugScene::render()
             );
             ImGui::SliderFloat3(
                 ("World Position#Point#" + iString).c_str(),
-                pointLight->worldPosition.data(), -10.f, 10.f
+                pointLight->worldPosition.data(), -100.f, 100.f
             );
             ImGui::SliderFloat(
                 ("Attenuation Coefficient C0#Point#" + iString).c_str(),
@@ -112,6 +113,70 @@ bool DebugScene::render()
             ImGui::Checkbox(
                 ("Attenuation Enabled?#Point#" + iString).c_str(),
                 &pointLight->isAttenuationEnabled
+            );
+        }
+    }
+
+    nSpotLights = this->state->spotLights->size();
+    for (int i = 0; i < nSpotLights; i++)
+    {
+        std::string iString = std::to_string(i);
+        std::string spotLightHeading = "Spot Light " + iString + " Settings";
+        if (ImGui::CollapsingHeader(spotLightHeading.c_str()))
+        {
+            SpotLight *spotLight = this->state->spotLights->at(i);
+            ImGui::ColorPicker3(
+                ("Diffuse#Spot#" + iString).c_str(),
+                spotLight->diffuseColour.data(),
+                ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
+
+            );
+            ImGui::ColorPicker3(
+                ("Specular#Spot#" + iString).c_str(),
+                spotLight->specularColour.data(),
+                ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_DisplayRGB
+
+            );
+            ImGui::SliderFloat(
+                ("Specular Power#Spot#" + iString).c_str(),
+                &spotLight->specularPower, 0.01f, 50.f, "%.3f", false
+            );
+            ImGui::SliderFloat3(
+                ("World Position#Spot#" + iString).c_str(),
+                spotLight->worldPosition.data(), -100.f, 100.f
+            );
+            ImGui::SliderFloat(
+                ("Cone Angle#Spot#" + iString).c_str(),
+                &spotLight->coneAngle, 0.1f, 180.f
+            );
+            ImGui::SliderFloat3(
+                ("Direction Vector#Directional#" + iString).c_str(),
+                spotLight->directionVector.data(), -1.f, 1.f
+            );
+            ImGui::SliderFloat(
+                ("Attenuation Coefficient C0#Spot#" + iString).c_str(),
+                &spotLight->attenuationCoefficients[0], 0.1f, 1.f, "%.3f", false
+            );
+            ImGui::SliderFloat(
+                ("Attenuation Coefficient C1#Spot#" + iString).c_str(),
+                &spotLight->attenuationCoefficients[1], 0.01f, .3f, "%.5f",
+                false
+            );
+            ImGui::SliderFloat(
+                ("Attenuation Coefficient C2#Spot#" + iString).c_str(),
+                &spotLight->attenuationCoefficients[2], .01f, .1f, "%.6f", false
+            );
+            ImGui::Checkbox(
+                ("Diffuse Enabled?#Spot#" + iString).c_str(),
+                &spotLight->isDiffuseEnabled
+            );
+            ImGui::Checkbox(
+                ("Specular Enabled?#Spot#" + iString).c_str(),
+                &spotLight->isSpecularEnabled
+            );
+            ImGui::Checkbox(
+                ("Attenuation Enabled?#Spot#" + iString).c_str(),
+                &spotLight->isAttenuationEnabled
             );
         }
     }
@@ -218,8 +283,8 @@ bool DebugScene::render()
             "Curve Power", &this->state->crtSettings->curvePower.x, 0.1f, 2.0f
         );
         ImGui::SliderFloat(
-            "Vingette Strength",
-            &this->state->crtSettings->vingetteStrength.x, 0.1f, 2.0f
+            "Vingette Strength", &this->state->crtSettings->vingetteStrength.x,
+            0.1f, 2.0f
         );
         ImGui::SliderInt(
             "Scanlines Interval",

@@ -13,6 +13,7 @@ add_executable(
   src/buffer/matrix.cpp
   src/buffer/ambientLight.cpp
   src/buffer/pointLights.cpp
+  src/buffer/spotLights.cpp
   src/buffer/directionalLights.cpp
   src/buffer/waveData.cpp
   src/buffer/crt.cpp

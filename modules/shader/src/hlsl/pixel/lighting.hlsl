@@ -2,14 +2,54 @@
 
 Texture2D objectTexture: register(t0);
 SamplerState textureSampler: register(s0);
+Texture2D shadowMapTexture1: register(t1);
+Texture2D shadowMapTexture2: register(t2);
 
 cbuffer AmbientLightBuffer: register(b0)
 {
 	AmbientLightBufferType ambientLightData;
 }
 
-StructuredBuffer<DirectionalLightBufferType> DirectionalLightBuffer : register(t1);
-StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t2);
+StructuredBuffer<DirectionalLightBufferType> DirectionalLightBuffer : register(t3);
+StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t4);
+StructuredBuffer<SpotLightBufferType> SpotLightBuffer : register(t5);
+
+// Lab code
+bool hasDepthData(float2 uv)
+{
+    if (uv.x < 0.f || uv.x > 1.f || uv.y < 0.f || uv.y > 1.f)
+    {
+        return false;
+    }
+    return true;
+}
+
+// Lab code
+bool isInShadow(
+	Texture2D _shadowMapTexture, SamplerState _sampler, 
+	float2 _uv, float4 lightViewPosition, float bias
+)
+{
+    float depthValue = _shadowMapTexture.Sample(_sampler, _uv).r;
+    float lightDepthValue = lightViewPosition.z / lightViewPosition.w;
+    lightDepthValue -= bias;
+
+    if (lightDepthValue < depthValue)
+    {
+        return false;
+    }
+    return true;
+}
+
+// Lab code
+float2 getProjectiveCoords(float4 lightViewPosition)
+{
+    float2 projTex = lightViewPosition.xy / lightViewPosition.w;
+    projTex *= float2(0.5, -0.5);
+    projTex += float2(0.5f, 0.5f);
+    return projTex;
+}
+
 
 float GetHeight(float2 uv)
 {
@@ -164,6 +204,63 @@ float3 calculatePointLighting(
 	return pointLighting;
 }
 
+float3 calculateSpotLighting(
+	SpotLightBufferType spotLightData,
+	float3 fragmentWorldPosition, 
+	float3 fragmentNormal, 
+	float3 lightVector,
+	float3 viewWorldPosition
+)
+{
+	float3 spotLighting;
+	float3 diffuse = {0.f, 0.f, 0.f};
+	float3 specular = {0.f, 0.f, 0.f};
+	float distance;
+	float attenuation = 1.f;
+	float directionalAttenuation;
+
+	if ((bool) spotLightData.isDiffuseEnabled.r)
+	{
+		diffuse = calculateDiffuseLighting(
+			spotLightData.diffuseColour.rgb, 
+			fragmentNormal, 
+			lightVector
+		);
+	}
+	if ((bool) spotLightData.isSpecularEnabled.r)
+	{
+		specular = calculateSpecularLighting(
+			spotLightData.specularColour.rgb,
+			spotLightData.specularPower.r,
+			viewWorldPosition,
+			lightVector,
+			fragmentNormal	
+		);
+	}
+
+	if ((bool) spotLightData.isAttenuationEnabled.r)
+	{
+		distance = length(spotLightData.worldPosition.xyz - fragmentWorldPosition);
+		attenuation = 1.0f / (
+			spotLightData.attenuationCoefficients[0] + 
+			(spotLightData.attenuationCoefficients[1] * distance) + 
+			(spotLightData.attenuationCoefficients[2] * distance * distance)
+		);
+	}
+
+	spotLighting = diffuse + specular;
+	spotLighting *= attenuation;
+
+	directionalAttenuation = dot(lightVector, -normalize(spotLightData.directionVector.xyz));
+	if (directionalAttenuation < cos(spotLightData.coneAngle.x * (3.14159f / 180.f)))
+	{
+		directionalAttenuation = 0.f;
+	}
+	spotLighting *= directionalAttenuation;
+
+	return spotLighting;
+}
+
 float3 calculateAmbientLighting(float3 colour)
 {
 	return max(colour, float3(0.f, 0.f, 0.f));
@@ -172,15 +269,21 @@ float3 calculateAmbientLighting(float3 colour)
 float3 calculateLighting(
 	float3 fragmentWorldPosition, 
 	float3 fragmentNormal,
-	float3 viewWorldPosition
+	float3 viewWorldPosition,
+	float4 spotLightviewPos1,
+	float4 spotLightviewPos2,
+	Texture2D _shadowMapTexture1,
+	Texture2D _shadowMapTexture2,
+	SamplerState _shadowSampler
 )
 {
 	float3 lightColourTotal = {0.f, 0.f, 0.f};
 	float3 ambientLighting = {0.f, 0.f, 0.f}; 
-	float3 pointLighting = {0.f, 0.f, 0.f};
-	float3 directionalLighting = {0.f, 0.f, 0.f};
+	float shadowMapBias = 0.005f;
 	float3 lightVector;
+	float2 projectedTextureCoordinate;
 	int totalNPointLights = 0;
+	int totalNSpotLights = 0;
 	int totalNDirectionalLights = 0;
 	int i;
 
@@ -209,6 +312,52 @@ float3 calculateLighting(
 		lightColourTotal += lightColourContribution;
 	}
 
+	projectedTextureCoordinate = getProjectiveCoords(spotLightviewPos1);
+	if (hasDepthData(projectedTextureCoordinate))
+	{
+		if (!isInShadow(
+			_shadowMapTexture1,
+			_shadowSampler,
+			projectedTextureCoordinate,
+			spotLightviewPos1,
+			shadowMapBias
+		))
+		{
+			SpotLightBufferType spotLightData = SpotLightBuffer[0];
+			lightVector = normalize(spotLightData.worldPosition.xyz - fragmentWorldPosition.xyz).xyz;
+			lightColourTotal += calculateSpotLighting(
+				spotLightData,
+				fragmentWorldPosition, 
+				fragmentNormal, 
+				lightVector,
+				viewWorldPosition
+			);
+		}
+	}
+
+	projectedTextureCoordinate = getProjectiveCoords(spotLightviewPos2);
+	if (hasDepthData(projectedTextureCoordinate))
+	{
+		if (!isInShadow(
+			_shadowMapTexture2,
+			_shadowSampler,
+			projectedTextureCoordinate,
+			spotLightviewPos2,
+			shadowMapBias
+		))
+		{
+			SpotLightBufferType spotLightData = SpotLightBuffer[1];
+			lightVector = normalize(spotLightData.worldPosition.xyz - fragmentWorldPosition.xyz).xyz;
+			lightColourTotal += calculateSpotLighting(
+				spotLightData,
+				fragmentWorldPosition, 
+				fragmentNormal, 
+				lightVector,
+				viewWorldPosition
+			);
+		}
+	}
+
 	DirectionalLightBufferType firstDirectionalLightData = DirectionalLightBuffer[0];
 	totalNDirectionalLights = firstDirectionalLightData.nLights.x;
 	for(i=0; i<totalNDirectionalLights; i++)
@@ -227,7 +376,6 @@ float3 calculateLighting(
 
 	return lightColourTotal;
 }
-
 float4 getTextureColour(Texture2D _objectTexture, SamplerState _textureSampler, float2 uv)
 {
 	return _objectTexture.Sample(_textureSampler, uv);
@@ -236,11 +384,17 @@ float4 getTextureColour(Texture2D _objectTexture, SamplerState _textureSampler, 
 float4 main(PixelInputType input) : SV_TARGET
 {
 	float4 textureColour;
-	float4 lightColour = 0.f;
+	float4 lightColour = {0.f, 0.f, 0.f, 0.f};
 	float3 newNormal;
+	float2 projectedTextureCoordinate;
 	textureColour = getTextureColour(objectTexture, textureSampler, input.tex);
 	newNormal = calculateNormalUsingNeighbouringTexels(input.tex, input.position.xyz);
-	lightColour = calculateLighting(input.worldPosition.xyz, newNormal.xyz, input.viewVector.xyz).rgbb;
+	
+	lightColour += calculateLighting(
+		input.worldPosition.xyz, newNormal.xyz, input.viewVector.xyz,
+		input.spotLightViewPos1, input.spotLightViewPos2,
+		shadowMapTexture1, shadowMapTexture2, textureSampler
+	).rgbb;
 	lightColour[3] = 1.f;
 	
     return textureColour * lightColour;

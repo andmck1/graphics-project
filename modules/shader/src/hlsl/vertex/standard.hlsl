@@ -29,5 +29,13 @@ VertexOutputType main(VertexInputType input)
 	
     output.viewVector = normalize(cameraData.worldPosition.xyz - worldPosition.xyz);
 
+    // Lab code
+    output.spotLightViewPos1 = mul(input.position, matrixData.worldMatrix);
+    output.spotLightViewPos1 = mul(output.spotLightViewPos1, matrixData.spotLightViewMatrix1);
+    output.spotLightViewPos1 = mul(output.spotLightViewPos1, matrixData.spotLightProjectionMatrix1);
+    output.spotLightViewPos2 = mul(input.position, matrixData.worldMatrix);
+    output.spotLightViewPos2 = mul(output.spotLightViewPos2, matrixData.spotLightViewMatrix2);
+    output.spotLightViewPos2 = mul(output.spotLightViewPos2, matrixData.spotLightProjectionMatrix2);
+
 	return output;
 }

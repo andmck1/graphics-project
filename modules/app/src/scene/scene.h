@@ -26,6 +26,7 @@
 #include <core_graphics/sampler/downsampler.h>
 #include <core_graphics/sampler/upsampler.h>
 #include <core_utils/timer.h>
+#include "core_graphics/light/spotlight.h"
 #include "core_graphics/water/water.h"
 
 #include "../shadermanager/shadermanager.h"
@@ -49,6 +50,7 @@ struct SceneState
 
     AmbientLight *ambientLight;
     std::vector<PointLight *> pointLights;
+    std::vector<SpotLight *> spotLights;
     std::vector<DirectionalLight *> directionalLights;
 
     Camera *camera;
@@ -57,6 +59,7 @@ struct SceneState
     SharedBufferTypes::CRTBufferType crtSettings =
         SharedBufferTypes::CRTBufferType();
     CRTPostProcessor crtPostProcessor;
+
 };
 
 class Scene

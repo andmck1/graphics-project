@@ -1,5 +1,8 @@
 #include "scene.h"
 #include "../postprocessors/renderstage.h"
+
+#include "core_graphics/actor/scene.h"
+#include "core_graphics/light/spotlight.h"
 #include <spdlog/spdlog.h>
 #include <d3d11.h>
 #include <wrl/client.h>
@@ -9,14 +12,40 @@ Scene::Scene(SceneState *state)
     this->state = state;
 }
 
-#include "scene.h"
-
-#include <spdlog/spdlog.h>
-#include <d3d11.h>
-#include <wrl/client.h>
-
 bool Scene::updateAndDraw()
 {
+    // Depth pass
+    for (int spotLightIndex = 0;
+         spotLightIndex < this->state->spotLights.size(); spotLightIndex++)
+    {
+        SpotLight *spotLightPtr = this->state->spotLights[spotLightIndex];
+
+        spotLightPtr->shadowMap.set();
+        XMMATRIX lightViewMatrix = spotLightPtr->calculateViewMatrix();
+        XMMATRIX lightProjectionMatrix =
+            spotLightPtr->calculateOrthographicProjectionMatrix(
+                100, 100, .1f, 100.f
+            );
+        for (int i = 0; i < this->state->actors.size(); i++)
+        {
+            SceneActor *actor = this->state->actors[i].get();
+            if (actor->isDrawEnabled)
+            {
+                actor->currentShaderStack =
+                    &this->state->shaderManagerState->depthShaderStack;
+                this->state->shaderManagerState->matrixBuffer.setData(
+                    actor->getWorldMatrix(), lightViewMatrix,
+                    lightProjectionMatrix
+                );
+                if (!actor->drawMesh(this->state->graphicsManager, false))
+                    return false;
+            }
+        }
+        this->state->graphicsManager->setRenderTargetViewToBackBuffer();
+        this->state->graphicsManager->setDefaultViewport();
+    }
+
+    // Set to render to texture if needed
     if ((this->state->crtPostProcessor.renderStages.size() > 0) &&
         (this->state->crtPostProcessor.isEnabled))
     {
@@ -33,7 +62,10 @@ bool Scene::updateAndDraw()
             this->state->clearColour.data()
         );
         this->state->graphicsManager->setRenderTargetViewToBackBuffer();
+        this->state->graphicsManager->setDefaultViewport();
     }
+
+    // Draw scene
     this->state->graphicsManager->setDepthStencilState(true);
     for (int i = 0; i < this->state->actors.size(); i++)
     {
@@ -48,27 +80,37 @@ bool Scene::updateAndDraw()
         }
         if (actor->isDrawEnabled)
         {
-            {
-                this->state->shaderManagerState->matrixBuffer.setData(
-                    actor->getWorldMatrix(), this->state->camera->viewMatrix,
-                    this->state->graphicsManager->projectionMatrix
-                );
+            actor->currentShaderStack = actor->defaultShaderStack;
+            this->state->shaderManagerState->matrixBuffer.setData(
+                actor->getWorldMatrix(), this->state->camera->viewMatrix,
+                this->state->graphicsManager->projectionMatrix,
+                this->state->spotLights[0]->calculateViewMatrix(),
+                this->state->spotLights[0]
+                    ->calculateOrthographicProjectionMatrix(
+                        100, 100, 0.1, 100.f
+                    ),
+                this->state->spotLights[1]->calculateViewMatrix(),
+                this->state->spotLights[1]
+                    ->calculateOrthographicProjectionMatrix(
+                        100, 100, 0.1, 100.f
+                    )
 
-                if (!actor->drawMesh(this->state->graphicsManager))
-                    return false;
-            }
+            );
+            if (!actor->drawMesh(this->state->graphicsManager))
+                return false;
         }
     }
 
     this->state->graphicsManager->setRenderTargetViewToBackBuffer();
 
+    // Post processing
     if ((this->state->crtPostProcessor.renderStages.size() > 0) &&
         (this->state->crtPostProcessor.isEnabled))
     {
         for (const std::unique_ptr<RenderStage> &renderStagePtr :
              this->state->crtPostProcessor.renderStages)
         {
-            if(!renderStagePtr->render(this->state->graphicsManager))
+            if (!renderStagePtr->render(this->state->graphicsManager))
                 return false;
         }
     }

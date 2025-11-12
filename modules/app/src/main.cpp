@@ -56,8 +56,9 @@ int main()
     spdlog::info("Creating debug scene");
     state.initDebugSceneState(
         &graphicsManager, &app.timer.fps, state.sceneState.ambientLight,
-        &state.sceneState.pointLights, &state.sceneState.directionalLights,
-        state.sceneState.water, &state.sceneState.crtSettings,
+        &state.sceneState.pointLights, &state.sceneState.spotLights,
+        &state.sceneState.directionalLights, state.sceneState.water,
+        &state.sceneState.crtSettings,
         &state.sceneState.crtPostProcessor.isEnabled
     );
     DebugScene debugScene = DebugScene(&state.debugSceneState);

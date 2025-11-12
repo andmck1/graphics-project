@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core_graphics/light/directional.h"
+#include "core_graphics/light/spotlight.h"
 #include "core_graphics/sampler/base.h"
 #include "core_graphics/shader/shader.h"
 #include "core_graphics/water/water.h"
@@ -40,6 +41,7 @@ class State
     void initDebugSceneState(
         D3D *graphicsManager, float *fps, AmbientLight *ambientLight,
         std::vector<PointLight *> *pointLights,
+        std::vector<SpotLight *> *spotLights,
         std::vector<DirectionalLight *> *directionalLights, Water *water,
         SharedBufferTypes::CRTBufferType *crtSettings, bool *isCRTEnabled
     );
@@ -60,8 +62,8 @@ class State
     void initSceneStatePostProcessors();
     template <typename MeshType, typename SceneActorType>
     void initSceneStateActor(
-        ShaderStack *shaderStack, BaseTexture *texture, BaseSampler *sampler,
-        BaseTexture *heightMap = nullptr,
+        ShaderStack *defaultShaderStack, BaseTexture *texture,
+        BaseSampler *sampler, BaseTexture *heightMap = nullptr,
         BaseSampler *heightMapSampler = nullptr,
         std::array<float, 3> initScaling = {1.f, 1.f, 1.f},
         std::array<float, 3> initRotation = {0.f, 0.f, 0.f},
@@ -77,6 +79,14 @@ class State
         XMFLOAT3 initAttenuationCoefficients, bool initIsDiffuseEnabled,
         bool initIsSpecularEnabled, bool initIsAttenuationEnabled
     );
+    void initSceneStateSpotLights();
+    void initSceneStateSpotLight(
+        XMFLOAT3 initDiffuseColour, XMFLOAT3 initSpecularColour,
+        float initSpecularPower, XMFLOAT3 initWorldPosition,
+        XMFLOAT3 initDirectionVector, float initConeAngle,
+        XMFLOAT3 initAttenuationCoefficients, bool initIsDiffuseEnabled,
+        bool initIsSpecularEnabled, bool initIsAttenuationEnabled
+    );
     void initSceneStateDirectionalLights();
     void initSceneStateDirectionalLight(
         XMFLOAT3 initDiffuseColour, XMFLOAT3 initSpecularColour,
@@ -87,6 +97,7 @@ class State
     );
     void initSceneStateCamera();
     void initSceneStateWater();
+    void initSceneStateActorShadowMaps();
     void createRenderTexture(
         BasePostProcessor *postProcessor, int textureWidth, int textureHeight,
         float screenNear, float screenFar

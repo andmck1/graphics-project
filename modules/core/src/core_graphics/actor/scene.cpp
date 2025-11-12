@@ -1,5 +1,6 @@
 #include "scene.h"
 #include "core_graphics/buffer/base.h"
+#include "core_graphics/d3d/shadowmap.h"
 #include "core_graphics/shader/shader.h"
 
 SceneActor::SceneActor()
@@ -10,11 +11,9 @@ SceneActor::SceneActor()
     this->update();
 }
 
-void SceneActor::update()
-{
-}
+void SceneActor::update() {};
 
-bool SceneActor::drawMesh(D3D *graphicsManager)
+bool SceneActor::drawMesh(D3D *graphicsManager, bool isTextureSet)
 {
     UINT stride = sizeof(Vertex);
     UINT offset = 0;
@@ -30,27 +29,38 @@ bool SceneActor::drawMesh(D3D *graphicsManager)
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST
     );
 
-    if (!this->texture->setPixelShader(&slotCounters, 1))
-        return false;
-
-    if (!this->textureSampler->setPixelShader(graphicsManager, &slotCounters))
-        return false;
-
-    if (this->heightMap != nullptr)
+    if (isTextureSet)
     {
-        if (!this->heightMapSampler->setVertexShader(
+        if (!this->texture->setPixelShader(&slotCounters, 1))
+            return false;
+
+        if (!this->textureSampler->setPixelShader(
                 graphicsManager, &slotCounters
             ))
             return false;
-        if (!this->heightMap->setVertexShader(&slotCounters, 1))
-            return false;
+
+        if (this->heightMap != nullptr)
+        {
+            if (!this->heightMapSampler->setVertexShader(
+                    graphicsManager, &slotCounters
+                ))
+                return false;
+            if (!this->heightMap->setVertexShader(&slotCounters, 1))
+                return false;
+        }
+
+        for (ShadowMap *shadowMap : this->shadowMaps)
+        {
+            if (!shadowMap->setPixelShader(&slotCounters))
+                return false;
+        }
     }
 
     BufferSlots loopSlotCounters = slotCounters;
-    for (int shaderIndex = 0; shaderIndex < this->shaderStack->shaders.size();
-         shaderIndex++)
+    for (int shaderIndex = 0;
+         shaderIndex < this->currentShaderStack->shaders.size(); shaderIndex++)
     {
-        BaseShader *shader = this->shaderStack->shaders[shaderIndex];
+        BaseShader *shader = this->currentShaderStack->shaders[shaderIndex];
         if (shader->inputLayout)
         {
             graphicsManager->deviceContext->IASetInputLayout(

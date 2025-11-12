@@ -2,7 +2,7 @@
 
 #include "core_graphics/camera/camera.h"
 #include "core_graphics/d3d/d3d.h"
-#include "core_graphics/d3d/renderTexture.h"
+#include "core_graphics/d3d/rendertexture.h"
 #include "core_graphics/mesh/ortho.h"
 
 #include "../shadermanager/shadermanager.h"

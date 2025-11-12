@@ -15,4 +15,10 @@ class PointLight : public SceneActor
     bool isDiffuseEnabled;
     bool isSpecularEnabled;
     bool isAttenuationEnabled;
+
+    XMMATRIX calculateViewMatrix(XMVECTOR directionVector, XMVECTOR upVector);
+    XMMATRIX calculateProjectionMatrix(float nearPlane, float farPlane);
+    XMMATRIX calculateOrthographicProjectionMatrix(
+        float screenWidth, float screenHeight, float nearPlane, float farPlane
+    );
 };

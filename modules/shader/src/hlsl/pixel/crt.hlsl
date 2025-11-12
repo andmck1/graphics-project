@@ -2,6 +2,8 @@
 
 Texture2D objectTexture: register(t0);
 SamplerState textureSampler: register(s0);
+Texture2D shadowMapTexture: register(t1);
+Texture2D shadowMapTexture2: register(t2);
 
 cbuffer CRTBufferType : register(b0)
 {

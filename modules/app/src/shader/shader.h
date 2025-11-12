@@ -6,6 +6,7 @@
 #include "../buffer/camera.h"
 #include "../buffer/ambientLight.h"
 #include "../buffer/pointLights.h"
+#include "../buffer/spotLights.h"
 #include "../buffer/directionalLights.h"
 #include "../buffer/waveData.h"
 #include "../buffer/crt.h"
@@ -32,11 +33,18 @@ class WaveVertexShader : public VertexShader
     WaveDataBuffer waveDataBuffer = WaveDataBuffer();
 };
 
+class DepthVertexShader : public VertexShader
+{
+    public:
+    MatrixBuffer matrixBuffer = MatrixBuffer();
+};
+
 class LightingPixelShader : public PixelShader
 {
     public:
     AmbientLightBuffer ambientLightBuffer = AmbientLightBuffer();
     PointLightsBuffer pointLightsBuffer = PointLightsBuffer();
+    SpotLightsBuffer spotLightsBuffer = SpotLightsBuffer();
     DirectionalLightsBuffer directionalLightsBuffer = DirectionalLightsBuffer();
 };
 
@@ -48,4 +56,8 @@ class CRTPixelShader : public PixelShader
 {
     public:
     CRTBuffer crtBuffer = CRTBuffer();
+};
+
+class DepthPixelShader : public PixelShader
+{
 };

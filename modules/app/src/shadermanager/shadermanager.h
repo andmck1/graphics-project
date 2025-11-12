@@ -12,6 +12,7 @@ class ShaderManagerState : public BaseShaderManagerState
     ShaderStack textureOnlyShaderStack;
     ShaderStack heightMappedObjectShaderStack;
     ShaderStack waveDataShaderStack;
+    ShaderStack depthShaderStack;
 
     StandardVertexShader standardVertexShader;
     WaveVertexShader waveVertexShader;
@@ -19,6 +20,8 @@ class ShaderManagerState : public BaseShaderManagerState
     LightingPixelShader lightingPixelShader;
     TextureOnlyPixelShader textureOnlyPixelShader;
     CRTPixelShader crtPixelShader;
+    DepthVertexShader depthVertexShader;
+    DepthPixelShader depthPixelShader;
 
     MatrixBuffer matrixBuffer = MatrixBuffer();
     CameraBuffer cameraBuffer = CameraBuffer();
@@ -26,5 +29,6 @@ class ShaderManagerState : public BaseShaderManagerState
     AmbientLightBuffer ambientLightBuffer = AmbientLightBuffer();
     DirectionalLightsBuffer directionalLightsBuffer = DirectionalLightsBuffer();
     PointLightsBuffer pointLightsBuffer = PointLightsBuffer();
+    SpotLightsBuffer spotLightsBuffer = SpotLightsBuffer();
     CRTBuffer crtBuffer = CRTBuffer();
 };

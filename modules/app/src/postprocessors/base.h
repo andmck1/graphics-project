@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core_graphics/d3d/renderTexture.h"
+#include "core_graphics/d3d/rendertexture.h"
 #include "renderstage.h"
 
 #include <vector>

@@ -13,7 +13,8 @@ target_include_directories(core_utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_library(
   core_graphics STATIC
   src/core_graphics/d3d/d3d.cpp
-  src/core_graphics/d3d/renderTexture.cpp
+  src/core_graphics/d3d/rendertexture.cpp
+  src/core_graphics/d3d/shadowmap.cpp
   src/core_graphics/shader/shader.cpp
   src/core_graphics/sampler/base.cpp
   src/core_graphics/sampler/clamp.cpp
@@ -31,6 +32,8 @@ add_library(
   src/core_graphics/mesh/ortho.cpp
   src/core_graphics/actor/base.cpp
   src/core_graphics/actor/scene.cpp
+  src/core_graphics/light/point.cpp
+  src/core_graphics/light/spotlight.cpp
   src/core_graphics/camera/camera.cpp
   )
 target_link_libraries(core_graphics PRIVATE spdlog imgui dxtk)
