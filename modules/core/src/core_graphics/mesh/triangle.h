@@ -16,7 +16,7 @@ class TriangleMesh : public BaseTriangleMesh, public BaseNonTessellatedMesh
 };
 
 class TessellatedTriangleMesh : public BaseTriangleMesh,
-                                public BaseTessellatedMesh
+                                public Base3PointTessellatedMesh
 {
     public:
     TessellatedTriangleMesh(D3D *graphicsManager);

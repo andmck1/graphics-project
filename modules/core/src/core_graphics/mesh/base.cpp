@@ -76,7 +76,7 @@ void BaseNonTessellatedMesh::sendMeshData(D3D *graphicsManager)
     );
 }
 
-void BaseTessellatedMesh::sendMeshData(D3D *graphicsManager)
+void Base3PointTessellatedMesh::sendMeshData(D3D *graphicsManager)
 {
     UINT stride = sizeof(Vertex);
     UINT offset = 0;
@@ -89,5 +89,22 @@ void BaseTessellatedMesh::sendMeshData(D3D *graphicsManager)
     );
     graphicsManager->deviceContext->IASetPrimitiveTopology(
         D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST
+    );
+}
+
+
+void Base4PointTessellatedMesh::sendMeshData(D3D *graphicsManager)
+{
+    UINT stride = sizeof(Vertex);
+    UINT offset = 0;
+
+    graphicsManager->deviceContext->IASetVertexBuffers(
+        0, 1, this->vertexBuffer.GetAddressOf(), &stride, &offset
+    );
+    graphicsManager->deviceContext->IASetIndexBuffer(
+        this->vertexIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0
+    );
+    graphicsManager->deviceContext->IASetPrimitiveTopology(
+        D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST
     );
 }

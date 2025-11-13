@@ -41,10 +41,19 @@ class BaseNonTessellatedMesh : public virtual BaseMesh
     void sendMeshData(D3D *graphicsManager) override;
 };
 
-class BaseTessellatedMesh : public virtual BaseMesh
+class Base3PointTessellatedMesh : public virtual BaseMesh
 {
     public:
-    virtual ~BaseTessellatedMesh() = default;
+    virtual ~Base3PointTessellatedMesh() = default;
+
+    void sendMeshData(D3D *graphicsManager) override;
+};
+
+
+class Base4PointTessellatedMesh : public virtual BaseMesh
+{
+    public:
+    virtual ~Base4PointTessellatedMesh() = default;
 
     void sendMeshData(D3D *graphicsManager) override;
 };

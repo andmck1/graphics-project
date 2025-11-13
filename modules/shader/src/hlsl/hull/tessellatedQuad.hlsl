@@ -45,7 +45,7 @@ QuadTessellationConstantOutputType PatchConstantFunction(
     // Decreasing distance to Camera increases the tessellation factor up to maximum
     // Altered Frank Luna's example so it doesn't just clip things that are too far away
     // (tessellation factor = 0)
-    tessellationFactor = 64.f * (
+    tessellationFactor = 16.f * (
         saturate(
             (minTessellationDistanceThreshold - distanceToCamera ) / 
             (minTessellationDistanceThreshold - maxTessellationDistanceThreshold)

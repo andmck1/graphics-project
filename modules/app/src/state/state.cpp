@@ -355,34 +355,35 @@ void State::initSceneStateActor(
 void State::initSceneStateActors()
 {
     spdlog::debug("Initialising scene state meshes");
-    this->initSceneStateActor<SphereMesh, SceneActor>(
-        &this->shaderManagerState.defaultShaderStack,
-        &this->textureManagerState.moonTexture, &this->sceneState.clampSampler,
-        nullptr, nullptr, {1.f, 1.f, 1.f}, {0.f, 0.f, 0.f}, {-3.f, 0.f, 0.f}
-    );
-
-    this->initSceneStateActor<TessellatedQuadMesh, SceneActor>(
-        &this->shaderManagerState.tessellatedQuadShaderStack,
-        &this->textureManagerState.defaultTexture,
-        &this->sceneState.clampSampler, nullptr, nullptr, {100.f, 100.f, 100.f},
-        {XMConvertToRadians(-90.f), 0.f, 0.f}, {0.f, -10.f, 0.f}
-    );
-
-    this->initSceneStateActor<PlaneMesh, SceneActor>(
-        &this->shaderManagerState.heightMappedObjectShaderStack,
-        &this->textureManagerState.mountainsHeightMap,
-        &this->sceneState.clampSampler,
-        &this->textureManagerState.mountainsHeightMap,
-        &this->sceneState.wrapSampler, {1.f, 1.f, 1.f}, {0.f, 0.f, 0.f},
-        {0.f, 0.f, 0.f}
-    );
-
-    this->initSceneStateActor<TessellatedTriangleMesh, SceneActor>(
-        &this->shaderManagerState.tessellatedTriangleShaderStack,
-        &this->textureManagerState.defaultTexture,
-        &this->sceneState.clampSampler, nullptr, nullptr, {1.f, 1.f, 1.f},
-        {0.f, 0.f, 0.f}, {-5.f, 0.f, 5.f}
-    );
+    // this->initSceneStateActor<SphereMesh, SceneActor>(
+    //     &this->shaderManagerState.defaultShaderStack,
+    //     &this->textureManagerState.moonTexture,
+    //     &this->sceneState.clampSampler, nullptr, nullptr, {1.f, 1.f, 1.f},
+    //     {0.f, 0.f, 0.f}, {-3.f, 0.f, 0.f}
+    // );
+    //
+    // this->initSceneStateActor<TessellatedQuadMesh, SceneActor>(
+    //     &this->shaderManagerState.tessellatedQuadShaderStack,
+    //     &this->textureManagerState.defaultTexture,
+    //     &this->sceneState.clampSampler, nullptr, nullptr, {100.f, 100.f,
+    //     100.f}, {XMConvertToRadians(-90.f), 0.f, 0.f}, {0.f, -10.f, 0.f}
+    // );
+    //
+    // this->initSceneStateActor<PlaneMesh, SceneActor>(
+    //     &this->shaderManagerState.heightMappedObjectShaderStack,
+    //     &this->textureManagerState.mountainsHeightMap,
+    //     &this->sceneState.clampSampler,
+    //     &this->textureManagerState.mountainsHeightMap,
+    //     &this->sceneState.wrapSampler, {1.f, 1.f, 1.f}, {0.f, 0.f, 0.f},
+    //     {0.f, 0.f, 0.f}
+    // );
+    //
+    // this->initSceneStateActor<TessellatedTriangleMesh, SceneActor>(
+    //     &this->shaderManagerState.tessellatedTriangleShaderStack,
+    //     &this->textureManagerState.defaultTexture,
+    //     &this->sceneState.clampSampler, nullptr, nullptr, {1.f, 1.f, 1.f},
+    //     {0.f, 0.f, 0.f}, {-5.f, 0.f, 5.f}
+    // );
 }
 
 void State::initSceneStateAmbientLight()
@@ -587,10 +588,10 @@ void State::initSceneStateCamera()
 void State::initSceneStateWater()
 {
     spdlog::debug("Initialising scene state water");
-    this->initSceneStateActor<PlaneMesh, Water>(
-        &this->shaderManagerState.waveDataShaderStack,
+    this->initSceneStateActor<TessellatedPlaneMesh, Water>(
+        &this->shaderManagerState.tessellatedQuadShaderStack,
         &this->textureManagerState.defaultTexture,
-        &this->sceneState.clampSampler, nullptr, nullptr, {1.f, 1.f, 1.f},
+        &this->sceneState.clampSampler, nullptr, nullptr, {10.f, 10.f, 10.f},
         {0.f, 0.f, 0.f}, {0.f, -250.f, 0.f}
     );
     Water *waterPtr =

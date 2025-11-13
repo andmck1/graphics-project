@@ -11,7 +11,7 @@ void PlaneMesh::init()
     // Lab code
     int vertexCount, indexCount, index, i, j;
     float positionX, positionZ, u, v, increment;
-    int resolution = 1000;
+    int resolution = 100;
 
     vertexCount = (resolution - 1) * (resolution - 1) * 6;
 
@@ -108,5 +108,69 @@ void PlaneMesh::init()
 
         u = 0;
         v += increment;
+    }
+}
+
+TessellatedPlaneMesh::TessellatedPlaneMesh(D3D *graphicsManager)
+{
+    this->init();
+    this->createBuffers(graphicsManager);
+}
+
+void TessellatedPlaneMesh::init()
+{
+    int vertexIndex = 0;
+    int resolution = 100;
+    float uvResolution;
+    XMFLOAT3 normal = XMFLOAT3(0.f, 1.f, 0.f);
+
+    uvResolution = 1.0f / (float) resolution;
+
+    for (int xIndex = 0; xIndex < (resolution - 1); xIndex++)
+    {
+        for (int zIndex = 0; zIndex < (resolution - 1); zIndex++)
+        {
+            float u, v;
+            float xIndexFloat = (float) xIndex;
+            float zIndexFloat = (float) zIndex;
+
+            u = xIndex * uvResolution;
+            v = zIndex * uvResolution;
+
+            // Top left
+            this->vertices.push_back(Vertex());
+            this->vertices[vertexIndex].positionCoordinate =
+                XMFLOAT3(xIndexFloat, 0.f, zIndexFloat);
+            this->vertices[vertexIndex].textureCoordinate = XMFLOAT2(u, v);
+            this->vertices[vertexIndex].normalVector = normal;
+            this->vertexIndices.push_back(vertexIndex++);
+
+            // Top right
+            this->vertices.push_back(Vertex());
+            this->vertices[vertexIndex].positionCoordinate =
+                XMFLOAT3(xIndexFloat + 1.f, 0.f, zIndexFloat);
+            this->vertices[vertexIndex].textureCoordinate =
+                XMFLOAT2(u + uvResolution, v);
+            this->vertices[vertexIndex].normalVector = normal;
+            this->vertexIndices.push_back(vertexIndex++);
+
+            // Bottom right
+            this->vertices.push_back(Vertex());
+            this->vertices[vertexIndex].positionCoordinate =
+                XMFLOAT3(xIndexFloat + 1.f, 0.f, zIndexFloat + 1.f);
+            this->vertices[vertexIndex].textureCoordinate =
+                XMFLOAT2(u + uvResolution, v + uvResolution);
+            this->vertices[vertexIndex].normalVector = normal;
+            this->vertexIndices.push_back(vertexIndex++);
+
+            // Bottom left
+            this->vertices.push_back(Vertex());
+            this->vertices[vertexIndex].positionCoordinate =
+                XMFLOAT3(xIndexFloat, 0.f, zIndexFloat + 1.f);
+            this->vertices[vertexIndex].textureCoordinate =
+                XMFLOAT2(u, v + uvResolution);
+            this->vertices[vertexIndex].normalVector = normal;
+            this->vertexIndices.push_back(vertexIndex++);
+        }
     }
 }

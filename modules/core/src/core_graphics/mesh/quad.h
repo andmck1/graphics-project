@@ -15,7 +15,8 @@ class QuadMesh : public BaseQuadMesh, public BaseNonTessellatedMesh
     QuadMesh(D3D *graphicsManager);
 };
 
-class TessellatedQuadMesh : public BaseQuadMesh, public BaseTessellatedMesh
+class TessellatedQuadMesh : public BaseQuadMesh,
+                            public Base4PointTessellatedMesh
 {
     public:
     TessellatedQuadMesh(D3D *graphicsManager);
