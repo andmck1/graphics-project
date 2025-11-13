@@ -165,16 +165,16 @@ void State::initShaderManagerStateShaderBuffers()
     // Vertex
     this->shaderManagerState.standardVertexShader.bufferStack = {
         &this->shaderManagerState.matrixBuffer,
-        &this->shaderManagerState.cameraBuffer
+        &this->shaderManagerState.cameraVertexBuffer
     };
     this->shaderManagerState.heightMapVertexShader.bufferStack = {
         &this->shaderManagerState.matrixBuffer,
-        &this->shaderManagerState.cameraBuffer
+        &this->shaderManagerState.cameraVertexBuffer
     };
     this->shaderManagerState.waveVertexShader.bufferStack = {
         &this->shaderManagerState.matrixBuffer,
-        &this->shaderManagerState.cameraBuffer,
-        &this->shaderManagerState.waveDataBuffer
+        &this->shaderManagerState.cameraVertexBuffer,
+        &this->shaderManagerState.waveDataVertexBuffer
     };
     this->shaderManagerState.depthVertexShader.bufferStack = {
         &this->shaderManagerState.matrixBuffer,
@@ -195,7 +195,9 @@ void State::initShaderManagerStateShaderBuffers()
         &this->shaderManagerState.matrixDomainBuffer
     };
     this->shaderManagerState.tessellatedQuadDomainShader.bufferStack = {
-        &this->shaderManagerState.matrixDomainBuffer
+        &this->shaderManagerState.matrixDomainBuffer,
+        &this->shaderManagerState.cameraDomainBuffer,
+        &this->shaderManagerState.waveDataDomainBuffer
     };
 
     // Pixel
@@ -215,8 +217,13 @@ void State::initShaderManagerStateShaderBuffers()
 void State::setShaderManagerStateShaderBufferData()
 {
     spdlog::debug("Setting shader manager state shader buffer data");
-    this->shaderManagerState.cameraBuffer.setData(this->sceneState.camera);
+    this->shaderManagerState.cameraVertexBuffer.setData(
+        this->sceneState.camera
+    );
     this->shaderManagerState.cameraHullBuffer.setData(this->sceneState.camera);
+    this->shaderManagerState.cameraDomainBuffer.setData(
+        this->sceneState.camera
+    );
 
     this->shaderManagerState.ambientLightBuffer.setData(
         this->sceneState.ambientLight
@@ -230,7 +237,12 @@ void State::setShaderManagerStateShaderBufferData()
     this->shaderManagerState.spotLightsBuffer.setData(
         &this->sceneState.spotLights
     );
-    this->shaderManagerState.waveDataBuffer.setData(
+    this->shaderManagerState.waveDataVertexBuffer.setData(
+        &this->appState.timer->totalTime, &this->sceneState.water->magnitude,
+        &this->sceneState.water->waveNumber,
+        &this->sceneState.water->angularVelocity
+    );
+    this->shaderManagerState.waveDataDomainBuffer.setData(
         &this->appState.timer->totalTime, &this->sceneState.water->magnitude,
         &this->sceneState.water->waveNumber,
         &this->sceneState.water->angularVelocity
@@ -721,7 +733,7 @@ void State::initSceneStateTessellationSettings()
 {
     spdlog::debug("Initialising scene state tessellation settings");
     this->sceneState.tessellationHullDataSettings
-        .maxTessellationDistanceThreshold = XMFLOAT4(20.f, 0.f, 0.f, 0.f);
+        .minTessellationDistanceThreshold = XMFLOAT4(20.f, 0.f, 0.f, 0.f);
     this->sceneState.tessellationHullDataSettings
         .maxTessellationDistanceThreshold = XMFLOAT4(100.f, 0.f, 0.f, 0.f);
 }
@@ -758,10 +770,13 @@ void State::initSceneState(
     this->shaderManagerState.matrixDomainBuffer.init(
         this->shaderManagerState.graphicsManager
     );
-    this->shaderManagerState.cameraBuffer.init(
+    this->shaderManagerState.cameraVertexBuffer.init(
         this->shaderManagerState.graphicsManager
     );
     this->shaderManagerState.cameraHullBuffer.init(
+        this->shaderManagerState.graphicsManager
+    );
+    this->shaderManagerState.cameraDomainBuffer.init(
         this->shaderManagerState.graphicsManager
     );
     this->shaderManagerState.ambientLightBuffer.init(
@@ -776,7 +791,10 @@ void State::initSceneState(
     this->shaderManagerState.spotLightsBuffer.init(
         this->shaderManagerState.graphicsManager
     );
-    this->shaderManagerState.waveDataBuffer.init(
+    this->shaderManagerState.waveDataVertexBuffer.init(
+        this->shaderManagerState.graphicsManager
+    );
+    this->shaderManagerState.waveDataDomainBuffer.init(
         this->shaderManagerState.graphicsManager
     );
     this->shaderManagerState.tessellationHullDataBuffer.init(

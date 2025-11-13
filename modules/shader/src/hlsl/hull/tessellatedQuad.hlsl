@@ -18,7 +18,7 @@ cbuffer SettingsBuffer : register(b2)
 }
 
 QuadTessellationConstantOutputType PatchConstantFunction(
-    InputPatch<QuadTessellationInputType, 4> inputPatch, 
+    InputPatch<QuadTessellationHullInputType, 4> inputPatch, 
     uint patchId : SV_PrimitiveID
 )
 {    
@@ -71,13 +71,14 @@ QuadTessellationConstantOutputType PatchConstantFunction(
 [outputcontrolpoints(4)]
 [patchconstantfunc("PatchConstantFunction")]
 QuadTessellationHullOutputType main(
-    InputPatch<QuadTessellationInputType, 4> patch, 
+    InputPatch<QuadTessellationHullInputType, 4> patch, 
     uint pointId : SV_OutputControlPointID, 
     uint patchId : SV_PrimitiveID
 )
 {
     QuadTessellationHullOutputType output;
     output.position = patch[pointId].position;
-    output.colour = patch[pointId].colour;
+    output.tex = patch[pointId].tex;
+    output.normal = patch[pointId].normal;
     return output;
 }

@@ -42,29 +42,51 @@ struct DepthVertexOutputType
     float4 depthPosition : TEXCOORD0;
 };
 
-// Hull and Domain (Tessellation)
-struct QuadTessellationInputType
+struct TessellationVertexInputType
 {
     float3 position : POSITION;
-    float4 colour : COLOR;
+    float2 tex : TEXCOORD0;
+    float3 normal : NORMAL;
+};
+
+struct TessellationVertexOutputType
+{
+    float3 position : POSITION;
+    float2 tex : TEXCOORD0;
+    float3 normal : NORMAL;
+};
+
+// Hull and Domain (Tessellation)
+struct QuadTessellationHullInputType
+{
+    float3 position : POSITION;
+    float2 tex : TEXCOORD0;
+    float3 normal : NORMAL;
+};
+
+
+struct QuadTessellationHullOutputType
+{
+    float3 position : POSITION;
+    float2 tex : TEXCOORD0;
+    float3 normal : NORMAL;
+};
+
+struct QuadTessellationDomainOutputType
+{
+    float4 position : SV_POSITION;
+    float2 tex : TEXCOORD0;
+    float3 normal : NORMAL;
+    float3 worldPosition : TEXCOORD1;
+    float3 viewVector : TEXCOORD2;
+    float4 spotLightViewPos1 : TEXCOORD3;
+    float4 spotLightViewPos2 : TEXCOORD4;
 };
 
 struct QuadTessellationConstantOutputType
 {
     float edges[4] : SV_TessFactor;
     float inside[2] : SV_InsideTessFactor;
-};
-
-struct QuadTessellationHullOutputType
-{
-    float3 position : POSITION;
-    float4 colour : COLOR;
-};
-
-struct QuadTessellationDomainOutputType
-{
-    float4 position : SV_POSITION;
-    float4 colour : COLOR;
 };
 
 // Pixel

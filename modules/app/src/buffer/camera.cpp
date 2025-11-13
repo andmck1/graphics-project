@@ -1,14 +1,14 @@
 #include "camera.h"
 #include <core_utils/graphics.h>
 
-bool CameraBuffer::init(D3D *graphicsManager)
+bool CameraVertexBuffer::init(D3D *graphicsManager)
 {
     HRESULT createBufferHR;
 
     spdlog::debug("Initialising camera buffer");
     this->graphicsManager = graphicsManager;
     this->bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-    this->bufferDesc.ByteWidth = sizeof(CameraBuffer::ShaderBuffer);
+    this->bufferDesc.ByteWidth = sizeof(CameraVertexBuffer::ShaderBuffer);
     this->bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     this->bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     this->bufferDesc.MiscFlags = 0;
@@ -21,15 +21,15 @@ bool CameraBuffer::init(D3D *graphicsManager)
     return true;
 }
 
-void CameraBuffer::setData(Camera *camera)
+void CameraVertexBuffer::setData(Camera *camera)
 {
     this->camera = camera;
 }
 
-bool CameraBuffer::setShader(BufferSlots *slotCounters, int numberOfBuffers)
+bool CameraVertexBuffer::setShader(BufferSlots *slotCounters, int numberOfBuffers)
 {
     D3D11_MAPPED_SUBRESOURCE mappedResource;
-    CameraBuffer::ShaderBuffer *bufferData;
+    CameraVertexBuffer::ShaderBuffer *bufferData;
     HRESULT mapHR;
 
     int bufferSlot = slotCounters->vertexShaderCounters.constantSlot;
@@ -39,7 +39,7 @@ bool CameraBuffer::setShader(BufferSlots *slotCounters, int numberOfBuffers)
     );
     if (!TryDXCall(mapHR, "Camera buffer vertex shader map failed.\n"))
         return false;
-    bufferData = (CameraBuffer::ShaderBuffer *) mappedResource.pData;
+    bufferData = (CameraVertexBuffer::ShaderBuffer *) mappedResource.pData;
     bufferData->worldPosition = XMFLOAT4(
         this->camera->worldPosition[0], this->camera->worldPosition[1],
         this->camera->worldPosition[2], 0.f
@@ -104,5 +104,59 @@ bool CameraHullBuffer::setShader(BufferSlots *slotCounters, int numberOfBuffers)
     );
 
     slotCounters->hullShaderCounters.constantSlot++;
+    return true;
+}
+
+
+bool CameraDomainBuffer::init(D3D *graphicsManager)
+{
+    HRESULT createBufferHR;
+
+    spdlog::debug("Initialising camera buffer");
+    this->graphicsManager = graphicsManager;
+    this->bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+    this->bufferDesc.ByteWidth = sizeof(CameraDomainBuffer::ShaderBuffer);
+    this->bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    this->bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    this->bufferDesc.MiscFlags = 0;
+    this->bufferDesc.StructureByteStride = 0;
+    createBufferHR = this->graphicsManager->device->CreateBuffer(
+        &(this->bufferDesc), NULL, this->buffer.GetAddressOf()
+    );
+    if (!TryDXCall(createBufferHR, "Failed to create camera buffer."))
+        return false;
+    return true;
+}
+
+void CameraDomainBuffer::setData(Camera *camera)
+{
+    this->camera = camera;
+}
+
+bool CameraDomainBuffer::setShader(BufferSlots *slotCounters, int numberOfBuffers)
+{
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    CameraDomainBuffer::ShaderBuffer *bufferData;
+    HRESULT mapHR;
+
+    int bufferSlot = slotCounters->domainShaderCounters.constantSlot;
+
+    mapHR = graphicsManager->deviceContext->Map(
+        this->buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource
+    );
+    if (!TryDXCall(mapHR, "Camera buffer domain shader map failed.\n"))
+        return false;
+    bufferData = (CameraDomainBuffer::ShaderBuffer *) mappedResource.pData;
+    bufferData->worldPosition = XMFLOAT4(
+        this->camera->worldPosition[0], this->camera->worldPosition[1],
+        this->camera->worldPosition[2], 0.f
+    );
+
+    graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
+    graphicsManager->deviceContext->DSSetConstantBuffers(
+        bufferSlot, numberOfBuffers, this->buffer.GetAddressOf()
+    );
+
+    slotCounters->domainShaderCounters.constantSlot++;
     return true;
 }

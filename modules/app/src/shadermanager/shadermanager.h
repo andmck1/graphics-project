@@ -49,9 +49,11 @@ class ShaderManagerState : public BaseShaderManagerState
     MatrixBuffer matrixBuffer = MatrixBuffer();
     MatrixHullBuffer matrixHullBuffer = MatrixHullBuffer();
     MatrixDomainBuffer matrixDomainBuffer = MatrixDomainBuffer();
-    CameraBuffer cameraBuffer = CameraBuffer();
+    CameraVertexBuffer cameraVertexBuffer = CameraVertexBuffer();
     CameraHullBuffer cameraHullBuffer = CameraHullBuffer();
-    WaveDataBuffer waveDataBuffer = WaveDataBuffer();
+    CameraDomainBuffer cameraDomainBuffer = CameraDomainBuffer();
+    WaveDataVertexBuffer waveDataVertexBuffer = WaveDataVertexBuffer();
+    WaveDataDomainBuffer waveDataDomainBuffer = WaveDataDomainBuffer();
     TessellationHullDataBuffer tessellationHullDataBuffer =
         TessellationHullDataBuffer();
     AmbientLightBuffer ambientLightBuffer = AmbientLightBuffer();

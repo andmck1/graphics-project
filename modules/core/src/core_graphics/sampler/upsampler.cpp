@@ -30,6 +30,19 @@ bool UpSampler::setVertexShader(
     return true;
 }
 
+bool UpSampler::setDomainShader(
+    D3D *graphicsManager, BufferSlots *slotCounters
+)
+{
+    int startSlot = slotCounters->domainShaderCounters.samplerSlot;
+    graphicsManager->deviceContext->DSSetSamplers(
+        startSlot, 1, this->samplerState.GetAddressOf()
+    );
+    slotCounters->domainShaderCounters.samplerSlot++;
+    return true;
+}
+
+
 bool UpSampler::setPixelShader(
     D3D *graphicsManager, BufferSlots *slotCounters
 )

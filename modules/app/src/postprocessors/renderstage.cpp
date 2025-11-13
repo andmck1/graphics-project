@@ -4,8 +4,6 @@
 
 bool RenderStage::render(D3D *graphicsManager)
 {
-    UINT stride = sizeof(Vertex);
-    UINT offset = 0;
     BufferSlots slotCounters = BufferSlots();
     XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 
@@ -39,11 +37,13 @@ bool RenderStage::render(D3D *graphicsManager)
     this->shaderManagerState->matrixBuffer.setData(
         worldMatrix, viewMatrix, projectionMatrix
     );
-    if(!this->shaderManagerState->matrixBuffer.setShader(&slotCounters, 0))
+    if (!this->shaderManagerState->matrixBuffer.setShader(&slotCounters, 0))
         return false;
-    if(!this->shaderManagerState->cameraBuffer.setShader(&slotCounters, 0))
+    if (!this->shaderManagerState->cameraVertexBuffer.setShader(
+            &slotCounters, 0
+        ))
         return false;
-    
+
     if (!this->inputRenderTexture->setPixelShader(&slotCounters))
         return false;
     if (!this->textureSampler->setPixelShader(graphicsManager, &slotCounters))
@@ -56,7 +56,6 @@ bool RenderStage::render(D3D *graphicsManager)
             &slotCounters, 1
         );
     }
-
 
     this->shaderManagerState->standardVertexShader.set(graphicsManager);
     this->pixelShader->set(graphicsManager);

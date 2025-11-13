@@ -6,7 +6,7 @@
 
 #include "shared_shader/sharedbuffertypes.h"
 
-class CameraBuffer : public BaseConstantBuffer
+class CameraVertexBuffer : public BaseConstantBuffer
 {
     public:
     bool init(D3D *graphicsManager) override;
@@ -22,6 +22,20 @@ class CameraBuffer : public BaseConstantBuffer
 
 
 class CameraHullBuffer : public BaseConstantBuffer
+{
+    public:
+    bool init(D3D *graphicsManager) override;
+    bool setShader(BufferSlots *slotCounters, int numberOfBuffers) override;
+    void setData(Camera *camera);
+
+    struct ShaderBuffer : SharedBufferTypes::CameraBufferType
+    {
+    };
+
+    Camera *camera;
+};
+
+class CameraDomainBuffer : public BaseConstantBuffer
 {
     public:
     bool init(D3D *graphicsManager) override;
