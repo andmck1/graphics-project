@@ -15,6 +15,8 @@ using matrix = XMMATRIX;
 
 // TODO - repeated structs here
 #ifndef __cplusplus
+
+// Vertex
 struct VertexInputType
 {
     float4 position : POSITION;
@@ -33,12 +35,39 @@ struct VertexOutputType
     float4 spotLightViewPos2 : TEXCOORD4;
 };
 
+
 struct DepthVertexOutputType
 {
     float4 position : SV_POSITION;
     float4 depthPosition : TEXCOORD0;
 };
 
+// Hull and Domain (Tessellation)
+struct QuadTessellationInputType
+{
+    float3 position : POSITION;
+    float4 colour : COLOR;
+};
+
+struct QuadTessellationConstantOutputType
+{
+    float edges[4] : SV_TessFactor;
+    float inside[2] : SV_InsideTessFactor;
+};
+
+struct QuadTessellationHullOutputType
+{
+    float3 position : POSITION;
+    float4 colour : COLOR;
+};
+
+struct QuadTessellationDomainOutputType
+{
+    float4 position : SV_POSITION;
+    float4 colour : COLOR;
+};
+
+// Pixel
 struct PixelInputType
 {
     float4 position : SV_POSITION;
@@ -53,7 +82,7 @@ struct PixelInputType
 struct DepthPixelInputType
 {
     float4 position : SV_POSITION;
-    float4 depthPosition: TEXCOORD0;
+    float4 depthPosition : TEXCOORD0;
 };
 
 #endif
@@ -82,6 +111,17 @@ struct MatrixBufferType
         matrix spotLightProjectionMatrix1;
         matrix spotLightViewMatrix2;
         matrix spotLightProjectionMatrix2;
+    };
+
+#ifdef __cplusplus
+    struct MatrixDomainBufferType : BaseBufferType
+#else
+struct MatrixDomainBufferType
+#endif
+    {
+        matrix worldMatrix;
+        matrix viewMatrix;
+        matrix projectionMatrix;
     };
 
 #ifdef __cplusplus
@@ -139,7 +179,6 @@ struct SpotLightBufferType
         int4 isAttenuationEnabled;
         int4 nLights;
     };
-
 
 #ifdef __cplusplus
     struct DirectionalLightBufferType : BaseBufferType

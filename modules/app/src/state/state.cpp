@@ -11,6 +11,7 @@
 
 #include <DirectXMathMatrix.inl>
 #include <directxmath.h>
+#include <memory>
 #include <spdlog/spdlog.h>
 #include <filesystem>
 
@@ -69,6 +70,31 @@ void State::initShaderManagerStateShaders()
         this->initShaderManagerStateShader<DepthVertexShader>(
             "./build/hlsl/vertex/depth.cso", inputElementDescription
         );
+    this->shaderManagerState.tessellationPassThroughVertexShader =
+        this->initShaderManagerStateShader<TessellationPassThroughVertexShader>(
+            "./build/hlsl/vertex/tessellationPassThrough.cso",
+            inputElementDescription
+        );
+
+    // Hull
+    this->shaderManagerState.tessellatedTriangleHullShader =
+        this->initShaderManagerStateShader<TessellatedTriangleHullShader>(
+            "./build/hlsl/hull/tessellatedTriangle.cso"
+        );
+    this->shaderManagerState.tessellatedQuadHullShader =
+        this->initShaderManagerStateShader<TessellatedQuadHullShader>(
+            "./build/hlsl/hull/tessellatedQuad.cso"
+        );
+
+    // Domain
+    this->shaderManagerState.tessellatedTriangleDomainShader =
+        this->initShaderManagerStateShader<TessellatedTriangleDomainShader>(
+            "./build/hlsl/domain/tessellatedTriangle.cso"
+        );
+    this->shaderManagerState.tessellatedQuadDomainShader =
+        this->initShaderManagerStateShader<TessellatedQuadDomainShader>(
+            "./build/hlsl/domain/tessellatedQuad.cso"
+        );
 
     // Pixel
     this->shaderManagerState.lightingPixelShader =
@@ -118,10 +144,25 @@ void State::initShaderManagerStateShaderStacks()
             {&this->shaderManagerState.depthVertexShader,
              &this->shaderManagerState.depthPixelShader}
         );
+    this->shaderManagerState.tessellatedTriangleShaderStack.shaders =
+        std::vector<BaseShader *>({
+            &this->shaderManagerState.tessellationPassThroughVertexShader,
+            &this->shaderManagerState.tessellatedTriangleHullShader,
+            &this->shaderManagerState.tessellatedTriangleDomainShader,
+            &this->shaderManagerState.lightingPixelShader,
+        });
+    this->shaderManagerState.tessellatedQuadShaderStack.shaders =
+        std::vector<BaseShader *>({
+            &this->shaderManagerState.tessellationPassThroughVertexShader,
+            &this->shaderManagerState.tessellatedQuadHullShader,
+            &this->shaderManagerState.tessellatedQuadDomainShader,
+            &this->shaderManagerState.lightingPixelShader,
+        });
 }
 
 void State::initShaderManagerStateShaderBuffers()
 {
+    // Vertex
     this->shaderManagerState.standardVertexShader.bufferStack = {
         &this->shaderManagerState.matrixBuffer,
         &this->shaderManagerState.cameraBuffer
@@ -138,7 +179,25 @@ void State::initShaderManagerStateShaderBuffers()
     this->shaderManagerState.depthVertexShader.bufferStack = {
         &this->shaderManagerState.matrixBuffer,
     };
+    this->shaderManagerState.tessellationPassThroughVertexShader
+        .bufferStack = {};
 
+    // Domain
+    this->shaderManagerState.tessellatedTriangleDomainShader.bufferStack = {
+        &this->shaderManagerState.matrixDomainBuffer
+    };
+    this->shaderManagerState.tessellatedQuadDomainShader.bufferStack = {
+        &this->shaderManagerState.matrixDomainBuffer
+    };
+
+    // Hull
+    this->shaderManagerState.tessellatedTriangleHullShader.bufferStack = {};
+    this->shaderManagerState.tessellatedQuadHullShader.bufferStack = {
+        &this->shaderManagerState.matrixDomainBuffer,
+        &this->shaderManagerState.cameraHullBuffer
+    };
+
+    // Pixel
     this->shaderManagerState.lightingPixelShader.bufferStack = {
         &this->shaderManagerState.ambientLightBuffer,
         &this->shaderManagerState.directionalLightsBuffer,
@@ -156,6 +215,7 @@ void State::setShaderManagerStateShaderBufferData()
 {
     spdlog::debug("Setting shader manager state shader buffer data");
     this->shaderManagerState.cameraBuffer.setData(this->sceneState.camera);
+    this->shaderManagerState.cameraHullBuffer.setData(this->sceneState.camera);
 
     this->shaderManagerState.ambientLightBuffer.setData(
         this->sceneState.ambientLight
@@ -257,8 +317,9 @@ void State::initSceneStateActor(
     spdlog::debug("Initialising scene state mesh");
 
     this->sceneState.actors.push_back(std::make_unique<SceneActorType>());
-    auto *sceneActorPtr = this->sceneState.actors.back().get();
-    sceneActorPtr->mesh = MeshType(this->sceneState.graphicsManager);
+    std::unique_ptr<SceneActor> &sceneActorPtr = this->sceneState.actors.back();
+    sceneActorPtr->mesh =
+        std::make_unique<MeshType>(this->sceneState.graphicsManager);
     sceneActorPtr->defaultShaderStack = defaultShaderStack;
     sceneActorPtr->currentShaderStack = defaultShaderStack;
     sceneActorPtr->texture = texture;
@@ -284,8 +345,8 @@ void State::initSceneStateActors()
         nullptr, nullptr, {1.f, 1.f, 1.f}, {0.f, 0.f, 0.f}, {-3.f, 0.f, 0.f}
     );
 
-    this->initSceneStateActor<QuadMesh, SceneActor>(
-        &this->shaderManagerState.defaultShaderStack,
+    this->initSceneStateActor<TessellatedQuadMesh, SceneActor>(
+        &this->shaderManagerState.tessellatedQuadShaderStack,
         &this->textureManagerState.defaultTexture,
         &this->sceneState.clampSampler, nullptr, nullptr, {100.f, 100.f, 100.f},
         {XMConvertToRadians(-90.f), 0.f, 0.f}, {0.f, -10.f, 0.f}
@@ -298,6 +359,13 @@ void State::initSceneStateActors()
         &this->textureManagerState.mountainsHeightMap,
         &this->sceneState.wrapSampler, {1.f, 1.f, 1.f}, {0.f, 0.f, 0.f},
         {0.f, 0.f, 0.f}
+    );
+
+    this->initSceneStateActor<TessellatedTriangleMesh, SceneActor>(
+        &this->shaderManagerState.tessellatedTriangleShaderStack,
+        &this->textureManagerState.defaultTexture,
+        &this->sceneState.clampSampler, nullptr, nullptr, {1.f, 1.f, 1.f},
+        {0.f, 0.f, 0.f}, {-5.f, 0.f, 5.f}
     );
 }
 
@@ -329,7 +397,8 @@ void State::initSceneStatePointLight(
         dynamic_cast<PointLight *>(this->sceneState.actors.back().get());
     this->sceneState.pointLights.push_back(pointLightPtr);
 
-    pointLightPtr->mesh = SphereMesh(this->sceneState.graphicsManager);
+    pointLightPtr->mesh =
+        std::make_unique<SphereMesh>(this->sceneState.graphicsManager);
     pointLightPtr->defaultShaderStack =
         &this->shaderManagerState.textureOnlyShaderStack;
     pointLightPtr->currentShaderStack =
@@ -385,7 +454,8 @@ void State::initSceneStateSpotLight(
         dynamic_cast<SpotLight *>(this->sceneState.actors.back().get());
     this->sceneState.spotLights.push_back(spotLightPtr);
 
-    spotLightPtr->mesh = SphereMesh(this->sceneState.graphicsManager);
+    spotLightPtr->mesh =
+        std::make_unique<SphereMesh>(this->sceneState.graphicsManager);
     spotLightPtr->defaultShaderStack =
         &this->shaderManagerState.textureOnlyShaderStack;
     spotLightPtr->currentShaderStack =
@@ -668,7 +738,13 @@ void State::initSceneState(
     this->shaderManagerState.matrixBuffer.init(
         this->shaderManagerState.graphicsManager
     );
+    this->shaderManagerState.matrixDomainBuffer.init(
+        this->shaderManagerState.graphicsManager
+    );
     this->shaderManagerState.cameraBuffer.init(
+        this->shaderManagerState.graphicsManager
+    );
+    this->shaderManagerState.cameraHullBuffer.init(
         this->shaderManagerState.graphicsManager
     );
     this->shaderManagerState.ambientLightBuffer.init(

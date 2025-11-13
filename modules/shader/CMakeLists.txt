@@ -15,16 +15,35 @@ set(VERTEX_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/standard.hlsl"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/heightMap.hlsl"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/wave.hlsl"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/depth.hlsl")
-set(PIXEL_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/lighting.hlsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/depth.hlsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/tessellationPassThrough.hlsl")
+set(DOMAIN_SHADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/domain/tessellatedTriangle.hlsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/domain/tessellatedQuad.hlsl")
+set(HULL_SHADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/hull/tessellatedTriangle.hlsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/hull/tessellatedQuad.hlsl")
+set(PIXEL_SHADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/lighting.hlsl"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/textureOnly.hlsl"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/crt.hlsl"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/depth.hlsl")
-set(HLSL_SHADER_FILES ${VERTEX_SHADERS} ${PIXEL_SHADERS})
+set(HLSL_SHADER_FILES ${VERTEX_SHADERS} ${DOMAIN_SHADERS} ${HULL_SHADERS}
+                      ${PIXEL_SHADERS})
 set(CMAKE_HLSL_OUTPUT_DIR ${CMAKE_BINARY_DIR}/hlsl)
 
 foreach(FILE ${VERTEX_SHADERS})
   set_source_files_properties(${FILE} PROPERTIES ShaderType "vs" ShaderModel
+                                                                 "5_0")
+endforeach()
+
+foreach(FILE ${DOMAIN_SHADERS})
+  set_source_files_properties(${FILE} PROPERTIES ShaderType "ds" ShaderModel
+                                                                 "5_0")
+endforeach()
+
+foreach(FILE ${HULL_SHADERS})
+  set_source_files_properties(${FILE} PROPERTIES ShaderType "hs" ShaderModel
                                                                  "5_0")
 endforeach()
 
@@ -40,6 +59,10 @@ foreach(FILE ${HLSL_SHADER_FILES})
 
   if(shadertype STREQUAL "vs")
     set(OUTPUT_DIR "${CMAKE_HLSL_OUTPUT_DIR}/vertex")
+  elseif(shadertype STREQUAL "ds")
+    set(OUTPUT_DIR "${CMAKE_HLSL_OUTPUT_DIR}/domain")
+  elseif(shadertype STREQUAL "hs")
+    set(OUTPUT_DIR "${CMAKE_HLSL_OUTPUT_DIR}/hull")
   elseif(shadertype STREQUAL "ps")
     set(OUTPUT_DIR "${CMAKE_HLSL_OUTPUT_DIR}/pixel")
   endif()
@@ -71,7 +94,8 @@ foreach(FILE ${HLSL_SHADER_FILES})
     COMMENT "Compiling HLSL shader: ${FILE}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     VERBATIM)
-  add_custom_target(compile_shaders_${FILE_WE}_${shadertype} ALL DEPENDS ${CSO_SHADER_FILES})
+  add_custom_target(compile_shaders_${FILE_WE}_${shadertype} ALL
+                    DEPENDS ${CSO_SHADER_FILES})
 endforeach()
 
 set(CSO_SHADER_FILES

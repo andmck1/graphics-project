@@ -29,6 +29,7 @@ bool BaseShader::load(D3D *graphicsManager)
     return true;
 }
 
+// TODO - repeated code
 bool VertexShader::create(D3D *graphicsManager)
 {
     this->shader = graphicsManager->createVertexShader(this->blob);
@@ -41,6 +42,30 @@ bool VertexShader::create(D3D *graphicsManager)
 bool VertexShader::set(D3D *graphicsManager)
 {
     graphicsManager->deviceContext->VSSetShader(shader.Get(), nullptr, 0);
+    return true;
+}
+
+bool DomainShader::create(D3D *graphicsManager)
+{
+    this->shader = graphicsManager->createDomainShader(this->blob);
+    return true;
+}
+
+bool DomainShader::set(D3D *graphicsManager)
+{
+    graphicsManager->deviceContext->DSSetShader(shader.Get(), nullptr, 0);
+    return true;
+}
+
+bool HullShader::create(D3D *graphicsManager)
+{
+    this->shader = graphicsManager->createHullShader(this->blob);
+    return true;
+}
+
+bool HullShader::set(D3D *graphicsManager)
+{
+    graphicsManager->deviceContext->HSSetShader(shader.Get(), nullptr, 0);
     return true;
 }
 

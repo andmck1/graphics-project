@@ -36,6 +36,22 @@ class VertexShader : public BaseShader
     bool create(D3D *graphicsManager);
 };
 
+class DomainShader : public BaseShader
+{
+    public:
+    ComPtr<ID3D11DomainShader> shader;
+    bool set(D3D *graphicsManager);
+    bool create(D3D *graphicsManager);
+};
+
+class HullShader : public BaseShader
+{
+    public:
+    ComPtr<ID3D11HullShader> shader;
+    bool set(D3D *graphicsManager);
+    bool create(D3D *graphicsManager);
+};
+
 class PixelShader : public BaseShader
 {
     public:

@@ -15,19 +15,12 @@ void SceneActor::update() {};
 
 bool SceneActor::drawMesh(D3D *graphicsManager, bool isTextureSet)
 {
-    UINT stride = sizeof(Vertex);
-    UINT offset = 0;
     BufferSlots slotCounters = BufferSlots();
 
-    graphicsManager->deviceContext->IASetVertexBuffers(
-        0, 1, this->mesh->vertexBuffer.GetAddressOf(), &stride, &offset
-    );
-    graphicsManager->deviceContext->IASetIndexBuffer(
-        this->mesh->vertexIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0
-    );
-    graphicsManager->deviceContext->IASetPrimitiveTopology(
-        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST
-    );
+    graphicsManager->deviceContext->HSSetShader(nullptr, nullptr, 0);
+    graphicsManager->deviceContext->DSSetShader(nullptr, nullptr, 0);
+
+    this->mesh->get()->sendMeshData(graphicsManager);
 
     if (isTextureSet)
     {
@@ -80,8 +73,10 @@ bool SceneActor::drawMesh(D3D *graphicsManager, bool isTextureSet)
     }
 
     graphicsManager->deviceContext->DrawIndexed(
-        this->mesh->getVertexIndexCount(), 0, 0
+        this->mesh->get()->getVertexIndexCount(), 0, 0
     );
 
+    graphicsManager->deviceContext->HSSetShader(nullptr, nullptr, 0);
+    graphicsManager->deviceContext->DSSetShader(nullptr, nullptr, 0);
     return true;
 }

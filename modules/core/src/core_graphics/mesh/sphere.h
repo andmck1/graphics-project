@@ -4,10 +4,10 @@
 
 #include "../d3d/d3d.h"
 
-class SphereMesh : public BaseMesh
+class SphereMesh : public BaseNonTessellatedMesh
 {
     public:
     SphereMesh(D3D *graphicsManager);
 
-    void init();
+    void init() override;
 };

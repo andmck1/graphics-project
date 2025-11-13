@@ -114,7 +114,6 @@ bool D3D::createRasteriserStates()
     D3D11_RASTERIZER_DESC rasteriserDescription,
         wireframeEnabledRasteriserDescription;
 
-    // Some help from the lab code for these settings
     rasteriserDescription = {};
     rasteriserDescription.FillMode = D3D11_FILL_SOLID;
     rasteriserDescription.CullMode = D3D11_CULL_NONE;
@@ -184,7 +183,7 @@ ComPtr<ID3DBlob> D3D::loadShader(std::string shaderFilepath)
         shaderFilepath.begin(), shaderFilepath.end()
     );
     const std::string errorMessage =
-        std::string("Failed to read pixel shader: ") + shaderFilepath;
+        std::string("Failed to read shader: ") + shaderFilepath;
 
     loadShaderHR = D3DReadFileToBlob(
         shaderFilepathWString.c_str(), shaderBlob.GetAddressOf()
@@ -210,6 +209,39 @@ ComPtr<ID3D11VertexShader> D3D::createVertexShader(ComPtr<ID3DBlob> shaderBlob)
     }
     return vertexShader;
 }
+
+ComPtr<ID3D11DomainShader> D3D::createDomainShader(ComPtr<ID3DBlob> shaderBlob)
+{
+    ComPtr<ID3D11DomainShader> domainShader;
+    HRESULT createDomainShaderHR;
+
+    createDomainShaderHR = this->device->CreateDomainShader(
+        shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr,
+        domainShader.GetAddressOf()
+    );
+    if (!TryDXCall(createDomainShaderHR, "Failed to create domain shader.\n"))
+    {
+        return nullptr;
+    }
+    return domainShader;
+}
+
+ComPtr<ID3D11HullShader> D3D::createHullShader(ComPtr<ID3DBlob> shaderBlob)
+{
+    ComPtr<ID3D11HullShader> hullShader;
+    HRESULT createHullShaderHR;
+
+    createHullShaderHR = this->device->CreateHullShader(
+        shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr,
+        hullShader.GetAddressOf()
+    );
+    if (!TryDXCall(createHullShaderHR, "Failed to create hull shader.\n"))
+    {
+        return nullptr;
+    }
+    return hullShader;
+}
+
 
 ComPtr<ID3D11PixelShader> D3D::createPixelShader(ComPtr<ID3DBlob> shaderBlob)
 {

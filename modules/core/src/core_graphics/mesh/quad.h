@@ -2,10 +2,21 @@
 
 #include "base.h"
 
-class QuadMesh : public BaseMesh
+class BaseQuadMesh : public virtual BaseMesh
+{
+    public:
+    virtual ~BaseQuadMesh() = default;
+    virtual void init() override;
+};
+
+class QuadMesh : public BaseQuadMesh, public BaseNonTessellatedMesh
 {
     public:
     QuadMesh(D3D *graphicsManager);
+};
 
-    void init();
+class TessellatedQuadMesh : public BaseQuadMesh, public BaseTessellatedMesh
+{
+    public:
+    TessellatedQuadMesh(D3D *graphicsManager);
 };

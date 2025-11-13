@@ -1,12 +1,6 @@
 #include "quad.h"
 
-QuadMesh::QuadMesh(D3D *graphicsManager)
-{
-    this->init();
-    this->createBuffers(graphicsManager);
-}
-
-void QuadMesh::init()
+void BaseQuadMesh::init()
 {
     for (int i = 0; i < 4; i++)
     {
@@ -27,11 +21,23 @@ void QuadMesh::init()
     this->vertices[3].positionCoordinate = XMFLOAT3(1.0f, -1.0f, 0.0f);
     this->vertices[3].textureCoordinate = XMFLOAT2(1.0f, 1.0f);
     this->vertices[3].normalVector = XMFLOAT3(0.0f, 0.0f, -1.0f);
-    
+
     this->vertexIndices.push_back(0);
     this->vertexIndices.push_back(1);
     this->vertexIndices.push_back(2);
     this->vertexIndices.push_back(0);
     this->vertexIndices.push_back(3);
     this->vertexIndices.push_back(2);
+}
+
+QuadMesh::QuadMesh(D3D *graphicsManager)
+{
+    this->init();
+    this->createBuffers(graphicsManager);
+}
+
+TessellatedQuadMesh::TessellatedQuadMesh(D3D *graphicsManager)
+{
+    this->init();
+    this->createBuffers(graphicsManager);
 }

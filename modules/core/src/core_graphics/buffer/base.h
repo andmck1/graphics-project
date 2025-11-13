@@ -15,13 +15,24 @@ struct BufferSlots
     {
     };
 
+    struct HullShaderCounters : BaseBufferSlotCounters
+    {
+    };
+
+    struct DomainShaderCounters : BaseBufferSlotCounters
+    {
+    };
+
     struct PixelShaderCounters : BaseBufferSlotCounters
     {
     };
 
     VertexShaderCounters vertexShaderCounters = VertexShaderCounters();
+    HullShaderCounters hullShaderCounters = HullShaderCounters();
+    DomainShaderCounters domainShaderCounters = DomainShaderCounters();
     PixelShaderCounters pixelShaderCounters = PixelShaderCounters();
 };
+
 
 class BaseBuffer
 {

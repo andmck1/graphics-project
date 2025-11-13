@@ -59,3 +59,35 @@ bool BaseMesh::createBuffers(D3D *graphicsManager)
 
     return true;
 }
+
+void BaseNonTessellatedMesh::sendMeshData(D3D *graphicsManager)
+{
+    UINT stride = sizeof(Vertex);
+    UINT offset = 0;
+
+    graphicsManager->deviceContext->IASetVertexBuffers(
+        0, 1, this->vertexBuffer.GetAddressOf(), &stride, &offset
+    );
+    graphicsManager->deviceContext->IASetIndexBuffer(
+        this->vertexIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0
+    );
+    graphicsManager->deviceContext->IASetPrimitiveTopology(
+        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST
+    );
+}
+
+void BaseTessellatedMesh::sendMeshData(D3D *graphicsManager)
+{
+    UINT stride = sizeof(Vertex);
+    UINT offset = 0;
+
+    graphicsManager->deviceContext->IASetVertexBuffers(
+        0, 1, this->vertexBuffer.GetAddressOf(), &stride, &offset
+    );
+    graphicsManager->deviceContext->IASetIndexBuffer(
+        this->vertexIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0
+    );
+    graphicsManager->deviceContext->IASetPrimitiveTopology(
+        D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST
+    );
+}

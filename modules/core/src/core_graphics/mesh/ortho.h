@@ -2,7 +2,7 @@
 
 #include "base.h"
 
-class OrthoMesh : public BaseMesh
+class OrthoMesh : public BaseNonTessellatedMesh
 {
     public:
     OrthoMesh(
@@ -15,5 +15,5 @@ class OrthoMesh : public BaseMesh
     int xPosition;
     int yPosition;
 
-    void init();
+    void init() override;
 };

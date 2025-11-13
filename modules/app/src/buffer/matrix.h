@@ -31,3 +31,21 @@ class MatrixBuffer : public BaseConstantBuffer
     {
     };
 };
+
+class MatrixDomainBuffer : public BaseConstantBuffer
+{
+    public:
+    bool init(D3D *graphicsManager) override;
+    bool setShader(BufferSlots *slotCounters, int numberOfBuffers) override;
+    void setData(
+        XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix
+    );
+
+    XMMATRIX worldMatrix;
+    XMMATRIX viewMatrix;
+    XMMATRIX projectionMatrix;
+
+    struct ShaderBuffer : SharedBufferTypes::MatrixDomainBufferType
+    {
+    };
+};

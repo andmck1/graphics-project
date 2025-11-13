@@ -30,15 +30,7 @@ bool RenderStage::render(D3D *graphicsManager)
 
     graphicsManager->setDepthStencilState(false);
 
-    graphicsManager->deviceContext->IASetVertexBuffers(
-        0, 1, this->mesh.value().vertexBuffer.GetAddressOf(), &stride, &offset
-    );
-    graphicsManager->deviceContext->IASetIndexBuffer(
-        this->mesh.value().vertexIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0
-    );
-    graphicsManager->deviceContext->IASetPrimitiveTopology(
-        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST
-    );
+    this->mesh->sendMeshData(graphicsManager);
 
     graphicsManager->deviceContext->IASetInputLayout(
         this->shaderManagerState->standardVertexShader.inputLayout.value().Get()

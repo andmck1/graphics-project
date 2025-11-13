@@ -7,13 +7,14 @@
 #include <core_graphics/texture/base.h>
 #include <core_graphics/sampler/base.h>
 #include <optional>
+#include <memory>
 
 class SceneActor : public BaseActor
 {
     public:
     SceneActor();
 
-    std::optional<BaseMesh> mesh;
+    std::optional<std::unique_ptr<BaseMesh>> mesh;
 
     ShaderStack *currentShaderStack = nullptr;
     ShaderStack *defaultShaderStack = nullptr;

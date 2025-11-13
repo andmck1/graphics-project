@@ -19,3 +19,18 @@ class CameraBuffer : public BaseConstantBuffer
 
     Camera *camera;
 };
+
+
+class CameraHullBuffer : public BaseConstantBuffer
+{
+    public:
+    bool init(D3D *graphicsManager) override;
+    bool setShader(BufferSlots *slotCounters, int numberOfBuffers) override;
+    void setData(Camera *camera);
+
+    struct ShaderBuffer : SharedBufferTypes::CameraBufferType
+    {
+    };
+
+    Camera *camera;
+};

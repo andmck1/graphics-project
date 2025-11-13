@@ -1,14 +1,6 @@
 #include "triangle.h"
 
-TriangleMesh::TriangleMesh(D3D *graphicsManager)
-{
-    this->init();
-    this->createBuffers(graphicsManager);
-    // this->vertices.clear();
-    // this->vertexIndices.clear();
-}
-
-void TriangleMesh::init()
+void BaseTriangleMesh::init()
 {
     for (int i=0; i<3; i++)
     {
@@ -27,3 +19,18 @@ void TriangleMesh::init()
     this->vertices[2].textureCoordinate = {1.f, 1.f};
     this->vertices[2].normalVector = {0.f, 0.f, -1.f}; 
 }
+
+TriangleMesh::TriangleMesh(D3D *graphicsManager)
+{
+    this->init();
+    this->createBuffers(graphicsManager);
+    // this->vertices.clear();
+    // this->vertexIndices.clear();
+}
+
+TessellatedTriangleMesh::TessellatedTriangleMesh(D3D *graphicsManager)
+{
+    this->init();
+    this->createBuffers(graphicsManager);
+}
+

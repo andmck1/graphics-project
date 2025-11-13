@@ -38,7 +38,10 @@ class D3D
 
     bool init();
     void setWireframeEnabled(bool isWireframeEnabled);
+    // TODO - Template these functions
     ComPtr<ID3D11VertexShader> createVertexShader(ComPtr<ID3DBlob> shaderBlob);
+    ComPtr<ID3D11DomainShader> createDomainShader(ComPtr<ID3DBlob> shaderBlob);
+    ComPtr<ID3D11HullShader> createHullShader(ComPtr<ID3DBlob> shaderBlob);
     ComPtr<ID3D11PixelShader> createPixelShader(ComPtr<ID3DBlob> shaderBlob);
     ComPtr<ID3D11InputLayout> createInputLayout(
         std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDescription,

@@ -2,10 +2,22 @@
 
 #include "base.h"
 
-class TriangleMesh : public BaseMesh
+class BaseTriangleMesh : public virtual BaseMesh
+{
+    public:
+    virtual ~BaseTriangleMesh() = default;
+    virtual void init() override;
+};
+
+class TriangleMesh : public BaseTriangleMesh, public BaseNonTessellatedMesh
 {
     public:
     TriangleMesh(D3D *graphicsManager);
+};
 
-    void init();
+class TessellatedTriangleMesh : public BaseTriangleMesh,
+                                public BaseTessellatedMesh
+{
+    public:
+    TessellatedTriangleMesh(D3D *graphicsManager);
 };

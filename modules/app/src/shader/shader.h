@@ -11,6 +11,7 @@
 #include "../buffer/waveData.h"
 #include "../buffer/crt.h"
 
+// Vertex
 class StandardVertexShader : public VertexShader
 {
     public:
@@ -39,6 +40,33 @@ class DepthVertexShader : public VertexShader
     MatrixBuffer matrixBuffer = MatrixBuffer();
 };
 
+class TessellationPassThroughVertexShader : public VertexShader
+{
+};
+
+// Domain
+class TessellatedTriangleDomainShader : public DomainShader
+{
+};
+
+class TessellatedQuadDomainShader : public DomainShader
+{
+};
+
+// Hull
+class TessellatedTriangleHullShader : public HullShader
+{
+    public:
+    MatrixBuffer matrixBuffer = MatrixBuffer();
+};
+
+class TessellatedQuadHullShader : public HullShader
+{
+    public:
+    MatrixBuffer matrixBuffer = MatrixBuffer();
+};
+
+// Pixel
 class LightingPixelShader : public PixelShader
 {
     public:

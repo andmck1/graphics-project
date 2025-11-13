@@ -27,7 +27,24 @@ class BaseMesh
 
     int getVertexCount();
     int getVertexIndexCount();
-    bool createBuffers(D3D *graphicsManager);
+    virtual bool createBuffers(D3D *graphicsManager);
 
-    virtual void init() {};
+    virtual void init() = 0;
+    virtual void sendMeshData(D3D *graphicsManager) = 0;
+};
+
+class BaseNonTessellatedMesh : public virtual BaseMesh
+{
+    public:
+    virtual ~BaseNonTessellatedMesh() = default;
+
+    void sendMeshData(D3D *graphicsManager) override;
+};
+
+class BaseTessellatedMesh : public virtual BaseMesh
+{
+    public:
+    virtual ~BaseTessellatedMesh() = default;
+
+    void sendMeshData(D3D *graphicsManager) override;
 };
