@@ -25,8 +25,8 @@ class D3D
     XMMATRIX projectionMatrix;
     XMMATRIX orthographicProjectionMatrix;
     D3D11_VIEWPORT viewport = {};
-    ComPtr<ID3D11RasterizerState> rasterizerState;
-    D3D11_RASTERIZER_DESC rasterizerDesc = {};
+    ComPtr<ID3D11RasterizerState> defaultRasteriserState;
+    ComPtr<ID3D11RasterizerState> wireframeEnabledRasteriserState;
     ComPtr<ID3DBlob> errorBlob;
     ComPtr<ID3D11Buffer> matrixBuffer;
     ComPtr<ID3D11Texture2D> depthStencilBuffer;
@@ -37,6 +37,7 @@ class D3D
     D3D(D3DAppState *state);
 
     bool init();
+    void setWireframeEnabled(bool isWireframeEnabled);
     ComPtr<ID3D11VertexShader> createVertexShader(ComPtr<ID3DBlob> shaderBlob);
     ComPtr<ID3D11PixelShader> createPixelShader(ComPtr<ID3DBlob> shaderBlob);
     ComPtr<ID3D11InputLayout> createInputLayout(
@@ -69,6 +70,8 @@ class D3D
     bool createDepthStencilEnabledState();
     bool createDepthStencilDisabledState();
     bool setStencilBuffer();
-    bool setRasterizerState();
+    bool createRasteriserStates();
+    bool setRasteriserState(ComPtr<ID3D11RasterizerState> rasteriserState);
+    bool setDefaultRasteriserState();
     bool createMatrixBuffer();
 };

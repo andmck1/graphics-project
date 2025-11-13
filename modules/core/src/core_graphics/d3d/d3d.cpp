@@ -1,3 +1,4 @@
+#include <d3d11.h>
 #include <d3dcompiler.h>
 #include <core_utils/graphics.h>
 #include "d3d.h"
@@ -37,6 +38,14 @@ bool D3D::createDeviceAndSwapChain()
     return TryDXCall(
         createDeviceAndSwapChainHR, "Failed to create device and swap chain.\n"
     );
+}
+
+void D3D::setWireframeEnabled(bool isWireframeEnabled)
+{
+    if (isWireframeEnabled)
+        this->setRasteriserState(this->wireframeEnabledRasteriserState);
+    else
+        this->setRasteriserState(this->defaultRasteriserState);
 }
 
 bool D3D::initProjectionMatrix()
@@ -99,22 +108,54 @@ bool D3D::setViewport(D3D11_VIEWPORT viewport)
     return true;
 }
 
-bool D3D::setRasterizerState()
+bool D3D::createRasteriserStates()
 {
     HRESULT createRasteriserHR;
+    D3D11_RASTERIZER_DESC rasteriserDescription,
+        wireframeEnabledRasteriserDescription;
 
-    this->rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-    this->rasterizerDesc.CullMode = D3D11_CULL_NONE;
-    this->rasterizerDesc.FrontCounterClockwise = FALSE;
+    // Some help from the lab code for these settings
+    rasteriserDescription = {};
+    rasteriserDescription.FillMode = D3D11_FILL_SOLID;
+    rasteriserDescription.CullMode = D3D11_CULL_NONE;
+    rasteriserDescription.FrontCounterClockwise = FALSE;
 
     createRasteriserHR = this->device->CreateRasterizerState(
-        &rasterizerDesc, this->rasterizerState.GetAddressOf()
+        &rasteriserDescription, this->defaultRasteriserState.GetAddressOf()
     );
     if (!TryDXCall(createRasteriserHR, "Failed to create rasteriser.\n"))
     {
         return false;
     }
-    this->deviceContext->RSSetState(this->rasterizerState.Get());
+
+    wireframeEnabledRasteriserDescription = {};
+    wireframeEnabledRasteriserDescription.FillMode = D3D11_FILL_WIREFRAME;
+    wireframeEnabledRasteriserDescription.CullMode = D3D11_CULL_NONE;
+    wireframeEnabledRasteriserDescription.FrontCounterClockwise = FALSE;
+
+    createRasteriserHR = this->device->CreateRasterizerState(
+        &wireframeEnabledRasteriserDescription,
+        this->wireframeEnabledRasteriserState.GetAddressOf()
+    );
+    if (!TryDXCall(
+            createRasteriserHR,
+            "Failed to create wireframe enabled rasteriser.\n"
+        ))
+    {
+        return false;
+    }
+    return true;
+}
+
+bool D3D::setRasteriserState(ComPtr<ID3D11RasterizerState> rasteriserState)
+{
+    this->deviceContext->RSSetState(rasteriserState.Get());
+    return true;
+}
+
+bool D3D::setDefaultRasteriserState()
+{
+    this->setRasteriserState(this->defaultRasteriserState.Get());
     return true;
 }
 
@@ -378,7 +419,9 @@ bool D3D::init()
     this->setDepthStencilState(true);
     if (!this->setStencilBuffer())
         return false;
-    if (!this->setRasterizerState())
+    if (!this->createRasteriserStates())
+        return false;
+    if (!this->setDefaultRasteriserState())
         return false;
     if (!this->setDefaultViewport())
         return false;

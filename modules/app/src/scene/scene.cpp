@@ -14,6 +14,10 @@ Scene::Scene(SceneState *state)
 
 bool Scene::updateAndDraw()
 {
+    this->state->graphicsManager->setWireframeEnabled(
+        this->state->isWireframeEnabled
+    );
+
     // Depth pass
     for (int spotLightIndex = 0;
          spotLightIndex < this->state->spotLights.size(); spotLightIndex++)

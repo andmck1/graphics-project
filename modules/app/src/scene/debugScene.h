@@ -13,6 +13,7 @@ struct DebugSceneState
 {
     D3D *graphicsManager;
     float *fps;
+    bool *isWireframeEnabled;
 
     AmbientLight *ambientLight;
     std::vector<PointLight *> *pointLights;

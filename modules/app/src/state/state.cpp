@@ -649,7 +649,6 @@ void State::initSceneState(
 {
     spdlog::debug("Initialising scene state");
     this->sceneState.graphicsManager = graphicsManager;
-    // TODO - recreate shader manager?
     this->sceneState.shaderManagerState = shaderManagerState;
     this->sceneState.clearColour = {0.392f, 0.584f, 0.929f, 1.0f};
 
@@ -708,8 +707,8 @@ void State::initAppState()
 }
 
 void State::initDebugSceneState(
-    D3D *graphicsManager, float *fps, AmbientLight *ambientLight,
-    std::vector<PointLight *> *pointLights,
+    D3D *graphicsManager, float *fps, bool *isWireframeEnabled,
+    AmbientLight *ambientLight, std::vector<PointLight *> *pointLights,
     std::vector<SpotLight *> *spotLights,
     std::vector<DirectionalLight *> *directionalLights, Water *water,
     SharedBufferTypes::CRTBufferType *crtSettings, bool *isCRTEnabled
@@ -718,6 +717,7 @@ void State::initDebugSceneState(
     spdlog::debug("Initialising debug scene state");
     this->debugSceneState.graphicsManager = graphicsManager;
     this->debugSceneState.fps = fps;
+    this->debugSceneState.isWireframeEnabled = isWireframeEnabled;
 
     this->debugSceneState.ambientLight = ambientLight;
     this->debugSceneState.pointLights = pointLights;

@@ -39,8 +39,8 @@ class State
     void initAppInputState(Window *window, Scene *scene, Timer *timer);
     void initAppState();
     void initDebugSceneState(
-        D3D *graphicsManager, float *fps, AmbientLight *ambientLight,
-        std::vector<PointLight *> *pointLights,
+        D3D *graphicsManager, float *fps, bool *isWireframeEnabled,
+        AmbientLight *ambientLight, std::vector<PointLight *> *pointLights,
         std::vector<SpotLight *> *spotLights,
         std::vector<DirectionalLight *> *directionalLights, Water *water,
         SharedBufferTypes::CRTBufferType *crtSettings, bool *isCRTEnabled

@@ -47,6 +47,7 @@ bool DebugScene::render()
 
     ImGui::Begin("Draggable Window");
     ImGui::Text("FPS: %.2f", *(this->state->fps));
+    ImGui::Checkbox("Wireframe Enabled?", this->state->isWireframeEnabled);
     if (ImGui::CollapsingHeader("Ambient Light Settings"))
     {
         ImGui::ColorPicker3(
@@ -146,8 +147,8 @@ bool DebugScene::render()
                 spotLight->worldPosition.data(), -100.f, 100.f
             );
             ImGui::SliderFloat(
-                ("Cone Angle#Spot#" + iString).c_str(),
-                &spotLight->coneAngle, 0.1f, 180.f
+                ("Cone Angle#Spot#" + iString).c_str(), &spotLight->coneAngle,
+                0.1f, 180.f
             );
             ImGui::SliderFloat3(
                 ("Direction Vector#Directional#" + iString).c_str(),

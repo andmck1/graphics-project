@@ -36,6 +36,7 @@
 struct SceneState
 {
     D3D *graphicsManager;
+    bool isWireframeEnabled = false;
     ShaderManagerState *shaderManagerState;
     std::string vertexShaderDirectory;
     std::string pixelShaderDirectory;
