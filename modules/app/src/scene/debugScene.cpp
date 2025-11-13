@@ -309,6 +309,22 @@ bool DebugScene::render()
         );
     }
 
+    if (ImGui::CollapsingHeader("Tessellation settings"))
+    {
+        ImGui::SliderFloat(
+            "Min Distance for Maximum Tessellation Factor",
+            &this->state->tessellationSettings->minTessellationDistanceThreshold
+                 .x,
+            10.f, 100.f
+        );
+        ImGui::SliderFloat(
+            "Max Distance for Minimum Tessellation Factor",
+            &this->state->tessellationSettings->maxTessellationDistanceThreshold
+                 .x,
+            50.f, 1000.f
+        );
+    }
+
     ImGui::End();
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

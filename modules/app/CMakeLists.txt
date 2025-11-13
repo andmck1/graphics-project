@@ -16,6 +16,7 @@ add_executable(
   src/buffer/spotLights.cpp
   src/buffer/directionalLights.cpp
   src/buffer/waveData.cpp
+  src/buffer/tessellationhulldata.cpp
   src/buffer/crt.cpp
   src/buffer/camera.cpp)
 

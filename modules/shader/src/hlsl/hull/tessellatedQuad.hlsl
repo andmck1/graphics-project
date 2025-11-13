@@ -12,6 +12,11 @@ cbuffer CameraBuffer : register(b1)
 	CameraBufferType cameraData;
 };
 
+cbuffer SettingsBuffer : register(b2)
+{
+    TessellationHullDataBufferType settingsData;
+}
+
 QuadTessellationConstantOutputType PatchConstantFunction(
     InputPatch<QuadTessellationInputType, 4> inputPatch, 
     uint patchId : SV_PrimitiveID
@@ -22,8 +27,8 @@ QuadTessellationConstantOutputType PatchConstantFunction(
     float3 centre;
     float4 centreWorldPosition;
 
-    const float maxTessellationDistanceThreshold = 20.f;
-    const float minTessellationDistanceThreshold = 100.f;
+    const float maxTessellationDistanceThreshold = settingsData.minTessellationDistanceThreshold.x;
+    const float minTessellationDistanceThreshold = settingsData.maxTessellationDistanceThreshold.x;
 
     // Tessellate based on distance from camera
     // Frank Luna help

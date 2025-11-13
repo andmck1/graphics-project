@@ -10,5 +10,7 @@ class WrapSampler : public BaseSampler
     bool
     setVertexShader(D3D *graphicsManager, BufferSlots *slotCounters) override;
     bool
+    setDomainShader(D3D *graphicsManager, BufferSlots *slotCounters) override;
+    bool
     setPixelShader(D3D *graphicsManager, BufferSlots *slotCounters) override;
 };

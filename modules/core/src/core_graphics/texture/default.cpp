@@ -68,6 +68,17 @@ bool DefaultTexture::setVertexShader(BufferSlots *slotCounters, int numViews)
     return true;
 }
 
+bool DefaultTexture::setDomainShader(BufferSlots *slotCounters, int numViews)
+{
+    int startSlot = slotCounters->domainShaderCounters.textureSlot;
+    this->graphicsManager->deviceContext->VSSetShaderResources(
+        startSlot, numViews, this->textureResource.GetAddressOf()
+    );
+    slotCounters->domainShaderCounters.textureSlot++;
+
+    return true;
+}
+
 bool DefaultTexture::setPixelShader(BufferSlots *slotCounters, int numViews)
 {
     int startSlot = slotCounters->pixelShaderCounters.textureSlot;

@@ -182,19 +182,20 @@ void State::initShaderManagerStateShaderBuffers()
     this->shaderManagerState.tessellationPassThroughVertexShader
         .bufferStack = {};
 
+    // Hull
+    this->shaderManagerState.tessellatedTriangleHullShader.bufferStack = {};
+    this->shaderManagerState.tessellatedQuadHullShader.bufferStack = {
+        &this->shaderManagerState.matrixHullBuffer,
+        &this->shaderManagerState.cameraHullBuffer,
+        &this->shaderManagerState.tessellationHullDataBuffer
+    };
+
     // Domain
     this->shaderManagerState.tessellatedTriangleDomainShader.bufferStack = {
         &this->shaderManagerState.matrixDomainBuffer
     };
     this->shaderManagerState.tessellatedQuadDomainShader.bufferStack = {
         &this->shaderManagerState.matrixDomainBuffer
-    };
-
-    // Hull
-    this->shaderManagerState.tessellatedTriangleHullShader.bufferStack = {};
-    this->shaderManagerState.tessellatedQuadHullShader.bufferStack = {
-        &this->shaderManagerState.matrixDomainBuffer,
-        &this->shaderManagerState.cameraHullBuffer
     };
 
     // Pixel
@@ -233,6 +234,9 @@ void State::setShaderManagerStateShaderBufferData()
         &this->appState.timer->totalTime, &this->sceneState.water->magnitude,
         &this->sceneState.water->waveNumber,
         &this->sceneState.water->angularVelocity
+    );
+    this->shaderManagerState.tessellationHullDataBuffer.setData(
+        &this->sceneState.tessellationHullDataSettings
     );
     this->shaderManagerState.crtBuffer.setData(
         &this->sceneState.crtSettings, &this->appState.timer->totalTime
@@ -713,6 +717,15 @@ void State::initSceneStateActorShadowMaps()
     }
 }
 
+void State::initSceneStateTessellationSettings()
+{
+    spdlog::debug("Initialising scene state tessellation settings");
+    this->sceneState.tessellationHullDataSettings
+        .maxTessellationDistanceThreshold = XMFLOAT4(20.f, 0.f, 0.f, 0.f);
+    this->sceneState.tessellationHullDataSettings
+        .maxTessellationDistanceThreshold = XMFLOAT4(100.f, 0.f, 0.f, 0.f);
+}
+
 void State::initSceneState(
     D3D *graphicsManager, ShaderManagerState *shaderManagerState
 )
@@ -732,10 +745,14 @@ void State::initSceneState(
     this->initSceneStateWater();
     this->initSceneStatePostProcessors();
     this->initSceneStateActorShadowMaps();
+    this->initSceneStateTessellationSettings();
 
     this->setShaderManagerStateShaderBufferData();
 
     this->shaderManagerState.matrixBuffer.init(
+        this->shaderManagerState.graphicsManager
+    );
+    this->shaderManagerState.matrixHullBuffer.init(
         this->shaderManagerState.graphicsManager
     );
     this->shaderManagerState.matrixDomainBuffer.init(
@@ -760,6 +777,9 @@ void State::initSceneState(
         this->shaderManagerState.graphicsManager
     );
     this->shaderManagerState.waveDataBuffer.init(
+        this->shaderManagerState.graphicsManager
+    );
+    this->shaderManagerState.tessellationHullDataBuffer.init(
         this->shaderManagerState.graphicsManager
     );
     this->shaderManagerState.crtBuffer.init(
@@ -787,7 +807,8 @@ void State::initDebugSceneState(
     AmbientLight *ambientLight, std::vector<PointLight *> *pointLights,
     std::vector<SpotLight *> *spotLights,
     std::vector<DirectionalLight *> *directionalLights, Water *water,
-    SharedBufferTypes::CRTBufferType *crtSettings, bool *isCRTEnabled
+    SharedBufferTypes::CRTBufferType *crtSettings, bool *isCRTEnabled,
+    SharedBufferTypes::TessellationHullDataBufferType *tessellationSettings
 )
 {
     spdlog::debug("Initialising debug scene state");
@@ -801,6 +822,6 @@ void State::initDebugSceneState(
     this->debugSceneState.directionalLights = directionalLights;
     this->debugSceneState.water = water;
     this->debugSceneState.crtSettings = crtSettings;
-
     this->debugSceneState.isCRTEnabled = isCRTEnabled;
+    this->debugSceneState.tessellationSettings = tessellationSettings;
 }

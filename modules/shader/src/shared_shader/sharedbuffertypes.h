@@ -235,5 +235,16 @@ struct CRTBufferType
     };
 
 #ifdef __cplusplus
+    struct TessellationHullDataBufferType : BaseBufferType
+#else
+struct TessellationHullDataBufferType
+#endif
+    {
+        float4 minTessellationDistanceThreshold;
+        float4 maxTessellationDistanceThreshold;
+    };
+
+
+#ifdef __cplusplus
 }
 #endif

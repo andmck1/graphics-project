@@ -15,6 +15,7 @@ class DefaultTexture : public BaseTexture
 
     bool load() override;
     bool setVertexShader(BufferSlots *slotCounters, int numberView) override;
+    bool setDomainShader(BufferSlots *slotCounters, int numberView) override;
     bool setPixelShader(BufferSlots *slotCounters, int numberView) override;
 
     private:

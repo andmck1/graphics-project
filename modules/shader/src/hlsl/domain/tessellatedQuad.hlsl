@@ -1,6 +1,6 @@
-// Lab code
-// Tessellation domain shader
-// After tessellation the domain shader processes the all the vertices
+Texture2D heightMap : register(t0);
+SamplerState heightSampler : register(s0);
+
 #include "sharedbuffertypes.h"
 cbuffer MatrixBuffer : register(b0)
 {
@@ -17,7 +17,7 @@ QuadTessellationDomainOutputType main(
     QuadTessellationDomainOutputType output;
     float3 v1, v2, vertexPosition;
 
-   // Frank Luna uses a bilinear interpolation here, and was told to use it in lecture for quad
+    // Frank Luna uses a bilinear interpolation here, and was told to use it in lecture for quad
     v1 = lerp(patch[0].position, patch[1].position, 1.f - uv.y);
     v2 = lerp(patch[3].position, patch[2].position, 1.f - uv.y);
     vertexPosition = lerp(v1, v2, uv.x);

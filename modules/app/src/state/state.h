@@ -43,7 +43,8 @@ class State
         AmbientLight *ambientLight, std::vector<PointLight *> *pointLights,
         std::vector<SpotLight *> *spotLights,
         std::vector<DirectionalLight *> *directionalLights, Water *water,
-        SharedBufferTypes::CRTBufferType *crtSettings, bool *isCRTEnabled
+        SharedBufferTypes::CRTBufferType *crtSettings, bool *isCRTEnabled,
+        SharedBufferTypes::TessellationHullDataBufferType *tessellationSettings
     );
 
     private:
@@ -98,6 +99,7 @@ class State
     void initSceneStateCamera();
     void initSceneStateWater();
     void initSceneStateActorShadowMaps();
+    void initSceneStateTessellationSettings();
     void createRenderTexture(
         BasePostProcessor *postProcessor, int textureWidth, int textureHeight,
         float screenNear, float screenFar

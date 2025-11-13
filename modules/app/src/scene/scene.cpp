@@ -103,18 +103,15 @@ bool Scene::updateAndDraw()
             this->state->shaderManagerState->matrixDomainBuffer.setData(
                 actor->getWorldMatrix(), this->state->camera->viewMatrix,
                 this->state->graphicsManager->projectionMatrix
-
+            );
+            this->state->shaderManagerState->matrixHullBuffer.setData(
+                actor->getWorldMatrix(), this->state->camera->viewMatrix,
+                this->state->graphicsManager->projectionMatrix
             );
             if (!actor->drawMesh(this->state->graphicsManager))
                 return false;
         }
     }
-    this->state->graphicsManager->deviceContext->HSSetShader(
-        nullptr, nullptr, 0
-    );
-    this->state->graphicsManager->deviceContext->DSSetShader(
-        nullptr, nullptr, 0
-    );
 
     this->state->graphicsManager->setRenderTargetViewToBackBuffer();
 

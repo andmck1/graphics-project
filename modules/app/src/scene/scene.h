@@ -61,6 +61,9 @@ struct SceneState
         SharedBufferTypes::CRTBufferType();
     CRTPostProcessor crtPostProcessor;
 
+    SharedBufferTypes::TessellationHullDataBufferType
+        tessellationHullDataSettings =
+            SharedBufferTypes::TessellationHullDataBufferType();
 };
 
 class Scene

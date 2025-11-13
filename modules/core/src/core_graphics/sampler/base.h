@@ -10,5 +10,7 @@ class BaseSampler
     virtual bool
     setVertexShader(D3D *graphicsManager, BufferSlots *slotCounters) = 0;
     virtual bool
+    setDomainShader(D3D *graphicsManager, BufferSlots *slotCounters) = 0;
+    virtual bool
     setPixelShader(D3D *graphicsManager, BufferSlots *slotCounters) = 0;
 };

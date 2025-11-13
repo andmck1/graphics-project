@@ -21,6 +21,7 @@ struct DebugSceneState
     std::vector<SpotLight *> *spotLights;
     Water *water;
     SharedBufferTypes::CRTBufferType *crtSettings;
+    SharedBufferTypes::TessellationHullDataBufferType *tessellationSettings;
     bool *isCRTEnabled;
 };
 

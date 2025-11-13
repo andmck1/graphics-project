@@ -38,7 +38,13 @@ bool SceneActor::drawMesh(D3D *graphicsManager, bool isTextureSet)
                     graphicsManager, &slotCounters
                 ))
                 return false;
+            if (!this->heightMapSampler->setDomainShader(
+                    graphicsManager, &slotCounters
+                ))
+                return false;
             if (!this->heightMap->setVertexShader(&slotCounters, 1))
+                return false;
+            if (!this->heightMap->setDomainShader(&slotCounters, 1))
                 return false;
         }
 

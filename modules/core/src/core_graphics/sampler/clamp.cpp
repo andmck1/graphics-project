@@ -34,6 +34,18 @@ bool ClampSampler::setVertexShader(
     return true;
 }
 
+bool ClampSampler::setDomainShader(
+    D3D *graphicsManager, BufferSlots *slotCounters
+)
+{
+    int startSlot = slotCounters->domainShaderCounters.samplerSlot;
+    graphicsManager->deviceContext->DSSetSamplers(
+        startSlot, 1, this->samplerState.GetAddressOf()
+    );
+    slotCounters->domainShaderCounters.samplerSlot++;
+    return true;
+}
+
 bool ClampSampler::setPixelShader(
     D3D *graphicsManager, BufferSlots *slotCounters
 )
