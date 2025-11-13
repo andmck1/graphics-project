@@ -164,20 +164,20 @@ void State::initShaderManagerStateShaderBuffers()
 {
     // Vertex
     this->shaderManagerState.standardVertexShader.bufferStack = {
-        &this->shaderManagerState.matrixBuffer,
+        &this->shaderManagerState.matrixVertexBuffer,
         &this->shaderManagerState.cameraVertexBuffer
     };
     this->shaderManagerState.heightMapVertexShader.bufferStack = {
-        &this->shaderManagerState.matrixBuffer,
+        &this->shaderManagerState.matrixVertexBuffer,
         &this->shaderManagerState.cameraVertexBuffer
     };
     this->shaderManagerState.waveVertexShader.bufferStack = {
-        &this->shaderManagerState.matrixBuffer,
+        &this->shaderManagerState.matrixVertexBuffer,
         &this->shaderManagerState.cameraVertexBuffer,
         &this->shaderManagerState.waveDataVertexBuffer
     };
     this->shaderManagerState.depthVertexShader.bufferStack = {
-        &this->shaderManagerState.matrixBuffer,
+        &this->shaderManagerState.matrixVertexBuffer,
     };
     this->shaderManagerState.tessellationPassThroughVertexShader
         .bufferStack = {};
@@ -733,9 +733,9 @@ void State::initSceneStateTessellationSettings()
 {
     spdlog::debug("Initialising scene state tessellation settings");
     this->sceneState.tessellationHullDataSettings
-        .minTessellationDistanceThreshold = XMFLOAT4(20.f, 0.f, 0.f, 0.f);
+        .minTessellationDistanceThreshold = XMFLOAT4(31.f, 0.f, 0.f, 0.f);
     this->sceneState.tessellationHullDataSettings
-        .maxTessellationDistanceThreshold = XMFLOAT4(100.f, 0.f, 0.f, 0.f);
+        .maxTessellationDistanceThreshold = XMFLOAT4(345.f, 0.f, 0.f, 0.f);
 }
 
 void State::initSceneState(
@@ -761,7 +761,7 @@ void State::initSceneState(
 
     this->setShaderManagerStateShaderBufferData();
 
-    this->shaderManagerState.matrixBuffer.init(
+    this->shaderManagerState.matrixVertexBuffer.init(
         this->shaderManagerState.graphicsManager
     );
     this->shaderManagerState.matrixHullBuffer.init(

@@ -37,7 +37,7 @@ bool Scene::updateAndDraw()
             {
                 actor->currentShaderStack =
                     &this->state->shaderManagerState->depthShaderStack;
-                this->state->shaderManagerState->matrixBuffer.setData(
+                this->state->shaderManagerState->matrixVertexBuffer.setData(
                     actor->getWorldMatrix(), lightViewMatrix,
                     lightProjectionMatrix
                 );
@@ -84,29 +84,37 @@ bool Scene::updateAndDraw()
         }
         if (actor->isDrawEnabled)
         {
-            actor->currentShaderStack = actor->defaultShaderStack;
-            this->state->shaderManagerState->matrixBuffer.setData(
-                actor->getWorldMatrix(), this->state->camera->viewMatrix,
-                this->state->graphicsManager->projectionMatrix,
-                this->state->spotLights[0]->calculateViewMatrix(),
+            XMMATRIX spotLightViewMatrix0 =
+                this->state->spotLights[0]->calculateViewMatrix();
+            XMMATRIX spotLightProjectionMatrix0 =
                 this->state->spotLights[0]
                     ->calculateOrthographicProjectionMatrix(
                         100, 100, 0.1, 100.f
-                    ),
-                this->state->spotLights[1]->calculateViewMatrix(),
+                    );
+            XMMATRIX spotLightViewMatrix1 =
+                this->state->spotLights[1]->calculateViewMatrix();
+            XMMATRIX spotLightProjectionMatrix1 =
                 this->state->spotLights[1]
                     ->calculateOrthographicProjectionMatrix(
                         100, 100, 0.1, 100.f
-                    )
-
-            );
-            this->state->shaderManagerState->matrixDomainBuffer.setData(
+                    );
+            actor->currentShaderStack = actor->defaultShaderStack;
+            this->state->shaderManagerState->matrixVertexBuffer.setData(
                 actor->getWorldMatrix(), this->state->camera->viewMatrix,
-                this->state->graphicsManager->projectionMatrix
+                this->state->graphicsManager->projectionMatrix,
+                spotLightViewMatrix0, spotLightProjectionMatrix0,
+                spotLightViewMatrix1, spotLightProjectionMatrix1
+
             );
             this->state->shaderManagerState->matrixHullBuffer.setData(
                 actor->getWorldMatrix(), this->state->camera->viewMatrix,
                 this->state->graphicsManager->projectionMatrix
+            );
+            this->state->shaderManagerState->matrixDomainBuffer.setData(
+                actor->getWorldMatrix(), this->state->camera->viewMatrix,
+                this->state->graphicsManager->projectionMatrix,
+                spotLightViewMatrix0, spotLightProjectionMatrix0,
+                spotLightViewMatrix1, spotLightProjectionMatrix1
             );
             if (!actor->drawMesh(this->state->graphicsManager))
                 return false;

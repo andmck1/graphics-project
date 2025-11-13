@@ -6,7 +6,7 @@
 
 #include "shared_shader/sharedbuffertypes.h"
 
-class MatrixBuffer : public BaseConstantBuffer
+class MatrixVertexBuffer : public BaseConstantBuffer
 {
     public:
     bool init(D3D *graphicsManager) override;
@@ -32,7 +32,7 @@ class MatrixBuffer : public BaseConstantBuffer
     };
 };
 
-class MatrixDomainBuffer : public BaseConstantBuffer
+class MatrixHullBuffer : public BaseConstantBuffer
 {
     public:
     bool init(D3D *graphicsManager) override;
@@ -50,19 +50,26 @@ class MatrixDomainBuffer : public BaseConstantBuffer
     };
 };
 
-
-class MatrixHullBuffer : public BaseConstantBuffer
+class MatrixDomainBuffer : public BaseConstantBuffer
 {
     public:
     bool init(D3D *graphicsManager) override;
     bool setShader(BufferSlots *slotCounters, int numberOfBuffers) override;
     void setData(
-        XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix
+        XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix,
+        XMMATRIX spotLightViewMatrix1 = XMMatrixIdentity(),
+        XMMATRIX spotLightProjectionMatrix1 = XMMatrixIdentity(),
+        XMMATRIX spotLightViewMatrix2 = XMMatrixIdentity(),
+        XMMATRIX spotLightProjectionMatrix2 = XMMatrixIdentity()
     );
 
     XMMATRIX worldMatrix;
     XMMATRIX viewMatrix;
     XMMATRIX projectionMatrix;
+    XMMATRIX spotLightViewMatrix1;
+    XMMATRIX spotLightProjectionMatrix1;
+    XMMATRIX spotLightViewMatrix2;
+    XMMATRIX spotLightProjectionMatrix2;
 
     struct ShaderBuffer : SharedBufferTypes::MatrixDomainBufferType
     {

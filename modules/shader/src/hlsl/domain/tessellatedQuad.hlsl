@@ -9,7 +9,7 @@ cbuffer MatrixBuffer : register(b0)
 
 cbuffer CameraBuffer : register(b1)
 {
-	CameraBufferType cameraData;
+	CameraDomainBufferType cameraData;
 };
 
 cbuffer WaveBuffer : register(b2)
@@ -25,12 +25,14 @@ QuadTessellationDomainOutputType main(
 )
 {
     QuadTessellationDomainOutputType output;
-    float3 v1, v2, vertexPosition, n1, n2, normal;
+    float3 v1, v2, vertexPosition3f, n1, n2, normal;
+    float4 vertexPosition4f;
 
     // Frank Luna uses a bilinear interpolation here, and was told to use it in lecture for quad
     v1 = lerp(patch[0].position, patch[1].position, 1.f - uv.y);
     v2 = lerp(patch[3].position, patch[2].position, 1.f - uv.y);
-    vertexPosition = lerp(v1, v2, uv.x);
+    vertexPosition3f = lerp(v1, v2, uv.x);
+    vertexPosition4f = float4(vertexPosition3f, 1.f);
 
     n1 = lerp(patch[0].normal, patch[1].normal, 1.f - uv.y);
     n2 = lerp(patch[3].normal, patch[2].normal, 1.f - uv.y);
@@ -39,7 +41,7 @@ QuadTessellationDomainOutputType main(
     // Displacement mapping code would go here
 
 
-    output.position = mul(float4(vertexPosition, 1.0f), matrixData.worldMatrix);
+    output.position = mul(vertexPosition4f, matrixData.worldMatrix);
     output.position = mul(output.position, matrixData.viewMatrix);
     output.position = mul(output.position, matrixData.projectionMatrix);
 
@@ -47,18 +49,16 @@ QuadTessellationDomainOutputType main(
 
     output.normal = normal;
 
-    float4 worldPosition = mul(float4( vertexPosition, 1.f), matrixData.worldMatrix);
+    float4 worldPosition = mul(vertexPosition4f, matrixData.worldMatrix);
     output.worldPosition = worldPosition.xyz;
     output.viewVector = normalize(cameraData.worldPosition.xyz - worldPosition.xyz);
 
-    // output.spotLightViewPos1 = mul(input.position, matrixData.worldMatrix);
-    // output.spotLightViewPos1 = mul(output.spotLightViewPos1, matrixData.spotLightViewMatrix1);
-    // output.spotLightViewPos1 = mul(output.spotLightViewPos1, matrixData.spotLightProjectionMatrix1);
-    // output.spotLightViewPos2 = mul(input.position, matrixData.worldMatrix);
-    // output.spotLightViewPos2 = mul(output.spotLightViewPos2, matrixData.spotLightViewMatrix2);
-    // output.spotLightViewPos2 = mul(output.spotLightViewPos2, matrixData.spotLightProjectionMatrix2);
-    output.spotLightViewPos1 = float4(1.f, 2.f, 3.f, 1.f) ;
-    output.spotLightViewPos2 = float4(1.f, 2.f, 3.f, 1.f) ;
+    output.spotLightViewPos1 = mul(vertexPosition4f, matrixData.worldMatrix);
+    output.spotLightViewPos1 = mul(output.spotLightViewPos1, matrixData.spotLightViewMatrix1);
+    output.spotLightViewPos1 = mul(output.spotLightViewPos1, matrixData.spotLightProjectionMatrix1);
+    output.spotLightViewPos2 = mul(vertexPosition4f, matrixData.worldMatrix);
+    output.spotLightViewPos2 = mul(output.spotLightViewPos2, matrixData.spotLightViewMatrix2);
+    output.spotLightViewPos2 = mul(output.spotLightViewPos2, matrixData.spotLightProjectionMatrix2);
  
     return output;
 }

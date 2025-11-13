@@ -136,9 +136,9 @@ struct MatrixBufferType
     };
 
 #ifdef __cplusplus
-    struct MatrixDomainBufferType : BaseBufferType
+    struct MatrixHullBufferType : BaseBufferType
 #else
-struct MatrixDomainBufferType
+struct MatrixHullBufferType
 #endif
     {
         matrix worldMatrix;
@@ -147,9 +147,42 @@ struct MatrixDomainBufferType
     };
 
 #ifdef __cplusplus
-    struct CameraBufferType : BaseBufferType
+    struct MatrixDomainBufferType : BaseBufferType
+#else
+struct MatrixDomainBufferType
+#endif
+    {
+        matrix worldMatrix;
+        matrix viewMatrix;
+        matrix projectionMatrix;
+        matrix spotLightViewMatrix1;
+        matrix spotLightProjectionMatrix1;
+        matrix spotLightViewMatrix2;
+        matrix spotLightProjectionMatrix2;
+    };
+
+#ifdef __cplusplus
+    struct CameraVertexBufferType : BaseBufferType
 #else
 struct CameraBufferType
+#endif
+    {
+        float4 worldPosition;
+    };
+
+#ifdef __cplusplus
+    struct CameraHullBufferType : BaseBufferType
+#else
+struct CameraHullBufferType
+#endif
+    {
+        float4 worldPosition;
+    };
+
+#ifdef __cplusplus
+    struct CameraDomainBufferType : BaseBufferType
+#else
+struct CameraDomainBufferType
 #endif
     {
         float4 worldPosition;

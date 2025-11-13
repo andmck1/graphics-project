@@ -4,12 +4,12 @@
 
 cbuffer MatrixBuffer : register(b0)
 {
-    MatrixDomainBufferType matrixData;
+    MatrixHullBufferType matrixData;
 };
 
 cbuffer CameraBuffer : register(b1)
 {
-	CameraBufferType cameraData;
+	CameraHullBufferType cameraData;
 };
 
 cbuffer SettingsBuffer : register(b2)

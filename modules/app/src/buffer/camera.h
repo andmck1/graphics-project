@@ -13,7 +13,7 @@ class CameraVertexBuffer : public BaseConstantBuffer
     bool setShader(BufferSlots *slotCounters, int numberOfBuffers) override;
     void setData(Camera *camera);
 
-    struct ShaderBuffer : SharedBufferTypes::CameraBufferType
+    struct ShaderBuffer : SharedBufferTypes::CameraVertexBufferType
     {
     };
 
@@ -28,7 +28,7 @@ class CameraHullBuffer : public BaseConstantBuffer
     bool setShader(BufferSlots *slotCounters, int numberOfBuffers) override;
     void setData(Camera *camera);
 
-    struct ShaderBuffer : SharedBufferTypes::CameraBufferType
+    struct ShaderBuffer : SharedBufferTypes::CameraHullBufferType
     {
     };
 
@@ -42,7 +42,7 @@ class CameraDomainBuffer : public BaseConstantBuffer
     bool setShader(BufferSlots *slotCounters, int numberOfBuffers) override;
     void setData(Camera *camera);
 
-    struct ShaderBuffer : SharedBufferTypes::CameraBufferType
+    struct ShaderBuffer : SharedBufferTypes::CameraDomainBufferType
     {
     };
 

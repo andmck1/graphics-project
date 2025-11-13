@@ -46,7 +46,7 @@ class ShaderManagerState : public BaseShaderManagerState
     CRTPixelShader crtPixelShader;
     DepthPixelShader depthPixelShader;
 
-    MatrixBuffer matrixBuffer = MatrixBuffer();
+    MatrixVertexBuffer matrixVertexBuffer = MatrixVertexBuffer();
     MatrixHullBuffer matrixHullBuffer = MatrixHullBuffer();
     MatrixDomainBuffer matrixDomainBuffer = MatrixDomainBuffer();
     CameraVertexBuffer cameraVertexBuffer = CameraVertexBuffer();

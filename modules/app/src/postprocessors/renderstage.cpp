@@ -34,10 +34,10 @@ bool RenderStage::render(D3D *graphicsManager)
         this->shaderManagerState->standardVertexShader.inputLayout.value().Get()
     );
 
-    this->shaderManagerState->matrixBuffer.setData(
+    this->shaderManagerState->matrixVertexBuffer.setData(
         worldMatrix, viewMatrix, projectionMatrix
     );
-    if (!this->shaderManagerState->matrixBuffer.setShader(&slotCounters, 0))
+    if (!this->shaderManagerState->matrixVertexBuffer.setShader(&slotCounters, 0))
         return false;
     if (!this->shaderManagerState->cameraVertexBuffer.setShader(
             &slotCounters, 0
