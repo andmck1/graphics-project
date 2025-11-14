@@ -14,7 +14,7 @@ void SphereMesh::init()
     this->vertices.clear();
     this->vertexIndices.clear();
 
-    int resolution = 20;
+    int resolution = 100;
     const float PI = 3.14159265359f;
 
     for (int y = 0; y <= resolution; ++y)

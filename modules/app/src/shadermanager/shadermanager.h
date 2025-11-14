@@ -8,6 +8,7 @@
 #include "../buffer/spotLights.h"
 #include "../buffer/directionalLights.h"
 #include "../buffer/waveData.h"
+#include "../buffer/lightSettings.h"
 #include "../buffer/tessellationhulldata.h"
 #include "../buffer/crt.h"
 #include <core_graphics/shadermanager/base.h>
@@ -20,40 +21,40 @@ class ShaderManagerState : public BaseShaderManagerState
     ShaderStack defaultShaderStack;
     ShaderStack textureOnlyShaderStack;
     ShaderStack heightMappedObjectShaderStack;
-    ShaderStack waveDataShaderStack;
     ShaderStack depthShaderStack;
-    ShaderStack tessellatedTriangleShaderStack;
-    ShaderStack tessellatedQuadShaderStack;
+    ShaderStack tessellatedWaterShaderStack;
+    ShaderStack tessellatedTerrainShaderStack;
 
     // Vertex
     StandardVertexShader standardVertexShader;
-    WaveVertexShader waveVertexShader;
-    HeightMapVertexShader heightMapVertexShader;
     DepthVertexShader depthVertexShader;
+    RadialHeightMapVertexShader radialHeightMapVertexShader;
     TessellationPassThroughVertexShader tessellationPassThroughVertexShader;
 
     // Hull
-    TessellatedTriangleHullShader tessellatedTriangleHullShader;
     TessellatedQuadHullShader tessellatedQuadHullShader;
 
     // Domain
-    TessellatedTriangleDomainShader tessellatedTriangleDomainShader;
-    TessellatedQuadDomainShader tessellatedQuadDomainShader;
+    TessellatedWaterDomainShader tessellatedWaterDomainShader;
+    TessellatedTerrainDomainShader tessellatedTerrainDomainShader;
 
     // Pixel
     LightingPixelShader lightingPixelShader;
+    WaterLightingPixelShader waterLightingPixelShader;
     TextureOnlyPixelShader textureOnlyPixelShader;
     CRTPixelShader crtPixelShader;
     DepthPixelShader depthPixelShader;
 
+    // Buffers
     MatrixVertexBuffer matrixVertexBuffer = MatrixVertexBuffer();
     MatrixHullBuffer matrixHullBuffer = MatrixHullBuffer();
     MatrixDomainBuffer matrixDomainBuffer = MatrixDomainBuffer();
     CameraVertexBuffer cameraVertexBuffer = CameraVertexBuffer();
     CameraHullBuffer cameraHullBuffer = CameraHullBuffer();
     CameraDomainBuffer cameraDomainBuffer = CameraDomainBuffer();
-    WaveDataVertexBuffer waveDataVertexBuffer = WaveDataVertexBuffer();
     WaveDataDomainBuffer waveDataDomainBuffer = WaveDataDomainBuffer();
+    LightSettingsPixelBuffer lightSettingsPixelBuffer =
+        LightSettingsPixelBuffer();
     TessellationHullDataBuffer tessellationHullDataBuffer =
         TessellationHullDataBuffer();
     AmbientLightBuffer ambientLightBuffer = AmbientLightBuffer();

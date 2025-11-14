@@ -28,7 +28,7 @@ bool Scene::updateAndDraw()
         XMMATRIX lightViewMatrix = spotLightPtr->calculateViewMatrix();
         XMMATRIX lightProjectionMatrix =
             spotLightPtr->calculateOrthographicProjectionMatrix(
-                100, 100, .1f, 100.f
+                10000, 10000, .1f, 5000.f
             );
         for (int i = 0; i < this->state->actors.size(); i++)
         {
@@ -89,14 +89,14 @@ bool Scene::updateAndDraw()
             XMMATRIX spotLightProjectionMatrix0 =
                 this->state->spotLights[0]
                     ->calculateOrthographicProjectionMatrix(
-                        100, 100, 0.1, 100.f
+                        10000, 10000, 0.1, 5000.f
                     );
             XMMATRIX spotLightViewMatrix1 =
                 this->state->spotLights[1]->calculateViewMatrix();
             XMMATRIX spotLightProjectionMatrix1 =
                 this->state->spotLights[1]
                     ->calculateOrthographicProjectionMatrix(
-                        100, 100, 0.1, 100.f
+                        10000, 10000, .1, 5000.f
                     );
             actor->currentShaderStack = actor->defaultShaderStack;
             this->state->shaderManagerState->matrixVertexBuffer.setData(

@@ -2,7 +2,6 @@
 
 #include "core_graphics/mesh/ortho.h"
 #include "core_graphics/light/ambient.h"
-#include "core_graphics/mesh/quad.h"
 #include "core_graphics/texture/default.h"
 #include "core_graphics/texture/file.h"
 #include "core_graphics/water/water.h"
@@ -58,13 +57,9 @@ void State::initShaderManagerStateShaders()
         this->initShaderManagerStateShader<StandardVertexShader>(
             "./build/hlsl/vertex/standard.cso", inputElementDescription
         );
-    this->shaderManagerState.heightMapVertexShader =
-        this->initShaderManagerStateShader<HeightMapVertexShader>(
-            "./build/hlsl/vertex/heightMap.cso", inputElementDescription
-        );
-    this->shaderManagerState.waveVertexShader =
-        this->initShaderManagerStateShader<WaveVertexShader>(
-            "./build/hlsl/vertex/wave.cso", inputElementDescription
+    this->shaderManagerState.radialHeightMapVertexShader =
+        this->initShaderManagerStateShader<RadialHeightMapVertexShader>(
+            "./build/hlsl/vertex/radialHeightMap.cso", inputElementDescription
         );
     this->shaderManagerState.depthVertexShader =
         this->initShaderManagerStateShader<DepthVertexShader>(
@@ -77,29 +72,30 @@ void State::initShaderManagerStateShaders()
         );
 
     // Hull
-    this->shaderManagerState.tessellatedTriangleHullShader =
-        this->initShaderManagerStateShader<TessellatedTriangleHullShader>(
-            "./build/hlsl/hull/tessellatedTriangle.cso"
-        );
     this->shaderManagerState.tessellatedQuadHullShader =
         this->initShaderManagerStateShader<TessellatedQuadHullShader>(
             "./build/hlsl/hull/tessellatedQuad.cso"
         );
 
     // Domain
-    this->shaderManagerState.tessellatedTriangleDomainShader =
-        this->initShaderManagerStateShader<TessellatedTriangleDomainShader>(
-            "./build/hlsl/domain/tessellatedTriangle.cso"
+    this->shaderManagerState.tessellatedWaterDomainShader =
+        this->initShaderManagerStateShader<TessellatedWaterDomainShader>(
+            "./build/hlsl/domain/tessellatedWater.cso"
         );
-    this->shaderManagerState.tessellatedQuadDomainShader =
-        this->initShaderManagerStateShader<TessellatedQuadDomainShader>(
-            "./build/hlsl/domain/tessellatedQuad.cso"
+    this->shaderManagerState.tessellatedTerrainDomainShader =
+        this->initShaderManagerStateShader<TessellatedTerrainDomainShader>(
+            "./build/hlsl/domain/tessellatedTerrain.cso"
         );
 
     // Pixel
     this->shaderManagerState.lightingPixelShader =
         this->initShaderManagerStateShader<LightingPixelShader>(
             "./build/hlsl/pixel/lighting.cso"
+        );
+
+    this->shaderManagerState.waterLightingPixelShader =
+        this->initShaderManagerStateShader<WaterLightingPixelShader>(
+            "./build/hlsl/pixel/waterLighting.cso"
         );
 
     this->shaderManagerState.textureOnlyPixelShader =
@@ -122,7 +118,7 @@ void State::initShaderManagerStateShaderStacks()
     this->shaderManagerState.defaultShaderStack.shaders =
         std::vector<BaseShader *>(
             {&this->shaderManagerState.standardVertexShader,
-             &this->shaderManagerState.lightingPixelShader}
+             &this->shaderManagerState.waterLightingPixelShader}
         );
     this->shaderManagerState.textureOnlyShaderStack.shaders =
         std::vector<BaseShader *>(
@@ -131,12 +127,7 @@ void State::initShaderManagerStateShaderStacks()
         );
     this->shaderManagerState.heightMappedObjectShaderStack.shaders =
         std::vector<BaseShader *>(
-            {&this->shaderManagerState.heightMapVertexShader,
-             &this->shaderManagerState.lightingPixelShader}
-        );
-    this->shaderManagerState.waveDataShaderStack.shaders =
-        std::vector<BaseShader *>(
-            {&this->shaderManagerState.waveVertexShader,
+            {&this->shaderManagerState.radialHeightMapVertexShader,
              &this->shaderManagerState.lightingPixelShader}
         );
     this->shaderManagerState.depthShaderStack.shaders =
@@ -144,18 +135,18 @@ void State::initShaderManagerStateShaderStacks()
             {&this->shaderManagerState.depthVertexShader,
              &this->shaderManagerState.depthPixelShader}
         );
-    this->shaderManagerState.tessellatedTriangleShaderStack.shaders =
-        std::vector<BaseShader *>({
-            &this->shaderManagerState.tessellationPassThroughVertexShader,
-            &this->shaderManagerState.tessellatedTriangleHullShader,
-            &this->shaderManagerState.tessellatedTriangleDomainShader,
-            &this->shaderManagerState.lightingPixelShader,
-        });
-    this->shaderManagerState.tessellatedQuadShaderStack.shaders =
+    this->shaderManagerState.tessellatedWaterShaderStack.shaders =
         std::vector<BaseShader *>({
             &this->shaderManagerState.tessellationPassThroughVertexShader,
             &this->shaderManagerState.tessellatedQuadHullShader,
-            &this->shaderManagerState.tessellatedQuadDomainShader,
+            &this->shaderManagerState.tessellatedWaterDomainShader,
+            &this->shaderManagerState.waterLightingPixelShader,
+        });
+    this->shaderManagerState.tessellatedTerrainShaderStack.shaders =
+        std::vector<BaseShader *>({
+            &this->shaderManagerState.tessellationPassThroughVertexShader,
+            &this->shaderManagerState.tessellatedQuadHullShader,
+            &this->shaderManagerState.tessellatedTerrainDomainShader,
             &this->shaderManagerState.lightingPixelShader,
         });
 }
@@ -167,14 +158,9 @@ void State::initShaderManagerStateShaderBuffers()
         &this->shaderManagerState.matrixVertexBuffer,
         &this->shaderManagerState.cameraVertexBuffer
     };
-    this->shaderManagerState.heightMapVertexShader.bufferStack = {
+    this->shaderManagerState.radialHeightMapVertexShader.bufferStack = {
         &this->shaderManagerState.matrixVertexBuffer,
         &this->shaderManagerState.cameraVertexBuffer
-    };
-    this->shaderManagerState.waveVertexShader.bufferStack = {
-        &this->shaderManagerState.matrixVertexBuffer,
-        &this->shaderManagerState.cameraVertexBuffer,
-        &this->shaderManagerState.waveDataVertexBuffer
     };
     this->shaderManagerState.depthVertexShader.bufferStack = {
         &this->shaderManagerState.matrixVertexBuffer,
@@ -183,7 +169,6 @@ void State::initShaderManagerStateShaderBuffers()
         .bufferStack = {};
 
     // Hull
-    this->shaderManagerState.tessellatedTriangleHullShader.bufferStack = {};
     this->shaderManagerState.tessellatedQuadHullShader.bufferStack = {
         &this->shaderManagerState.matrixHullBuffer,
         &this->shaderManagerState.cameraHullBuffer,
@@ -191,13 +176,14 @@ void State::initShaderManagerStateShaderBuffers()
     };
 
     // Domain
-    this->shaderManagerState.tessellatedTriangleDomainShader.bufferStack = {
-        &this->shaderManagerState.matrixDomainBuffer
-    };
-    this->shaderManagerState.tessellatedQuadDomainShader.bufferStack = {
+    this->shaderManagerState.tessellatedWaterDomainShader.bufferStack = {
         &this->shaderManagerState.matrixDomainBuffer,
         &this->shaderManagerState.cameraDomainBuffer,
         &this->shaderManagerState.waveDataDomainBuffer
+    };
+    this->shaderManagerState.tessellatedTerrainDomainShader.bufferStack = {
+        &this->shaderManagerState.matrixDomainBuffer,
+        &this->shaderManagerState.cameraDomainBuffer,
     };
 
     // Pixel
@@ -205,7 +191,15 @@ void State::initShaderManagerStateShaderBuffers()
         &this->shaderManagerState.ambientLightBuffer,
         &this->shaderManagerState.directionalLightsBuffer,
         &this->shaderManagerState.pointLightsBuffer,
-        &this->shaderManagerState.spotLightsBuffer
+        &this->shaderManagerState.spotLightsBuffer,
+        &this->shaderManagerState.lightSettingsPixelBuffer
+    };
+    this->shaderManagerState.waterLightingPixelShader.bufferStack = {
+        &this->shaderManagerState.ambientLightBuffer,
+        &this->shaderManagerState.directionalLightsBuffer,
+        &this->shaderManagerState.pointLightsBuffer,
+        &this->shaderManagerState.spotLightsBuffer,
+        &this->shaderManagerState.lightSettingsPixelBuffer
     };
     this->shaderManagerState.textureOnlyPixelShader.bufferStack = {};
     this->shaderManagerState.depthPixelShader.bufferStack = {};
@@ -237,15 +231,13 @@ void State::setShaderManagerStateShaderBufferData()
     this->shaderManagerState.spotLightsBuffer.setData(
         &this->sceneState.spotLights
     );
-    this->shaderManagerState.waveDataVertexBuffer.setData(
-        &this->appState.timer->totalTime, &this->sceneState.water->magnitude,
-        &this->sceneState.water->waveNumber,
-        &this->sceneState.water->angularVelocity
-    );
     this->shaderManagerState.waveDataDomainBuffer.setData(
         &this->appState.timer->totalTime, &this->sceneState.water->magnitude,
         &this->sceneState.water->waveNumber,
         &this->sceneState.water->angularVelocity
+    );
+    this->shaderManagerState.lightSettingsPixelBuffer.setData(
+        &this->sceneState.isNormalsAsColourEnabled
     );
     this->shaderManagerState.tessellationHullDataBuffer.setData(
         &this->sceneState.tessellationHullDataSettings
@@ -355,35 +347,21 @@ void State::initSceneStateActor(
 void State::initSceneStateActors()
 {
     spdlog::debug("Initialising scene state meshes");
-    // this->initSceneStateActor<SphereMesh, SceneActor>(
-    //     &this->shaderManagerState.defaultShaderStack,
-    //     &this->textureManagerState.moonTexture,
-    //     &this->sceneState.clampSampler, nullptr, nullptr, {1.f, 1.f, 1.f},
-    //     {0.f, 0.f, 0.f}, {-3.f, 0.f, 0.f}
-    // );
-    //
-    // this->initSceneStateActor<TessellatedQuadMesh, SceneActor>(
-    //     &this->shaderManagerState.tessellatedQuadShaderStack,
-    //     &this->textureManagerState.defaultTexture,
-    //     &this->sceneState.clampSampler, nullptr, nullptr, {100.f, 100.f,
-    //     100.f}, {XMConvertToRadians(-90.f), 0.f, 0.f}, {0.f, -10.f, 0.f}
-    // );
-    //
-    // this->initSceneStateActor<PlaneMesh, SceneActor>(
-    //     &this->shaderManagerState.heightMappedObjectShaderStack,
-    //     &this->textureManagerState.mountainsHeightMap,
-    //     &this->sceneState.clampSampler,
-    //     &this->textureManagerState.mountainsHeightMap,
-    //     &this->sceneState.wrapSampler, {1.f, 1.f, 1.f}, {0.f, 0.f, 0.f},
-    //     {0.f, 0.f, 0.f}
-    // );
-    //
-    // this->initSceneStateActor<TessellatedTriangleMesh, SceneActor>(
-    //     &this->shaderManagerState.tessellatedTriangleShaderStack,
-    //     &this->textureManagerState.defaultTexture,
-    //     &this->sceneState.clampSampler, nullptr, nullptr, {1.f, 1.f, 1.f},
-    //     {0.f, 0.f, 0.f}, {-5.f, 0.f, 5.f}
-    // );
+    this->initSceneStateActor<SphereMesh, SceneActor>(
+        &this->shaderManagerState.defaultShaderStack,
+        &this->textureManagerState.defaultTexture,
+        &this->sceneState.clampSampler, nullptr, nullptr, {50.f, 50.f, 50.f},
+        {0.f, 0.f, 0.f}, {1000.f, 100.f, 1000.f}
+    );
+
+    this->initSceneStateActor<TessellatedPlaneMesh, SceneActor>(
+        &this->shaderManagerState.tessellatedTerrainShaderStack,
+        &this->textureManagerState.mountainsHeightMap,
+        &this->sceneState.clampSampler,
+        &this->textureManagerState.mountainsHeightMap,
+        &this->sceneState.clampSampler, {50.f, 50.f, 50.f}, {0.f, 0.f, 0.f},
+        {-1000.f, 0.f, -1000.f}
+    );
 }
 
 void State::initSceneStateAmbientLight()
@@ -394,9 +372,9 @@ void State::initSceneStateAmbientLight()
         dynamic_cast<AmbientLight *>(this->sceneState.actors.back().get());
     this->sceneState.ambientLight = ambientLightPtr;
 
-    ambientLightPtr->colour[0] = 0.1f;
-    ambientLightPtr->colour[1] = 0.1f;
-    ambientLightPtr->colour[2] = 0.1f;
+    ambientLightPtr->colour[0] = 0.05f;
+    ambientLightPtr->colour[1] = 0.05f;
+    ambientLightPtr->colour[2] = 0.05f;
     ambientLightPtr->isEnabled = true;
     ambientLightPtr->isDrawEnabled = false;
 }
@@ -440,6 +418,8 @@ void State::initSceneStatePointLight(
     pointLightPtr->isSpecularEnabled = initIsSpecularEnabled;
     pointLightPtr->isAttenuationEnabled = initIsAttenuationEnabled;
 
+    pointLightPtr->scaleBy(10.f, 10.f, 10.f);
+
     pointLightPtr->isUpdateEnabled = true;
     pointLightPtr->isDrawEnabled = true;
 }
@@ -448,12 +428,14 @@ void State::initSceneStatePointLights()
 {
     spdlog::debug("Initialising scene state point lights");
     this->initSceneStatePointLight(
-        XMFLOAT3(1.f, 1.f, 1.f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
-        XMFLOAT3(0.f, 10.f, -20.f), XMFLOAT3(.1f, .01f, 0.01f), true, true, true
+        XMFLOAT3(0.99f, 0.97f, 0.89f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
+        XMFLOAT3(1500.f, 135.f, 775.f), XMFLOAT3(.001f, .0001f, 5e-6f), true,
+        true, true
     );
     this->initSceneStatePointLight(
-        XMFLOAT3(1.f, 1.f, 1.f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
-        XMFLOAT3(0.f, 10.f, 20.f), XMFLOAT3(.1f, .01f, 0.01f), true, true, true
+        XMFLOAT3(1.f, 0.85f, 0.73f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
+        XMFLOAT3(200.f, 435.f, 2000.f), XMFLOAT3(.001f, .0001f, 5e-6f), true,
+        true, true
     );
 }
 
@@ -504,6 +486,8 @@ void State::initSceneStateSpotLight(
     spotLightPtr->isUpdateEnabled = true;
     spotLightPtr->isDrawEnabled = true;
 
+    spotLightPtr->scaleBy(10.f, 10.f, 10.f);
+
     spotLightPtr->shadowMap.graphicsManager = this->sceneState.graphicsManager;
     spotLightPtr->shadowMap.width = 1024;
     spotLightPtr->shadowMap.height = 1024;
@@ -514,14 +498,14 @@ void State::initSceneStateSpotLights()
 {
     spdlog::debug("Initialising scene spot lights");
     this->initSceneStateSpotLight(
-        XMFLOAT3(1.f, 1.f, 1.f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
-        XMFLOAT3(-20.f, 10.f, 0.f), XMFLOAT3(-1.f, -1.f, -1.f), 45.f,
-        XMFLOAT3(.1f, .01f, 0.01f), true, true, true
+        XMFLOAT3(0.98f, 0.86f, 0.87f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
+        XMFLOAT3(-100.f, 2000.f, 195.f), XMFLOAT3(0.2f, -.62f, .3f), 15.f,
+        XMFLOAT3(.001f, .0001f, 1e-6f), true, true, true
     );
     this->initSceneStateSpotLight(
-        XMFLOAT3(1.f, 1.f, 1.f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
-        XMFLOAT3(20.f, 10.f, 0.f), XMFLOAT3(-1.f, -1.f, -1.f), 45.f,
-        XMFLOAT3(.1f, .01f, 0.01f), true, true, true
+        XMFLOAT3(0.69f, 0.88f, 0.87f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
+        XMFLOAT3(1350.f, 1500.f, 970.f), XMFLOAT3(-0.2f, -1.f, 0.f), 15.f,
+        XMFLOAT3(.001f, .0001f, 1e-6f), true, true, true
     );
 }
 
@@ -563,14 +547,14 @@ void State::initSceneStateDirectionalLights()
 {
     spdlog::debug("Initialising scene state directional lights");
     this->initSceneStateDirectionalLight(
-        XMFLOAT3(1.f, 1.f, 1.f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
+        XMFLOAT3(0.6f, 1.f, 0.6f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
         XMFLOAT3(5.f, 0.f, 5.f), XMFLOAT3(-1.f, 0.f, 0.f),
-        XMFLOAT3(.432f, .00056f, .000010f), true, true, true
+        XMFLOAT3(.432f, .00056f, .000010f), true, false, true
     );
     this->initSceneStateDirectionalLight(
         XMFLOAT3(1.f, 1.f, 1.f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
         XMFLOAT3(5.f, 0.f, -5.f), XMFLOAT3(-1.f, 0.f, 0.f),
-        XMFLOAT3(.432f, .00056f, .000010f), true, true, true
+        XMFLOAT3(.432f, .00056f, .000010f), false, false, true
     );
 }
 
@@ -589,18 +573,18 @@ void State::initSceneStateWater()
 {
     spdlog::debug("Initialising scene state water");
     this->initSceneStateActor<TessellatedPlaneMesh, Water>(
-        &this->shaderManagerState.tessellatedQuadShaderStack,
+        &this->shaderManagerState.tessellatedWaterShaderStack,
         &this->textureManagerState.defaultTexture,
-        &this->sceneState.clampSampler, nullptr, nullptr, {10.f, 10.f, 10.f},
-        {0.f, 0.f, 0.f}, {0.f, -250.f, 0.f}
+        &this->sceneState.clampSampler, nullptr, nullptr,
+        {1000.f, 100.f, 100.f}, {0.f, 0.f, 0.f}, {-1000.f, -750.f, -1000.f}
     );
     Water *waterPtr =
         dynamic_cast<Water *>(this->sceneState.actors.back().get());
     this->sceneState.water = waterPtr;
 
     waterPtr->isDrawEnabled = true;
-    waterPtr->magnitude = 2.f;
-    waterPtr->waveNumber = 0.1f;
+    waterPtr->magnitude = 1.f;
+    waterPtr->waveNumber = 0.5f;
     waterPtr->angularVelocity = 0.5f;
 }
 
@@ -734,9 +718,9 @@ void State::initSceneStateTessellationSettings()
 {
     spdlog::debug("Initialising scene state tessellation settings");
     this->sceneState.tessellationHullDataSettings
-        .minTessellationDistanceThreshold = XMFLOAT4(31.f, 0.f, 0.f, 0.f);
+        .minTessellationDistanceThreshold = XMFLOAT4(80.f, 0.f, 0.f, 0.f);
     this->sceneState.tessellationHullDataSettings
-        .maxTessellationDistanceThreshold = XMFLOAT4(345.f, 0.f, 0.f, 0.f);
+        .maxTessellationDistanceThreshold = XMFLOAT4(1000.f, 0.f, 0.f, 0.f);
 }
 
 void State::initSceneState(
@@ -792,10 +776,10 @@ void State::initSceneState(
     this->shaderManagerState.spotLightsBuffer.init(
         this->shaderManagerState.graphicsManager
     );
-    this->shaderManagerState.waveDataVertexBuffer.init(
+    this->shaderManagerState.waveDataDomainBuffer.init(
         this->shaderManagerState.graphicsManager
     );
-    this->shaderManagerState.waveDataDomainBuffer.init(
+    this->shaderManagerState.lightSettingsPixelBuffer.init(
         this->shaderManagerState.graphicsManager
     );
     this->shaderManagerState.tessellationHullDataBuffer.init(
@@ -823,7 +807,8 @@ void State::initAppState()
 
 void State::initDebugSceneState(
     D3D *graphicsManager, float *fps, bool *isWireframeEnabled,
-    AmbientLight *ambientLight, std::vector<PointLight *> *pointLights,
+    bool *isNormalsAsColourEnabled, AmbientLight *ambientLight,
+    std::vector<PointLight *> *pointLights,
     std::vector<SpotLight *> *spotLights,
     std::vector<DirectionalLight *> *directionalLights, Water *water,
     SharedBufferTypes::CRTBufferType *crtSettings, bool *isCRTEnabled,
@@ -834,6 +819,7 @@ void State::initDebugSceneState(
     this->debugSceneState.graphicsManager = graphicsManager;
     this->debugSceneState.fps = fps;
     this->debugSceneState.isWireframeEnabled = isWireframeEnabled;
+    this->debugSceneState.isNormalsAsColourEnabled = isNormalsAsColourEnabled;
 
     this->debugSceneState.ambientLight = ambientLight;
     this->debugSceneState.pointLights = pointLights;

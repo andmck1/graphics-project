@@ -14,6 +14,7 @@ struct DebugSceneState
     D3D *graphicsManager;
     float *fps;
     bool *isWireframeEnabled;
+    bool *isNormalsAsColourEnabled;
 
     AmbientLight *ambientLight;
     std::vector<PointLight *> *pointLights;

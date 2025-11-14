@@ -64,6 +64,8 @@ struct SceneState
     SharedBufferTypes::TessellationHullDataBufferType
         tessellationHullDataSettings =
             SharedBufferTypes::TessellationHullDataBufferType();
+    
+    bool isNormalsAsColourEnabled = false;
 };
 
 class Scene

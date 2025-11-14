@@ -48,6 +48,9 @@ bool DebugScene::render()
     ImGui::Begin("Draggable Window");
     ImGui::Text("FPS: %.2f", *(this->state->fps));
     ImGui::Checkbox("Wireframe Enabled?", this->state->isWireframeEnabled);
+    ImGui::Checkbox(
+        "Normals As Colour Enabled?", this->state->isNormalsAsColourEnabled
+    );
     if (ImGui::CollapsingHeader("Ambient Light Settings"))
     {
         ImGui::ColorPicker3(
@@ -86,22 +89,22 @@ bool DebugScene::render()
             );
             ImGui::SliderFloat3(
                 ("World Position#Point#" + iString).c_str(),
-                pointLight->worldPosition.data(), -100.f, 100.f
+                pointLight->worldPosition.data(), -2000.f, 2000.f
             );
             ImGui::SliderFloat(
                 ("Attenuation Coefficient C0#Point#" + iString).c_str(),
-                &pointLight->attenuationCoefficients[0], 0.1f, 1.f, "%.3f",
-                false
+                &pointLight->attenuationCoefficients[0], 0.00001f, .001f,
+                "%.5f", false
             );
             ImGui::SliderFloat(
                 ("Attenuation Coefficient C1#Point#" + iString).c_str(),
-                &pointLight->attenuationCoefficients[1], 0.01f, .3f, "%.5f",
-                false
+                &pointLight->attenuationCoefficients[1], 0.00001f, .001f,
+                "%.8f", false
             );
             ImGui::SliderFloat(
                 ("Attenuation Coefficient C2#Point#" + iString).c_str(),
-                &pointLight->attenuationCoefficients[2], .01f, .1f, "%.6f",
-                false
+                &pointLight->attenuationCoefficients[2], 1e-7, 1e-5f,
+                "%.8f", false
             );
             ImGui::Checkbox(
                 ("Diffuse Enabled?#Point#" + iString).c_str(),
@@ -144,7 +147,7 @@ bool DebugScene::render()
             );
             ImGui::SliderFloat3(
                 ("World Position#Spot#" + iString).c_str(),
-                spotLight->worldPosition.data(), -100.f, 100.f
+                spotLight->worldPosition.data(), -2000.f, 2000.f
             );
             ImGui::SliderFloat(
                 ("Cone Angle#Spot#" + iString).c_str(), &spotLight->coneAngle,
@@ -155,18 +158,21 @@ bool DebugScene::render()
                 spotLight->directionVector.data(), -1.f, 1.f
             );
             ImGui::SliderFloat(
-                ("Attenuation Coefficient C0#Spot#" + iString).c_str(),
-                &spotLight->attenuationCoefficients[0], 0.1f, 1.f, "%.3f", false
+                ("Attenuation Coefficient C0#Point#" + iString).c_str(),
+                &spotLight->attenuationCoefficients[0], 0.00001f, .001f,
+                "%.8f", false
             );
             ImGui::SliderFloat(
-                ("Attenuation Coefficient C1#Spot#" + iString).c_str(),
-                &spotLight->attenuationCoefficients[1], 0.01f, .3f, "%.5f",
-                false
+                ("Attenuation Coefficient C1#Point#" + iString).c_str(),
+                &spotLight->attenuationCoefficients[1], 0.00001f, .001f,
+                "%.8f", false
             );
             ImGui::SliderFloat(
-                ("Attenuation Coefficient C2#Spot#" + iString).c_str(),
-                &spotLight->attenuationCoefficients[2], .01f, .1f, "%.6f", false
+                ("Attenuation Coefficient C2#Point#" + iString).c_str(),
+                &spotLight->attenuationCoefficients[2], 1e-7f, 1e-5f,
+                "%.8f", false
             );
+
             ImGui::Checkbox(
                 ("Diffuse Enabled?#Spot#" + iString).c_str(),
                 &spotLight->isDiffuseEnabled
@@ -226,7 +232,7 @@ bool DebugScene::render()
     if (ImGui::CollapsingHeader("Water settings"))
     {
         ImGui::SliderFloat(
-            "Water Wave Magnitude", &this->state->water->magnitude, 0.1f, 10.f
+            "Water Wave Magnitude", &this->state->water->magnitude, 0.1f, 2.f
         );
         ImGui::SliderFloat(
             "Water Wave Number", &this->state->water->waveNumber, 0.1f, 1.f
@@ -321,7 +327,7 @@ bool DebugScene::render()
             "Max Distance for Minimum Tessellation Factor",
             &this->state->tessellationSettings->maxTessellationDistanceThreshold
                  .x,
-            50.f, 1000.f
+            80.f, 5000.f
         );
     }
 

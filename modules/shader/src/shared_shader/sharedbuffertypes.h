@@ -299,6 +299,15 @@ struct TessellationHullDataBufferType
         float4 maxTessellationDistanceThreshold;
     };
 
+#ifdef __cplusplus
+    struct LightSettingsBufferType : BaseBufferType
+#else
+struct LightSettingsBufferType
+#endif
+    {
+        int4 isNormalsAsColourEnabled;
+    };
+
 
 #ifdef __cplusplus
 }

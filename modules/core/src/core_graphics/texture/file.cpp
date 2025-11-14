@@ -41,7 +41,7 @@ bool FileTexture::setVertexShader(BufferSlots *slotCounters, int numViews)
 bool FileTexture::setDomainShader(BufferSlots *slotCounters, int numViews)
 {
     int startSlot = slotCounters->domainShaderCounters.textureSlot;
-    this->graphicsManager->deviceContext->VSSetShaderResources(
+    this->graphicsManager->deviceContext->DSSetShaderResources(
         startSlot, numViews, this->textureResource.GetAddressOf()
     );
     slotCounters->domainShaderCounters.textureSlot++;

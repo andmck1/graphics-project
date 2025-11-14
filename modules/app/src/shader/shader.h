@@ -7,7 +7,7 @@ class StandardVertexShader : public VertexShader
 {
 };
 
-class HeightMapVertexShader : public VertexShader
+class RadialHeightMapVertexShader : public VertexShader
 {
 };
 
@@ -28,7 +28,11 @@ class TessellatedTriangleDomainShader : public DomainShader
 {
 };
 
-class TessellatedQuadDomainShader : public DomainShader
+class TessellatedWaterDomainShader : public DomainShader
+{
+};
+
+class TessellatedTerrainDomainShader : public DomainShader
 {
 };
 
@@ -43,6 +47,10 @@ class TessellatedQuadHullShader : public HullShader
 
 // Pixel
 class LightingPixelShader : public PixelShader
+{
+};
+
+class WaterLightingPixelShader : public PixelShader
 {
 };
 

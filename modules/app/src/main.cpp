@@ -1,3 +1,5 @@
+#include <cstdlib>
+#include <directxmath.h>
 #include <spdlog/spdlog.h>
 
 #include <core_window/window.h>
@@ -56,9 +58,10 @@ int main()
     spdlog::info("Creating debug scene");
     state.initDebugSceneState(
         &graphicsManager, &app.timer.fps, &scene.state->isWireframeEnabled,
-        state.sceneState.ambientLight, &state.sceneState.pointLights,
-        &state.sceneState.spotLights, &state.sceneState.directionalLights,
-        state.sceneState.water, &state.sceneState.crtSettings,
+        &scene.state->isNormalsAsColourEnabled, state.sceneState.ambientLight,
+        &state.sceneState.pointLights, &state.sceneState.spotLights,
+        &state.sceneState.directionalLights, state.sceneState.water,
+        &state.sceneState.crtSettings,
         &state.sceneState.crtPostProcessor.isEnabled,
         &state.sceneState.tessellationHullDataSettings
     );
@@ -67,10 +70,19 @@ int main()
     // Main loop
     spdlog::info("Running app");
     app.timer.start();
+    float rotationIncrement = 0.1;
     while (window.frame())
     {
         app.timer.frame();
         appInput.handleInputs();
+        scene.state->spotLights.back()->directionVector[0] +=
+            rotationIncrement * app.timer.deltaTime;
+        scene.state->spotLights.back()->directionVector[1] +=
+            rotationIncrement * app.timer.deltaTime;
+        if (std::abs(scene.state->spotLights.back()->directionVector[0]) > 0.25f)
+            rotationIncrement *= -1.f;
+        if (std::abs(scene.state->spotLights.back()->directionVector[2]) > 0.25f)
+            rotationIncrement *= -1.f;
         scene.updateAndDraw();
         debugScene.render();
         graphicsManager.presentScreen();

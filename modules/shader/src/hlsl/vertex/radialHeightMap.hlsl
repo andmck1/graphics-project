@@ -1,6 +1,9 @@
 #include "sharedbuffertypes.h"
 
-// Note, code provided from lab examples
+// My code from lab 5
+Texture2D heightMap : register(t0);
+SamplerState heightSampler : register(s0);
+
 cbuffer MatrixBuffer : register(b0)
 {
     MatrixBufferType matrixData;
@@ -11,72 +14,43 @@ cbuffer CameraBuffer : register(b1)
 	CameraBufferType cameraData;
 };
 
-cbuffer WaveBuffer : register(b2)
+// TODO - repeated code, should be in a shared shader file
+float getHeight(float2 _uv, Texture2D _heightMap, SamplerState _heightMapSampler)
 {
-	WaveDataBufferType waveData;
-};
+    float4 textureColour;
+    // Prevent from sampling around the seam of the texture
+    _uv.x = frac(_uv.x + 1e-6);
+    textureColour = _heightMap.SampleLevel(_heightMapSampler, _uv, 0);
+    // TODO - parameterise
+    float height = 1.f;
+    return (textureColour.r) * height;
+
+}
 
 VertexOutputType main(VertexInputType input)
 {
-	VertexOutputType output;
+    VertexOutputType output;
 
-	// WAVE
-	// Move wave through position
-	// Move the vertex along y axis
-    input.position.y += (
-		(
-			waveData.magnitude.x * 
-			sin(
-				(waveData.waveNumber.x * input.position.x) - 
-				(waveData.angularVelocity.x * waveData.totalTime.x)
-			)
-		) + 
-		(
-			waveData.magnitude.x * 
-			cos(
-				(waveData.waveNumber.x * input.position.z) - 
-				(waveData.angularVelocity.x * waveData.totalTime.x)
-				)
-		)
-	);
+	// TERRAIN HEIGHT
+    float4 displacedPosition;
+    displacedPosition = input.position;
+    displacedPosition.xyz += input.normal * getHeight(input.tex, heightMap, heightSampler);
 	
-	// Normals
-	// Wave Normals
-    input.normal.x = (
-		-waveData.magnitude.x * 
-		waveData.waveNumber.x * 
-		cos(
-			(waveData.waveNumber.x * input.position.x)  - 
-			(waveData.angularVelocity.x * waveData.totalTime.x)
-		)
-	);
-    input.normal.y = 1.0f;
-    input.normal.z = (
-		waveData.magnitude.x * 
-		waveData.waveNumber.x * 
-		sin(
-			(waveData.waveNumber.x * input.position.z) - 
-			(waveData.angularVelocity.x * waveData.totalTime.x)
-		)
-	);
-	
-	// Move the vertex along the normal
-    input.position.xyz += input.normal.xyz;	
-
 	// Calculate the position of the vertex against the world, view, and projection matrices.
-    output.position = mul(input.position, matrixData.worldMatrix);
+    output.position = mul(displacedPosition, matrixData.worldMatrix);
     output.position = mul(output.position, matrixData.viewMatrix);
     output.position = mul(output.position, matrixData.projectionMatrix);
 	
 	// Store the texture coordinates for the pixel shader.
     output.tex = input.tex;
 
-	output.normal = input.normal;
+    // Normal
+    output.normal = input.normal;
     
 	// Calculate the normal vector against the world matrix only and normalise.
     output.normal = mul(output.normal, (float3x3) matrixData.worldMatrix);
     output.normal = normalize(output.normal);
-	
+
     float4 worldPosition = mul(input.position, matrixData.worldMatrix);
     output.worldPosition = worldPosition.xyz;
 	
@@ -90,6 +64,5 @@ VertexOutputType main(VertexInputType input)
     output.spotLightViewPos2 = mul(output.spotLightViewPos2, matrixData.spotLightViewMatrix2);
     output.spotLightViewPos2 = mul(output.spotLightViewPos2, matrixData.spotLightProjectionMatrix2);
 
-	return output;
+    return output;
 }
-

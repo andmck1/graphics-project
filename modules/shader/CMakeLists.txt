@@ -13,18 +13,17 @@ target_include_directories(shared_shader PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # https://stackoverflow.com/questions/71299716/how-to-compile-hlsl-shaders-during-build-with-cmake
 set(VERTEX_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/standard.hlsl"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/heightMap.hlsl"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/wave.hlsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/radialHeightMap.hlsl"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/depth.hlsl"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/tessellationPassThrough.hlsl")
-set(DOMAIN_SHADERS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/domain/tessellatedTriangle.hlsl"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/domain/tessellatedQuad.hlsl")
 set(HULL_SHADERS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/hull/tessellatedTriangle.hlsl"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/hull/tessellatedQuad.hlsl")
+set(DOMAIN_SHADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/domain/tessellatedTerrain.hlsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/domain/tessellatedWater.hlsl")
 set(PIXEL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/lighting.hlsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/waterLighting.hlsl"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/textureOnly.hlsl"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/crt.hlsl"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/depth.hlsl")

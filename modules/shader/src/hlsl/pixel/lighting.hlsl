@@ -10,6 +10,11 @@ cbuffer AmbientLightBuffer: register(b0)
 	AmbientLightBufferType ambientLightData;
 }
 
+cbuffer LightSettingsBuffer: register(b1)
+{
+	LightSettingsBufferType lightSettings;
+}
+
 StructuredBuffer<DirectionalLightBufferType> DirectionalLightBuffer : register(t3);
 StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t4);
 StructuredBuffer<SpotLightBufferType> SpotLightBuffer : register(t5);
@@ -389,7 +394,11 @@ float4 main(PixelInputType input) : SV_TARGET
 	float2 projectedTextureCoordinate;
 	textureColour = getTextureColour(objectTexture, textureSampler, input.tex);
 	newNormal = calculateNormalUsingNeighbouringTexels(input.tex, input.position.xyz);
-	
+
+	if ((bool) lightSettings.isNormalsAsColourEnabled.x)
+	{
+		return float4((newNormal + 1.f) / 2.f, 1.f);
+	}
 	lightColour += calculateLighting(
 		input.worldPosition.xyz, newNormal.xyz, input.viewVector.xyz,
 		input.spotLightViewPos1, input.spotLightViewPos2,
