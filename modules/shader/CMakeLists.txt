@@ -73,6 +73,7 @@ foreach(FILE ${HLSL_SHADER_FILES})
   set(PDB_FILE "${OUTPUT_DIR}/${FILE_WE}.pdb")
   list(APPEND CSO_SHADER_FILES ${CSO_FILE})
 
+  # Zi and Fo flags for debugging
   set(FXC_ARGS
       /nologo
       /Emain
@@ -87,7 +88,6 @@ foreach(FILE ${HLSL_SHADER_FILES})
       ${PDB_FILE}
       ${FILE})
 
-  # Zi and Fo flags for debugging
   add_custom_command(
     OUTPUT ${CSO_FILE}
     COMMAND ${FXC_PATH} ${FXC_ARGS}
