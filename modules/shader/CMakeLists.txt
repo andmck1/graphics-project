@@ -20,7 +20,9 @@ set(HULL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/hull/tessellatedQuad.hlsl")
 set(DOMAIN_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/domain/tessellatedTerrain.hlsl"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/domain/tessellatedWater.hlsl")
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/domain/tessellatedWater.hlsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/domain/tessellatedDepthTerrain.hlsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/domain/tessellatedDepthWater.hlsl")
 set(PIXEL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/lighting.hlsl"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/pixel/waterLighting.hlsl"

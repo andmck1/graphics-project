@@ -24,15 +24,19 @@ class TessellationPassThroughVertexShader : public VertexShader
 };
 
 // Domain
-class TessellatedTriangleDomainShader : public DomainShader
-{
-};
-
 class TessellatedWaterDomainShader : public DomainShader
 {
 };
 
 class TessellatedTerrainDomainShader : public DomainShader
+{
+};
+
+class TessellatedDepthWaterDomainShader : public DomainShader
+{
+};
+
+class TessellatedDepthTerrainDomainShader : public DomainShader
 {
 };
 

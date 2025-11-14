@@ -28,16 +28,19 @@ bool Scene::updateAndDraw()
         XMMATRIX lightViewMatrix = spotLightPtr->calculateViewMatrix();
         XMMATRIX lightProjectionMatrix =
             spotLightPtr->calculateOrthographicProjectionMatrix(
-                10000, 10000, .1f, 5000.f
+                100000, 100000, .1f, 50000.f
             );
         for (int i = 0; i < this->state->actors.size(); i++)
         {
             SceneActor *actor = this->state->actors[i].get();
-            if (actor->isDrawEnabled)
+            if ((actor->isDrawEnabled) && (actor->depthShaderStack != nullptr))
             {
-                actor->currentShaderStack =
-                    &this->state->shaderManagerState->depthShaderStack;
+                actor->currentShaderStack = actor->depthShaderStack;
                 this->state->shaderManagerState->matrixVertexBuffer.setData(
+                    actor->getWorldMatrix(), lightViewMatrix,
+                    lightProjectionMatrix
+                );
+                this->state->shaderManagerState->matrixDomainBuffer.setData(
                     actor->getWorldMatrix(), lightViewMatrix,
                     lightProjectionMatrix
                 );
@@ -89,14 +92,14 @@ bool Scene::updateAndDraw()
             XMMATRIX spotLightProjectionMatrix0 =
                 this->state->spotLights[0]
                     ->calculateOrthographicProjectionMatrix(
-                        10000, 10000, 0.1, 5000.f
+                        100000, 100000, 0.1, 50000.f
                     );
             XMMATRIX spotLightViewMatrix1 =
                 this->state->spotLights[1]->calculateViewMatrix();
             XMMATRIX spotLightProjectionMatrix1 =
                 this->state->spotLights[1]
                     ->calculateOrthographicProjectionMatrix(
-                        10000, 10000, .1, 5000.f
+                        100000, 100000, .1, 50000.f
                     );
             actor->currentShaderStack = actor->defaultShaderStack;
             this->state->shaderManagerState->matrixVertexBuffer.setData(

@@ -24,6 +24,8 @@ class ShaderManagerState : public BaseShaderManagerState
     ShaderStack depthShaderStack;
     ShaderStack tessellatedWaterShaderStack;
     ShaderStack tessellatedTerrainShaderStack;
+    ShaderStack tessellatedDepthWaterShaderStack;
+    ShaderStack tessellatedDepthTerrainShaderStack;
 
     // Vertex
     StandardVertexShader standardVertexShader;
@@ -37,6 +39,8 @@ class ShaderManagerState : public BaseShaderManagerState
     // Domain
     TessellatedWaterDomainShader tessellatedWaterDomainShader;
     TessellatedTerrainDomainShader tessellatedTerrainDomainShader;
+    TessellatedDepthWaterDomainShader tessellatedDepthWaterDomainShader;
+    TessellatedDepthTerrainDomainShader tessellatedDepthTerrainDomainShader; 
 
     // Pixel
     LightingPixelShader lightingPixelShader;

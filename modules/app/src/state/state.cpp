@@ -86,6 +86,14 @@ void State::initShaderManagerStateShaders()
         this->initShaderManagerStateShader<TessellatedTerrainDomainShader>(
             "./build/hlsl/domain/tessellatedTerrain.cso"
         );
+    this->shaderManagerState.tessellatedDepthWaterDomainShader =
+        this->initShaderManagerStateShader<TessellatedDepthWaterDomainShader>(
+            "./build/hlsl/domain/tessellatedDepthWater.cso"
+        );
+    this->shaderManagerState.tessellatedDepthTerrainDomainShader =
+        this->initShaderManagerStateShader<TessellatedDepthTerrainDomainShader>(
+            "./build/hlsl/domain/tessellatedDepthTerrain.cso"
+        );
 
     // Pixel
     this->shaderManagerState.lightingPixelShader =
@@ -149,6 +157,20 @@ void State::initShaderManagerStateShaderStacks()
             &this->shaderManagerState.tessellatedTerrainDomainShader,
             &this->shaderManagerState.lightingPixelShader,
         });
+    this->shaderManagerState.tessellatedDepthWaterShaderStack.shaders =
+        std::vector<BaseShader *>(
+            {&this->shaderManagerState.tessellationPassThroughVertexShader,
+             &this->shaderManagerState.tessellatedQuadHullShader,
+             &this->shaderManagerState.tessellatedDepthWaterDomainShader,
+             &this->shaderManagerState.depthPixelShader}
+        );
+    this->shaderManagerState.tessellatedDepthTerrainShaderStack.shaders =
+        std::vector<BaseShader *>(
+            {&this->shaderManagerState.tessellationPassThroughVertexShader,
+             &this->shaderManagerState.tessellatedQuadHullShader,
+             &this->shaderManagerState.tessellatedDepthTerrainDomainShader,
+             &this->shaderManagerState.depthPixelShader}
+        );
 }
 
 void State::initShaderManagerStateShaderBuffers()
@@ -184,6 +206,13 @@ void State::initShaderManagerStateShaderBuffers()
     this->shaderManagerState.tessellatedTerrainDomainShader.bufferStack = {
         &this->shaderManagerState.matrixDomainBuffer,
         &this->shaderManagerState.cameraDomainBuffer,
+    };
+    this->shaderManagerState.tessellatedDepthWaterDomainShader.bufferStack = {
+        &this->shaderManagerState.matrixDomainBuffer,
+        &this->shaderManagerState.waveDataDomainBuffer
+    };
+    this->shaderManagerState.tessellatedDepthTerrainDomainShader.bufferStack = {
+        &this->shaderManagerState.matrixDomainBuffer,
     };
 
     // Pixel
@@ -323,10 +352,10 @@ void State::initSceneStateSampler()
 
 template <typename MeshType, typename SceneActorType>
 void State::initSceneStateActor(
-    ShaderStack *defaultShaderStack, BaseTexture *texture, BaseSampler *sampler,
-    BaseTexture *heightMap, BaseSampler *heightMapSampler,
-    std::array<float, 3> initScaling, std::array<float, 3> initRotation,
-    std::array<float, 3> initTranslation
+    ShaderStack *defaultShaderStack, ShaderStack *depthSahderStack,
+    BaseTexture *texture, BaseSampler *sampler, BaseTexture *heightMap,
+    BaseSampler *heightMapSampler, std::array<float, 3> initScaling,
+    std::array<float, 3> initRotation, std::array<float, 3> initTranslation
 )
 {
     spdlog::debug("Initialising scene state mesh");
@@ -337,6 +366,7 @@ void State::initSceneStateActor(
         std::make_unique<MeshType>(this->sceneState.graphicsManager);
     sceneActorPtr->defaultShaderStack = defaultShaderStack;
     sceneActorPtr->currentShaderStack = defaultShaderStack;
+    sceneActorPtr->depthShaderStack = depthSahderStack;
     sceneActorPtr->texture = texture;
     sceneActorPtr->textureSampler = sampler;
     sceneActorPtr->heightMap = heightMap;
@@ -356,6 +386,7 @@ void State::initSceneStateActors()
     spdlog::debug("Initialising scene state meshes");
     this->initSceneStateActor<SphereMesh, SceneActor>(
         &this->shaderManagerState.defaultShaderStack,
+        &this->shaderManagerState.depthShaderStack,
         &this->textureManagerState.defaultTexture,
         &this->sceneState.clampSampler, nullptr, nullptr, {50.f, 50.f, 50.f},
         {0.f, 0.f, 0.f}, {1000.f, 100.f, 1000.f}
@@ -363,6 +394,7 @@ void State::initSceneStateActors()
 
     this->initSceneStateActor<TessellatedPlaneMesh, SceneActor>(
         &this->shaderManagerState.tessellatedTerrainShaderStack,
+        &this->shaderManagerState.tessellatedDepthTerrainShaderStack,
         &this->textureManagerState.mountainsTexture,
         &this->sceneState.clampSampler,
         &this->textureManagerState.mountainsHeightMap,
@@ -581,6 +613,7 @@ void State::initSceneStateWater()
     spdlog::debug("Initialising scene state water");
     this->initSceneStateActor<TessellatedPlaneMesh, Water>(
         &this->shaderManagerState.tessellatedWaterShaderStack,
+        &this->shaderManagerState.tessellatedDepthWaterShaderStack,
         &this->textureManagerState.waterTexture, &this->sceneState.wrapSampler,
         nullptr, nullptr, {1000.f, 100.f, 100.f}, {0.f, 0.f, 0.f},
         {-1000.f, -750.f, -1000.f}
@@ -804,7 +837,7 @@ void State::initAppInputState(Window *window, Scene *scene, Timer *timer)
     this->appInputState.window = window;
     this->appInputState.scene = scene;
     this->appInputState.timer = timer;
-    this->appInputState.cameraMoveSpeed = 100.f;
+    this->appInputState.cameraMoveSpeed = 500.f;
     this->appInputState.cameraRotateSensitivity = 0.1f;
 }
 

@@ -18,6 +18,7 @@ class SceneActor : public BaseActor
 
     ShaderStack *currentShaderStack = nullptr;
     ShaderStack *defaultShaderStack = nullptr;
+    ShaderStack *depthShaderStack = nullptr;
     BaseTexture *texture = nullptr;
     BaseSampler *textureSampler = nullptr;
     BaseTexture *heightMap = nullptr;

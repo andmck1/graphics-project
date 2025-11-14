@@ -76,16 +76,16 @@ int main()
     {
         app.timer.frame();
         appInput.handleInputs();
-        scene.state->spotLights.back()->directionVector[0] +=
-            rotationIncrement0 * app.timer.deltaTime;
-        scene.state->spotLights.back()->directionVector[1] +=
-            rotationIncrement0 * app.timer.deltaTime;
-        if (std::abs(scene.state->spotLights.back()->directionVector[0]) >
-            0.25f)
-            rotationIncrement0 *= -1.f;
-        if (std::abs(scene.state->spotLights.back()->directionVector[2]) >
-            0.25f)
-            rotationIncrement0 *= -1.f;
+        // scene.state->spotLights.back()->directionVector[0] +=
+        //     rotationIncrement0 * app.timer.deltaTime;
+        // scene.state->spotLights.back()->directionVector[1] +=
+        //     rotationIncrement0 * app.timer.deltaTime;
+        // if (std::abs(scene.state->spotLights.back()->directionVector[0]) >
+        //     0.25f)
+        //     rotationIncrement0 *= -1.f;
+        // if (std::abs(scene.state->spotLights.back()->directionVector[2]) >
+        //     0.25f)
+        //     rotationIncrement0 *= -1.f;
         scene.state->spotLights.front()->directionVector[0] +=
             rotationIncrement1 * app.timer.deltaTime;
         scene.state->spotLights.front()->directionVector[1] +=

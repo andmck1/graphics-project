@@ -83,6 +83,12 @@ struct QuadTessellationDomainOutputType
     float4 spotLightViewPos2 : TEXCOORD4;
 };
 
+struct DepthQuadTessellationDomainOutputType
+{
+    float4 position : SV_POSITION;
+    float4 depthPosition : TEXCOORD0;
+};
+
 struct QuadTessellationConstantOutputType
 {
     float edges[4] : SV_TessFactor;

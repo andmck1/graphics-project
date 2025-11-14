@@ -64,8 +64,9 @@ class State
     void initSceneStatePostProcessors();
     template <typename MeshType, typename SceneActorType>
     void initSceneStateActor(
-        ShaderStack *defaultShaderStack, BaseTexture *texture,
-        BaseSampler *sampler, BaseTexture *heightMap = nullptr,
+        ShaderStack *defaultShaderStack, ShaderStack *depthShaderStack,
+        BaseTexture *texture, BaseSampler *sampler,
+        BaseTexture *heightMap = nullptr,
         BaseSampler *heightMapSampler = nullptr,
         std::array<float, 3> initScaling = {1.f, 1.f, 1.f},
         std::array<float, 3> initRotation = {0.f, 0.f, 0.f},
