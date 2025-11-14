@@ -235,10 +235,14 @@ bool DebugScene::render()
             "Water Wave Magnitude", &this->state->water->magnitude, 0.1f, 2.f
         );
         ImGui::SliderFloat(
-            "Water Wave Number", &this->state->water->waveNumber, 0.1f, 1.f
+            "Water Wave Number", &this->state->water->waveNumber, 0.1f, 10.f
         );
         ImGui::SliderFloat(
             "Water Wave Angular Velocity", &this->state->water->angularVelocity,
+            0.1f, 10.f
+        );
+        ImGui::SliderFloat(
+            "Water Steepness", &this->state->water->steepness,
             0.1f, 10.f
         );
     }

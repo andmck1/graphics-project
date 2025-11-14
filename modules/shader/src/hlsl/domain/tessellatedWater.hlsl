@@ -17,49 +17,64 @@ cbuffer WaveBuffer : register(b2)
     WaveDataBufferType waveData;
 }
 
-float getWaveHeight(float4 position, WaveDataBufferType _waveData)
+// TODO - a lot of AI help here to shoe horn this in. Need to go back and understand it
+float3 getWaveDisplacement(float4 position, WaveDataBufferType w)
 {
-    float heightDisplacement;
-    heightDisplacement = (
-		(
-			_waveData.magnitude.x * 
-			sin(
-				(_waveData.waveNumber.x * position.x) - 
-				(_waveData.angularVelocity.x * _waveData.totalTime.x)
-			)
-		) + 
-		(
-			_waveData.magnitude.x * 
-			cos(
-				(_waveData.waveNumber.x * position.z) - 
-				(_waveData.angularVelocity.x * _waveData.totalTime.x)
-				)
-		)
-	);
-    return heightDisplacement;
+    float3 disp = float3(position.x, position.y, position.z);
+
+    float A[3] = { w.magnitude.x, w.magnitude.y, w.magnitude.z };
+    float k[3] = { w.waveNumber.x, w.waveNumber.y, w.waveNumber.z };
+    float wv[3] = { w.angularVelocity.x, w.angularVelocity.y, w.angularVelocity.z };
+    float2 D[3] = {
+        normalize(float2( 1.f,  0.f)),
+        normalize(float2( 0.6f, 0.8f)),
+        normalize(float2(-0.7f, 0.3f))
+    };
+
+    float Q = w.steepness.x;    // steepness
+    float t = w.totalTime.x;
+
+    for (int i = 0; i < 3; i++)
+    {
+        float theta = dot(D[i] * k[i], position.xz) + wv[i] * t;
+        disp.x += Q * A[i] * D[i].x * cos(theta);
+        disp.z += Q * A[i] * D[i].y * cos(theta);
+        disp.y +=       A[i]         * sin(theta);
+    }
+
+    return disp;
 }
 
-float3 getWaveNormal(float4 position, WaveDataBufferType _waveData)
-{	
-    float3 normal = float3(0.f, 0.f, 0.f);
-    normal.x = (
-		-_waveData.magnitude.x * 
-		_waveData.waveNumber.x * 
-		cos(
-			(_waveData.waveNumber.x * position.x)  - 
-			(_waveData.angularVelocity.x * _waveData.totalTime.x)
-		)
-	);
-    normal.y = 1.0f;
-    normal.z = (
-		_waveData.magnitude.x * 
-		_waveData.waveNumber.x * 
-		sin(
-			(_waveData.waveNumber.x * position.z) - 
-			(_waveData.angularVelocity.x * _waveData.totalTime.x)
-		)
-	);
-    return normalize(normal);
+float3 getWaveNormal(float4 position, WaveDataBufferType w)
+{
+    float3 n = float3(0.f, 1.f, 0.f);
+
+    float A[3] = { w.magnitude.x, w.magnitude.y, w.magnitude.z };
+    float k[3] = { w.waveNumber.x, w.waveNumber.y, w.waveNumber.z };
+    float wv[3] = { w.angularVelocity.x, w.angularVelocity.y, w.angularVelocity.z };
+    float2 D[3] = {
+        normalize(float2( 1.f,  0.f)),
+        normalize(float2( 0.6f, 0.8f)),
+        normalize(float2(-0.7f, 0.3f))
+    };
+
+    float Q = w.steepness.x;
+    float t = w.totalTime.x;
+
+    float3 accum = float3(0, 0, 0);
+
+    for (int i = 0; i < 3; i++)
+    {
+        float theta = dot(D[i] * k[i], position.xz) + wv[i] * t;
+        float costheta = cos(theta);
+        float sintheta = sin(theta);
+
+        accum.x += -D[i].x * k[i] * A[i] * costheta;
+        accum.z += -D[i].y * k[i] * A[i] * costheta;
+        accum.y += 1.0 - Q * k[i] * A[i] * sintheta;
+    }
+
+    return normalize(accum);
 }
 
 [domain("quad")]
@@ -91,17 +106,17 @@ QuadTessellationDomainOutputType main(
     uv = lerp(uv1, uv2, uvPatch.y); 
     
 	// WAVE
-    waveDisplacement = getWaveHeight(vertexPosition4f, waveData);
+    float3 displacedVertex = getWaveDisplacement(vertexPosition4f, waveData);
     waveNormal = getWaveNormal(vertexPosition4f, waveData);
-    vertexPosition4f.y += waveDisplacement;
-    normal = waveNormal;
+    vertexPosition4f.xyz = displacedVertex;
+    normal = normalize(waveNormal);
     // vertexPosition4f.xyz += normal.xyz;	
 
     output.position = mul(vertexPosition4f, matrixData.worldMatrix);
     output.position = mul(output.position, matrixData.viewMatrix);
     output.position = mul(output.position, matrixData.projectionMatrix);
 
-    output.tex = uv;
+    output.tex = uv * 10.f;
 
     output.normal = normal;
 

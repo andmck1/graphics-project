@@ -70,19 +70,32 @@ int main()
     // Main loop
     spdlog::info("Running app");
     app.timer.start();
-    float rotationIncrement = 0.1;
+    float rotationIncrement0 = 0.1;
+    float rotationIncrement1 = 0.1;
     while (window.frame())
     {
         app.timer.frame();
         appInput.handleInputs();
         scene.state->spotLights.back()->directionVector[0] +=
-            rotationIncrement * app.timer.deltaTime;
+            rotationIncrement0 * app.timer.deltaTime;
         scene.state->spotLights.back()->directionVector[1] +=
-            rotationIncrement * app.timer.deltaTime;
-        if (std::abs(scene.state->spotLights.back()->directionVector[0]) > 0.25f)
-            rotationIncrement *= -1.f;
-        if (std::abs(scene.state->spotLights.back()->directionVector[2]) > 0.25f)
-            rotationIncrement *= -1.f;
+            rotationIncrement0 * app.timer.deltaTime;
+        if (std::abs(scene.state->spotLights.back()->directionVector[0]) >
+            0.25f)
+            rotationIncrement0 *= -1.f;
+        if (std::abs(scene.state->spotLights.back()->directionVector[2]) >
+            0.25f)
+            rotationIncrement0 *= -1.f;
+        scene.state->spotLights.front()->directionVector[0] +=
+            rotationIncrement1 * app.timer.deltaTime;
+        scene.state->spotLights.front()->directionVector[1] +=
+            rotationIncrement1 * app.timer.deltaTime;
+        if (std::abs(scene.state->spotLights.front()->directionVector[0]) >
+            0.25f)
+            rotationIncrement1 *= -1.f;
+        if (std::abs(scene.state->spotLights.front()->directionVector[2]) >
+            0.25f)
+            rotationIncrement1 *= -1.f;
         scene.updateAndDraw();
         debugScene.render();
         graphicsManager.presentScreen();

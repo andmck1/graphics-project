@@ -21,6 +21,8 @@ bool TextureManager::loadAll()
         return false;
     if (!this->state->lightDebugTexture.load())
         return false;
+    if (!this->state->waterTexture.load())
+        return false;
 
     return true;
 }

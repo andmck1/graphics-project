@@ -260,6 +260,7 @@ struct WaveDataBufferType
         float4 magnitude;
         float4 waveNumber;
         float4 angularVelocity;
+        float4 steepness;
     };
 
 #ifdef __cplusplus

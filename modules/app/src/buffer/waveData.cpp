@@ -4,7 +4,7 @@
 bool WaveDataVertexBuffer::init(D3D *graphicsManager)
 {
     HRESULT createBufferHR;
-    
+
     spdlog::debug("Initialising wave data buffer");
     this->graphicsManager = graphicsManager;
     this->bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -23,16 +23,19 @@ bool WaveDataVertexBuffer::init(D3D *graphicsManager)
 
 void WaveDataVertexBuffer::setData(
     float *totalTime, float *magnitude, float *waveNumber,
-    float *angularVelocity
+    float *angularVelocity, float *steepness
 )
 {
     this->totalTime = totalTime;
     this->magnitude = magnitude;
     this->waveNumber = waveNumber;
     this->angularVelocity = angularVelocity;
+    this->steepness = steepness;
 }
 
-bool WaveDataVertexBuffer::setShader(BufferSlots *slotCounters, int numberOfBuffers)
+bool WaveDataVertexBuffer::setShader(
+    BufferSlots *slotCounters, int numberOfBuffers
+)
 {
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     WaveDataVertexBuffer::ShaderBuffer *bufferData;
@@ -51,6 +54,7 @@ bool WaveDataVertexBuffer::setShader(BufferSlots *slotCounters, int numberOfBuff
     bufferData->waveNumber = XMFLOAT4(*this->waveNumber, 0.f, 0.f, 0.f);
     bufferData->angularVelocity =
         XMFLOAT4(*this->angularVelocity, 0.f, 0.f, 0.f);
+    bufferData->steepness = XMFLOAT4(*this->steepness, 0.f, 0.f, 0.f);
 
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->VSSetConstantBuffers(
@@ -64,7 +68,7 @@ bool WaveDataVertexBuffer::setShader(BufferSlots *slotCounters, int numberOfBuff
 bool WaveDataDomainBuffer::init(D3D *graphicsManager)
 {
     HRESULT createBufferHR;
-    
+
     spdlog::debug("Initialising wave data buffer");
     this->graphicsManager = graphicsManager;
     this->bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -83,16 +87,19 @@ bool WaveDataDomainBuffer::init(D3D *graphicsManager)
 
 void WaveDataDomainBuffer::setData(
     float *totalTime, float *magnitude, float *waveNumber,
-    float *angularVelocity
+    float *angularVelocity, float *steepness
 )
 {
     this->totalTime = totalTime;
     this->magnitude = magnitude;
     this->waveNumber = waveNumber;
     this->angularVelocity = angularVelocity;
+    this->steepness = steepness;
 }
 
-bool WaveDataDomainBuffer::setShader(BufferSlots *slotCounters, int numberOfBuffers)
+bool WaveDataDomainBuffer::setShader(
+    BufferSlots *slotCounters, int numberOfBuffers
+)
 {
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     WaveDataDomainBuffer::ShaderBuffer *bufferData;
@@ -111,6 +118,7 @@ bool WaveDataDomainBuffer::setShader(BufferSlots *slotCounters, int numberOfBuff
     bufferData->waveNumber = XMFLOAT4(*this->waveNumber, 0.f, 0.f, 0.f);
     bufferData->angularVelocity =
         XMFLOAT4(*this->angularVelocity, 0.f, 0.f, 0.f);
+    bufferData->steepness = XMFLOAT4(*this->steepness, 0.f, 0.f, 0.f);
 
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->DSSetConstantBuffers(

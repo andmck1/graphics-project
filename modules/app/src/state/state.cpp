@@ -234,7 +234,8 @@ void State::setShaderManagerStateShaderBufferData()
     this->shaderManagerState.waveDataDomainBuffer.setData(
         &this->appState.timer->totalTime, &this->sceneState.water->magnitude,
         &this->sceneState.water->waveNumber,
-        &this->sceneState.water->angularVelocity
+        &this->sceneState.water->angularVelocity,
+        &this->sceneState.water->steepness
     );
     this->shaderManagerState.lightSettingsPixelBuffer.setData(
         &this->sceneState.isNormalsAsColourEnabled
@@ -296,6 +297,12 @@ void State::initTextureManagerState(D3D *graphicsManager)
         std::filesystem::absolute(
             std::filesystem::path("./textures/light_debug.jpg")
         );
+
+    this->textureManagerState.waterTexture = FileTexture();
+    this->textureManagerState.waterTexture.graphicsManager = graphicsManager;
+    this->textureManagerState.waterTexture.filepath = std::filesystem::absolute(
+        std::filesystem::path("./textures/water.jpg")
+    );
 }
 
 void State::initSceneStateSampler()
@@ -356,7 +363,7 @@ void State::initSceneStateActors()
 
     this->initSceneStateActor<TessellatedPlaneMesh, SceneActor>(
         &this->shaderManagerState.tessellatedTerrainShaderStack,
-        &this->textureManagerState.mountainsHeightMap,
+        &this->textureManagerState.mountainsTexture,
         &this->sceneState.clampSampler,
         &this->textureManagerState.mountainsHeightMap,
         &this->sceneState.clampSampler, {50.f, 50.f, 50.f}, {0.f, 0.f, 0.f},
@@ -499,13 +506,13 @@ void State::initSceneStateSpotLights()
     spdlog::debug("Initialising scene spot lights");
     this->initSceneStateSpotLight(
         XMFLOAT3(0.98f, 0.86f, 0.87f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
-        XMFLOAT3(-100.f, 2000.f, 195.f), XMFLOAT3(0.2f, -.62f, .3f), 15.f,
-        XMFLOAT3(.001f, .0001f, 1e-6f), true, true, true
+        XMFLOAT3(-100.f, 2000.f, 195.f), XMFLOAT3(0.2f, -.2f, .2f), 15.f,
+        XMFLOAT3(1e-5, 1e-7, 1e-7), true, true, true
     );
     this->initSceneStateSpotLight(
         XMFLOAT3(0.69f, 0.88f, 0.87f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
         XMFLOAT3(1350.f, 1500.f, 970.f), XMFLOAT3(-0.2f, -1.f, 0.f), 15.f,
-        XMFLOAT3(.001f, .0001f, 1e-6f), true, true, true
+        XMFLOAT3(1e-5, 1e-7, 1e-7), true, true, true
     );
 }
 
@@ -547,8 +554,8 @@ void State::initSceneStateDirectionalLights()
 {
     spdlog::debug("Initialising scene state directional lights");
     this->initSceneStateDirectionalLight(
-        XMFLOAT3(0.6f, 1.f, 0.6f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
-        XMFLOAT3(5.f, 0.f, 5.f), XMFLOAT3(-1.f, 0.f, 0.f),
+        XMFLOAT3(.25f, .25f, .25f), XMFLOAT3(.25f, .25f, .25f), 10.f,
+        XMFLOAT3(5.f, 0.f, 5.f), XMFLOAT3(-.7f, .6f, 1.f),
         XMFLOAT3(.432f, .00056f, .000010f), true, false, true
     );
     this->initSceneStateDirectionalLight(
@@ -574,18 +581,19 @@ void State::initSceneStateWater()
     spdlog::debug("Initialising scene state water");
     this->initSceneStateActor<TessellatedPlaneMesh, Water>(
         &this->shaderManagerState.tessellatedWaterShaderStack,
-        &this->textureManagerState.defaultTexture,
-        &this->sceneState.clampSampler, nullptr, nullptr,
-        {1000.f, 100.f, 100.f}, {0.f, 0.f, 0.f}, {-1000.f, -750.f, -1000.f}
+        &this->textureManagerState.waterTexture, &this->sceneState.wrapSampler,
+        nullptr, nullptr, {1000.f, 100.f, 100.f}, {0.f, 0.f, 0.f},
+        {-1000.f, -750.f, -1000.f}
     );
     Water *waterPtr =
         dynamic_cast<Water *>(this->sceneState.actors.back().get());
     this->sceneState.water = waterPtr;
 
     waterPtr->isDrawEnabled = true;
-    waterPtr->magnitude = 1.f;
-    waterPtr->waveNumber = 0.5f;
-    waterPtr->angularVelocity = 0.5f;
+    waterPtr->magnitude = 1.1f;
+    waterPtr->waveNumber = 1.0f;
+    waterPtr->angularVelocity = 1.87f;
+    waterPtr->steepness = 0.84f;
 }
 
 void State::createRenderTexture(
@@ -718,9 +726,9 @@ void State::initSceneStateTessellationSettings()
 {
     spdlog::debug("Initialising scene state tessellation settings");
     this->sceneState.tessellationHullDataSettings
-        .minTessellationDistanceThreshold = XMFLOAT4(80.f, 0.f, 0.f, 0.f);
+        .minTessellationDistanceThreshold = XMFLOAT4(100.f, 0.f, 0.f, 0.f);
     this->sceneState.tessellationHullDataSettings
-        .maxTessellationDistanceThreshold = XMFLOAT4(1000.f, 0.f, 0.f, 0.f);
+        .maxTessellationDistanceThreshold = XMFLOAT4(3500.f, 0.f, 0.f, 0.f);
 }
 
 void State::initSceneState(

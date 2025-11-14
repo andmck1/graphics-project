@@ -8,4 +8,5 @@ class Water : public SceneActor
     float magnitude;
     float waveNumber;
     float angularVelocity;
+    float steepness;
 };

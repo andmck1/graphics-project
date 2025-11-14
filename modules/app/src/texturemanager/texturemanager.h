@@ -10,6 +10,7 @@ struct TextureManagerState
     FileTexture mountainsHeightMap;
     FileTexture mountainsTexture;
     FileTexture lightDebugTexture;
+    FileTexture waterTexture;
 };
 
 class TextureManager

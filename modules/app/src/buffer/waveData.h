@@ -13,13 +13,14 @@ class WaveDataVertexBuffer : public BaseConstantBuffer
     bool setShader(BufferSlots *slotCounters, int numberOfBuffers) override;
     void setData(
         float *totalTime, float *magnitude, float *waveNumber,
-        float *angularVelocity
+        float *angularVelocity, float *steepness
     );
 
     float *totalTime;
     float *magnitude;
     float *waveNumber;
     float *angularVelocity;
+    float *steepness;
     struct ShaderBuffer : SharedBufferTypes::WaveDataBufferType
     {
     };
@@ -33,13 +34,14 @@ class WaveDataDomainBuffer : public BaseConstantBuffer
     bool setShader(BufferSlots *slotCounters, int numberOfBuffers) override;
     void setData(
         float *totalTime, float *magnitude, float *waveNumber,
-        float *angularVelocity
+        float *angularVelocity, float *steepness
     );
 
     float *totalTime;
     float *magnitude;
     float *waveNumber;
     float *angularVelocity;
+    float *steepness;
     struct ShaderBuffer : SharedBufferTypes::WaveDataBufferType
     {
     };
