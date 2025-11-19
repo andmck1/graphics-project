@@ -40,6 +40,8 @@ add_library(
   ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp
   )
 
+# TODO - make not hardcoded
+set(DIRECTX_ARCH x86)
 include(FetchContent)
 FetchContent_Declare(
     dxtk

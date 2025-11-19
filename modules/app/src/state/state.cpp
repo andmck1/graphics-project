@@ -538,7 +538,7 @@ void State::initSceneStateSpotLights()
     spdlog::debug("Initialising scene spot lights");
     this->initSceneStateSpotLight(
         XMFLOAT3(0.98f, 0.86f, 0.87f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
-        XMFLOAT3(-100.f, 2000.f, 195.f), XMFLOAT3(0.2f, -.2f, .2f), 15.f,
+        XMFLOAT3(-100.f, 2000.f, 195.f), XMFLOAT3(0.05f, -.2f, .05f), 15.f,
         XMFLOAT3(1e-5, 1e-7, 1e-7), true, true, true
     );
     this->initSceneStateSpotLight(
@@ -761,7 +761,7 @@ void State::initSceneStateTessellationSettings()
     this->sceneState.tessellationHullDataSettings
         .minTessellationDistanceThreshold = XMFLOAT4(100.f, 0.f, 0.f, 0.f);
     this->sceneState.tessellationHullDataSettings
-        .maxTessellationDistanceThreshold = XMFLOAT4(3500.f, 0.f, 0.f, 0.f);
+        .maxTessellationDistanceThreshold = XMFLOAT4(1000.f, 0.f, 0.f, 0.f);
 }
 
 void State::initSceneState(

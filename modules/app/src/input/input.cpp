@@ -76,8 +76,10 @@ void AppInput::handleInputs()
         }
 
         // Camera
-        if (this->state->window->getKeyState(Input::Key::RMB) ==
-            Input::KeyState::PRESSED)
+        if ((this->state->window->getKeyState(Input::Key::RMB) ==
+             Input::KeyState::PRESSED) ||
+            (this->state->window->getKeyState(Input::Key::P) ==
+             Input::KeyState::PRESSED))
         {
             this->state->window->setMouseVisible(false);
             this->state->scene->state->camera->rotateBy(

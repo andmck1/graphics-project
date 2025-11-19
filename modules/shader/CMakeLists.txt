@@ -1,8 +1,7 @@
 # :TODO - make this not hardcoded
-set(FXC_PATH
-    "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/fxc.exe")
-# set(FXC_PATH "C:/Program Files (x86)/Windows
-# Kits/10/bin/10.0.22621.0/x86/fxc.exe")
+# set(FXC_PATH
+#     "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/fxc.exe")
+set(FXC_PATH "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x86/fxc.exe")
 
 add_library(shared_shader STATIC src/shared_shader/sharedbuffertypes.h
                                  src/shared_shader/sharedbuffertypes.cpp)
