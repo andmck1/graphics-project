@@ -4,42 +4,34 @@
 // Some lab code here
 XMMATRIX SpotLight::calculateViewMatrix()
 {
-    // Load position and direction
-    XMVECTOR pos =
+    XMVECTOR worldPositionVector =
         XMVectorSet(worldPosition[0], worldPosition[1], worldPosition[2], 1.f);
 
-    XMVECTOR dir = XMVectorSet(
+    XMVECTOR _directionVector = XMVectorSet(
         directionVector[0], directionVector[1], directionVector[2], 0.f
     );
 
-    // Handle zero direction vector (0,0,0)
-    if (XMVector3Equal(dir, XMVectorZero()))
+    if (XMVector3Equal(_directionVector, XMVectorZero()))
     {
-        // Default forward direction
-        dir = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+        _directionVector = XMVectorSet(0.f, 0.f, 1.f, 0.f);
     }
+    _directionVector = XMVector3Normalize(_directionVector);
 
-    // Normalize direction
-    dir = XMVector3Normalize(dir);
+    // check for gimball lock
+    // TODO - use quaternions?
+    XMVECTOR yVector = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 
-    // Choose up vector
-    XMVECTOR up = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    XMVECTOR upVector =
+        fabs(XMVectorGetX(XMVector3Dot(_directionVector, yVector))) > 0.99f
+            ? XMVectorSet(0.f, 0.f, 1.f, 0.f)
+            : XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    XMVECTOR rightVector =
+        XMVector3Normalize(XMVector3Cross(upVector, _directionVector));
+    upVector = XMVector3Cross(_directionVector, rightVector);
 
-    // If forward is too close to +Y or -Y, pick another up vector
-    XMVECTOR yAxis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
-    float dot = XMVectorGetX(XMVector3Dot(dir, yAxis));
-
-    if (fabs(dot) > 0.99f) // almost parallel to Y
-    {
-        up = XMVectorSet(0.f, 0.f, 1.f, 0.f);
-    }
-
-    // Recompute right and corrected up
-    XMVECTOR right = XMVector3Normalize(XMVector3Cross(up, dir));
-    up = XMVector3Cross(dir, right);
-
-    // Build view matrix
-    return XMMatrixLookAtLH(pos, pos + dir, up);
+    return XMMatrixLookAtLH(
+        worldPositionVector, worldPositionVector + _directionVector, upVector
+    );
 }
 
 // Some copilot help here

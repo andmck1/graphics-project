@@ -76,7 +76,8 @@ int main()
         appInput.handleInputs();
 
         // set spotlight to player
-        // weird calcs for my camera forward vector when using mouse to rotate
+        // TODO weird calcs for my camera forward vector when using mouse to
+        // rotate
         scene.state->spotLights.back()->moveTo(
             scene.state->camera->worldPosition[0],
             scene.state->camera->worldPosition[1],
