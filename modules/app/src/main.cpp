@@ -70,32 +70,27 @@ int main()
     // Main loop
     spdlog::info("Running app");
     app.timer.start();
-    float rotationIncrement0 = 0.1;
-    float rotationIncrement1 = 0.05;
     while (window.frame())
     {
         app.timer.frame();
         appInput.handleInputs();
-        // scene.state->spotLights.back()->directionVector[0] +=
-        //     rotationIncrement0 * app.timer.deltaTime;
-        // scene.state->spotLights.back()->directionVector[1] +=
-        //     rotationIncrement0 * app.timer.deltaTime;
-        // if (std::abs(scene.state->spotLights.back()->directionVector[0]) >
-        //     0.25f)
-        //     rotationIncrement0 *= -1.f;
-        // if (std::abs(scene.state->spotLights.back()->directionVector[2]) >
-        //     0.25f)
-        //     rotationIncrement0 *= -1.f;
-        scene.state->spotLights.front()->directionVector[0] +=
-            rotationIncrement1 * app.timer.deltaTime;
-        scene.state->spotLights.front()->directionVector[1] +=
-            rotationIncrement1 * app.timer.deltaTime;
-        if (std::abs(scene.state->spotLights.front()->directionVector[0]) >
-            0.1f)
-            rotationIncrement1 *= -1.f;
-        if (std::abs(scene.state->spotLights.front()->directionVector[2]) >
-            0.1f)
-            rotationIncrement1 *= -1.f;
+
+        // set spotlight to player
+        // weird calcs for my camera forward vector when using mouse to rotate
+        scene.state->spotLights.back()->moveTo(
+            scene.state->camera->worldPosition[0],
+            scene.state->camera->worldPosition[1],
+            scene.state->camera->worldPosition[2]
+        );
+        XMVECTOR forward = XMVector3TransformNormal(
+            XMVectorSet(0.f, 0.f, 1.f, 0.f),
+            scene.state->camera->getRotationMatrix()
+        );
+        scene.state->spotLights.back()->directionVector[0] = forward[0];
+        scene.state->spotLights.back()->directionVector[1] = forward[1];
+        scene.state->spotLights.back()->directionVector[2] = forward[2];
+        scene.state->spotLights.back()->isDrawEnabled = false;
+
         scene.updateAndDraw();
         debugScene.render();
         graphicsManager.presentScreen();

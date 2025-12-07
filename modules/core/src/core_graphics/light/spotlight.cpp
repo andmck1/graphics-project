@@ -2,38 +2,44 @@
 #include <directxmath.h>
 
 // Some lab code here
-XMMATRIX
-SpotLight::calculateViewMatrix()
+XMMATRIX SpotLight::calculateViewMatrix()
 {
-    XMFLOAT3 _worldPosition;
-    _worldPosition.x = this->worldPosition[0];
-    _worldPosition.y = this->worldPosition[1];
-    _worldPosition.z = this->worldPosition[2];
-    XMVECTOR worldPositionVector =
-        XMVectorSet(_worldPosition.x, _worldPosition.y, _worldPosition.z, 1.f);
-    XMFLOAT3 direction;
-    direction.x = this->directionVector[0];
-    direction.y = this->directionVector[1];
-    direction.z = this->directionVector[2];
-    XMVECTOR _directionVector = XMVector3Normalize(
-        XMVectorSet(direction.x, direction.y, direction.z, 0.f)
+    // Load position and direction
+    XMVECTOR pos =
+        XMVectorSet(worldPosition[0], worldPosition[1], worldPosition[2], 1.f);
+
+    XMVECTOR dir = XMVectorSet(
+        directionVector[0], directionVector[1], directionVector[2], 0.f
     );
 
-    XMVECTOR upVector = XMVectorSet(0.f, 1.f, 0.f, 1.f);
-    XMVECTOR checkVector = XMVectorSet(0.f, 0.f, 1.f, 1.f);
-    if (XMVector3NearEqual(
-            _directionVector, checkVector, XMVectorSet(1e-1f, 1e-1, 1e-1, 1e-1)
-        ))
-        upVector = XMVectorSet(0.f, 0.f, 1.f, 1.f);
-    else if (XMVector3Equal(_directionVector, -checkVector))
-        upVector = XMVectorSet(0.f, 0.f, 1.f, 1.f);
+    // Handle zero direction vector (0,0,0)
+    if (XMVector3Equal(dir, XMVectorZero()))
+    {
+        // Default forward direction
+        dir = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+    }
 
-    XMVECTOR rightVector = XMVector3Cross(_directionVector, upVector);
-    upVector = XMVector3Cross(rightVector, _directionVector);
+    // Normalize direction
+    dir = XMVector3Normalize(dir);
 
-    return XMMatrixLookAtLH(
-        worldPositionVector, worldPositionVector + _directionVector, upVector
-    );
+    // Choose up vector
+    XMVECTOR up = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+    // If forward is too close to +Y or -Y, pick another up vector
+    XMVECTOR yAxis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    float dot = XMVectorGetX(XMVector3Dot(dir, yAxis));
+
+    if (fabs(dot) > 0.99f) // almost parallel to Y
+    {
+        up = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+    }
+
+    // Recompute right and corrected up
+    XMVECTOR right = XMVector3Normalize(XMVector3Cross(up, dir));
+    up = XMVector3Cross(dir, right);
+
+    // Build view matrix
+    return XMMatrixLookAtLH(pos, pos + dir, up);
 }
 
 // Some copilot help here

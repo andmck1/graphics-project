@@ -21,13 +21,15 @@ void Camera::update()
     XMVECTOR forward = XMVector3TransformNormal(
         XMVectorSet(0.f, 0.f, 1.f, 0.f), cameraRotation
     );
+    this->forwardVector = {forward[0], forward[1], forward[2]};
+
     XMVECTOR up = XMVector3TransformNormal(
         XMVectorSet(0.f, 1.f, 0.f, 0.f), cameraRotation
     );
     XMVECTOR at = XMVectorAdd(eyePosition, forward);
 
     this->viewMatrix = XMMatrixLookAtLH(eyePosition, at, up);
-    
+
     this->updatePreviousWorldPosition();
     this->updatePreviousRotation();
     this->movementDirectionVector.x =

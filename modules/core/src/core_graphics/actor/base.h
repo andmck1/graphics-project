@@ -27,7 +27,7 @@ class BaseActor
     XMMATRIX getTranslationMatrix();
     XMMATRIX getRotationMatrix();
     XMMATRIX getScalingMatrix();
-    
+
     void updatePreviousWorldPosition();
     void updatePreviousRotation();
     void updatePreviousScaling();
@@ -36,7 +36,8 @@ class BaseActor
     void
     moveTo(float xWorldPosition, float yWorldPosition, float zWorldPosition);
     void moveBy(float xOffset, float yOffset, float zOffset);
-    void moveRelativeToForwardVectorBy(float xOffset, float yOffset, float zOffset);
+    void
+    moveRelativeToForwardVectorBy(float xOffset, float yOffset, float zOffset);
 
     void rotateTo(float pitch, float yaw, float roll);
     void rotateBy(float pitchOffset, float yawOffset, float rollOffset);
