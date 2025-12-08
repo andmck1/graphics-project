@@ -53,12 +53,14 @@ bool D3D::initProjectionMatrix()
 {
     float aspectRatio = static_cast<float>(this->state->window->state->width) /
                         static_cast<float>(this->state->window->state->height);
+    float nearPlane = 0.1f;
+    float farPlane = 10000.f;
     this->projectionMatrix =
-        XMMatrixPerspectiveFovLH(XM_PIDIV4, aspectRatio, 0.1f, 5000.0f);
+        XMMatrixPerspectiveFovLH(XM_PIDIV4, aspectRatio, nearPlane, farPlane);
 
     this->orthographicProjectionMatrix = XMMatrixOrthographicLH(
         (float) this->state->window->state->width,
-        (float) this->state->window->state->height, 0.1f, 5000.f
+        (float) this->state->window->state->height,nearPlane, farPlane 
     );
     return true;
 }

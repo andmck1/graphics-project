@@ -388,8 +388,43 @@ void State::initSceneStateActors()
         &this->shaderManagerState.defaultShaderStack,
         &this->shaderManagerState.depthShaderStack,
         &this->textureManagerState.defaultTexture,
-        &this->sceneState.clampSampler, nullptr, nullptr, {50.f, 50.f, 50.f},
+        &this->sceneState.clampSampler, nullptr, nullptr, {70.f, 70.f, 70.f},
         {0.f, 0.f, 0.f}, {1000.f, 100.f, 1000.f}
+    );
+    this->initSceneStateActor<SphereMesh, SceneActor>(
+        &this->shaderManagerState.defaultShaderStack,
+        &this->shaderManagerState.depthShaderStack,
+        &this->textureManagerState.defaultTexture,
+        &this->sceneState.clampSampler, nullptr, nullptr, {20.f, 20.f, 20.f},
+        {0.f, 0.f, 0.f}, {700.f, 120.f, 700.f}
+    );
+    this->initSceneStateActor<SphereMesh, SceneActor>(
+        &this->shaderManagerState.defaultShaderStack,
+        &this->shaderManagerState.depthShaderStack,
+        &this->textureManagerState.defaultTexture,
+        &this->sceneState.clampSampler, nullptr, nullptr, {40.f, 40.f, 40.f},
+        {0.f, 0.f, 0.f}, {1000.f, 80.f, 700.f}
+    );
+    this->initSceneStateActor<SphereMesh, SceneActor>(
+        &this->shaderManagerState.defaultShaderStack,
+        &this->shaderManagerState.depthShaderStack,
+        &this->textureManagerState.defaultTexture,
+        &this->sceneState.clampSampler, nullptr, nullptr, {50.f, 50.f, 50.f},
+        {0.f, 0.f, 0.f}, {800.f, 100.f, 1000.f}
+    );
+    this->initSceneStateActor<SphereMesh, SceneActor>(
+        &this->shaderManagerState.defaultShaderStack,
+        &this->shaderManagerState.depthShaderStack,
+        &this->textureManagerState.defaultTexture,
+        &this->sceneState.clampSampler, nullptr, nullptr, {60.f, 10.f, 60.f},
+        {0.f, 0.f, 0.f}, {1000.f, 200.f, 1000.f}
+    );
+    this->initSceneStateActor<PlaneMesh, SceneActor>(
+        &this->shaderManagerState.defaultShaderStack,
+        &this->shaderManagerState.depthShaderStack,
+        &this->textureManagerState.defaultTexture,
+        &this->sceneState.clampSampler, nullptr, nullptr, {10.f, 10.f, 10.f},
+        {1.f, 0.f, 1.f}, {1500.f, 50.f, 700.f}
     );
 
     this->initSceneStateActor<TessellatedPlaneMesh, SceneActor>(
@@ -467,13 +502,13 @@ void State::initSceneStatePointLights()
 {
     spdlog::debug("Initialising scene state point lights");
     this->initSceneStatePointLight(
-        XMFLOAT3(0.99f, 0.97f, 0.89f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
-        XMFLOAT3(1500.f, 135.f, 775.f), XMFLOAT3(.001f, .0001f, 5e-6f), true,
+        XMFLOAT3(.8f, .33f, 0.f), XMFLOAT3(.33f, .33f, .33f), 10.f,
+        XMFLOAT3(758.f, 0.f, 3100.f), XMFLOAT3(.001f, .0001f, 5e-6f), true,
         true, true
     );
     this->initSceneStatePointLight(
-        XMFLOAT3(1.f, 0.85f, 0.73f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
-        XMFLOAT3(200.f, 435.f, 2000.f), XMFLOAT3(.001f, .0001f, 5e-6f), true,
+        XMFLOAT3(.48, 0.1f, 0.6f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
+        XMFLOAT3(3889.f, -200.f, 3300.f), XMFLOAT3(.001f, .0001f, 5e-6f), true,
         true, true
     );
 }
@@ -537,13 +572,13 @@ void State::initSceneStateSpotLights()
 {
     spdlog::debug("Initialising scene spot lights");
     this->initSceneStateSpotLight(
-        XMFLOAT3(0.98f, 0.86f, 0.87f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
-        XMFLOAT3(-100.f, 2000.f, 195.f), XMFLOAT3(0.05f, -.2f, .05f), 15.f,
+        XMFLOAT3(0.6f, 0.6f, 0.6f), XMFLOAT3(0.f, 0.f, 0.f), 10.f,
+        XMFLOAT3(-1000.f, 800.f, 1500.f), XMFLOAT3(0.5f, -0.5f, 0.f), 15.f,
         XMFLOAT3(1e-5, 1e-7, 1e-7), true, true, true
     );
     this->initSceneStateSpotLight(
-        XMFLOAT3(0.69f, 0.88f, 0.87f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
-        XMFLOAT3(1350.f, 1500.f, 970.f), XMFLOAT3(-0.2f, -1.f, 0.f), 15.f,
+        XMFLOAT3(0.6f, 0.6f, 0.6f), XMFLOAT3(0.f, 0.f, 0.f), 10.f,
+        XMFLOAT3(4000.f, 800.f, 1500.f), XMFLOAT3(-0.5f, -0.5f, 0.f), 15.f,
         XMFLOAT3(1e-5, 1e-7, 1e-7), true, true, true
     );
 }
@@ -592,9 +627,9 @@ void State::initSceneStateDirectionalLights()
 {
     spdlog::debug("Initialising scene state directional lights");
     this->initSceneStateDirectionalLight(
-        XMFLOAT3(.25f, .25f, .25f), XMFLOAT3(.25f, .25f, .25f), 10.f,
-        XMFLOAT3(5.f, 0.f, 5.f), XMFLOAT3(-.7f, .6f, 1.f),
-        XMFLOAT3(.432f, .00056f, .000010f), true, false, true
+        XMFLOAT3(0.43, 0.43, 0.43), XMFLOAT3(0.31, 0.31, 0.31), 10.f,
+        XMFLOAT3(5.f, 0.f, 5.f), XMFLOAT3(0.723, -0.34, 0.258),
+        XMFLOAT3(.432f, .00056f, .000010f), true, true, true
     );
     this->initSceneStateDirectionalLight(
         XMFLOAT3(1.f, 1.f, 1.f), XMFLOAT3(1.f, 1.f, 1.f), 10.f,
@@ -611,8 +646,8 @@ void State::initSceneStateCamera()
         dynamic_cast<Camera *>(this->sceneState.actors.back().get());
     cameraPtr->isDrawEnabled = false;
     cameraPtr->isUpdateEnabled = true;
-    cameraPtr->worldPosition = {3309.90, 82.52, 3130.47};
-    cameraPtr->rotateTo(0.36, -1.84, 0.0);
+    cameraPtr->worldPosition = {-496.f, 337.f, 766.f};
+    cameraPtr->rotateTo(.24f, .95f, 0.f);
     this->sceneState.camera = cameraPtr;
 }
 
@@ -623,7 +658,7 @@ void State::initSceneStateWater()
         &this->shaderManagerState.tessellatedWaterShaderStack,
         &this->shaderManagerState.tessellatedDepthWaterShaderStack,
         &this->textureManagerState.waterTexture, &this->sceneState.wrapSampler,
-        nullptr, nullptr, {1000.f, 100.f, 100.f}, {0.f, 0.f, 0.f},
+        nullptr, nullptr, {50.f, 50.f, 50.f}, {0.f, 0.f, 0.f},
         {-1000.f, -750.f, -1000.f}
     );
     Water *waterPtr =
@@ -718,19 +753,20 @@ void State::initSceneStatePostProcessors()
     crtSettingsPtr->isCurvingEnabled = XMINT4(1, 0, 0, 0);
     crtSettingsPtr->isChromaticAberrationEnabled = XMINT4(1, 0, 0, 0);
     crtSettingsPtr->isGrainEnabled = XMINT4(1, 0, 0, 0);
-    crtSettingsPtr->isRGBGridEnabled = XMINT4(1, 0, 0, 0);
+    crtSettingsPtr->isRGBGridEnabled = XMINT4(0, 0, 0, 0);
     crtSettingsPtr->isScanlinesEnabled = XMINT4(0, 0, 0, 0);
     crtSettingsPtr->isVingetteEnabled = XMINT4(1, 0, 0, 0);
 
-    crtSettingsPtr->brightnessMultiplier = XMFLOAT4(1.f, 0.f, 0.f, 0.f);
-    crtSettingsPtr->grainStrength = XMFLOAT4(0.2f, 0.f, 0.f, 0.f);
+    crtSettingsPtr->brightnessMultiplier = XMFLOAT4(1.69f, 0.f, 0.f, 0.f);
+    crtSettingsPtr->grainStrength = XMFLOAT4(0.025f, 0.f, 0.f, 0.f);
     crtSettingsPtr->curvePower = XMFLOAT4(1.01f, 0.f, 0.f, 0.f);
-    crtSettingsPtr->vingetteStrength = XMFLOAT4(0.5f, 0.f, 0.f, 0.f);
+    crtSettingsPtr->vingetteStrength = XMFLOAT4(1.42f, 0.f, 0.f, 0.f);
     crtSettingsPtr->scanlinesInterval = XMINT4(2, 0, 0, 0);
     crtSettingsPtr->scanlinesOpacity = XMFLOAT4(1.f, 0.f, 0.f, 0.f);
     crtSettingsPtr->scanlinesThickness = XMINT4(2, 0, 0, 0);
-    crtSettingsPtr->chromaticAberrationStrength = XMFLOAT4(2.f, 0.f, 0.f, 0.f);
-    crtSettingsPtr->vhsWiggle = XMFLOAT4(0.002f, 0.f, 0.f, 0.f);
+    crtSettingsPtr->chromaticAberrationStrength =
+        XMFLOAT4(1.78f, 0.f, 0.f, 0.f);
+    crtSettingsPtr->vhsWiggle = XMFLOAT4(0.001f, 0.f, 0.f, 0.f);
 
     this->addRenderStage(
         crtPostProcessorPtr, false,
@@ -775,10 +811,14 @@ void State::initSceneStateActorShadowMaps()
 void State::initSceneStateTessellationSettings()
 {
     spdlog::debug("Initialising scene state tessellation settings");
+    this->sceneState.tessellationHullDataSettings.minTessellationFactor =
+        XMFLOAT4(1.f, 0.f, 0.f, 0.f);
+    this->sceneState.tessellationHullDataSettings.maxTessellationFactor =
+        XMFLOAT4(16.f, 0.f, 0.f, 0.f);
     this->sceneState.tessellationHullDataSettings
-        .minTessellationDistanceThreshold = XMFLOAT4(100.f, 0.f, 0.f, 0.f);
+        .minTessellationDistanceThreshold = XMFLOAT4(28.f, 0.f, 0.f, 0.f);
     this->sceneState.tessellationHullDataSettings
-        .maxTessellationDistanceThreshold = XMFLOAT4(1000.f, 0.f, 0.f, 0.f);
+        .maxTessellationDistanceThreshold = XMFLOAT4(4345.f, 0.f, 0.f, 0.f);
 }
 
 void State::initSceneState(

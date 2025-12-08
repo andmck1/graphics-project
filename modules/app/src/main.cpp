@@ -75,22 +75,29 @@ int main()
         app.timer.frame();
         appInput.handleInputs();
 
-        // set spotlight to player
-        // TODO weird calcs for my camera forward vector when using mouse to
-        // rotate
-        scene.state->spotLights.back()->moveTo(
-            scene.state->camera->worldPosition[0],
-            scene.state->camera->worldPosition[1],
-            scene.state->camera->worldPosition[2]
-        );
-        XMVECTOR forward = XMVector3TransformNormal(
-            XMVectorSet(0.f, 0.f, 1.f, 0.f),
-            scene.state->camera->getRotationMatrix()
-        );
-        scene.state->spotLights.back()->directionVector[0] = forward[0];
-        scene.state->spotLights.back()->directionVector[1] = forward[1];
-        scene.state->spotLights.back()->directionVector[2] = forward[2];
-        scene.state->spotLights.back()->isDrawEnabled = false;
+        for (SpotLight *spotlight : scene.state->spotLights)
+        {
+            XMMATRIX spotlightRotation =
+                XMMatrixTranslation(-1500.f, 0.f, -1500.f) *
+                XMMatrixRotationY(0.001f) *
+                XMMatrixTranslation(1500.f, 0.f, 1500.f);
+            XMVECTOR newWorldPosition = XMVector3Transform(
+                XMVectorSet(
+                    spotlight->worldPosition[0], spotlight->worldPosition[1],
+                    spotlight->worldPosition[2], 1.f
+                ),
+                spotlightRotation
+            );
+            spotlight->worldPosition[0] = newWorldPosition[0];
+            spotlight->worldPosition[1] = newWorldPosition[1];
+            spotlight->worldPosition[2] = newWorldPosition[2];
+            XMVECTOR newDirectionVector = XMVector3Normalize(
+                - newWorldPosition + XMVectorSet(1250.f, 0.f, 1250.f, 0.f)
+            );
+            spotlight->directionVector[0] = newDirectionVector[0];
+            spotlight->directionVector[1] = newDirectionVector[1];
+            spotlight->directionVector[2] = newDirectionVector[2];
+        }
 
         scene.updateAndDraw();
         debugScene.render();

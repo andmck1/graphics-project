@@ -61,7 +61,7 @@ bool Scene::updateAndDraw()
         XMMATRIX lightViewMatrix = directionalLightPtr->calculateViewMatrix();
         XMMATRIX lightProjectionMatrix =
             directionalLightPtr->calculateOrthographicProjectionMatrix(
-                100000, 100000, .1f, 50000.f
+                10000.f, 10000.f, 100.f, 50000.f
             );
         for (int i = 0; i < this->state->actors.size(); i++)
         {
@@ -137,14 +137,14 @@ bool Scene::updateAndDraw()
             XMMATRIX directionalLightProjectionMatrix0 =
                 this->state->directionalLights[0]
                     ->calculateOrthographicProjectionMatrix(
-                        100000, 100000, 0.1, 50000.f
+                        10000.f, 10000.f, 100.f, 50000.f
                     );
             XMMATRIX directionalLightViewMatrix1 =
                 this->state->directionalLights[1]->calculateViewMatrix();
             XMMATRIX directionalLightProjectionMatrix1 =
                 this->state->directionalLights[1]
                     ->calculateOrthographicProjectionMatrix(
-                        100000, 100000, .1, 50000.f
+                        10000.f, 10000.f, 100.f, 50000.f
                     );
             actor->currentShaderStack = actor->defaultShaderStack;
             this->state->shaderManagerState->matrixVertexBuffer.setData(

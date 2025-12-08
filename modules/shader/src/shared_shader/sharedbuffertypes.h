@@ -316,6 +316,8 @@ struct TessellationHullDataBufferType
     {
         float4 minTessellationDistanceThreshold;
         float4 maxTessellationDistanceThreshold;
+        float4 minTessellationFactor;
+        float4 maxTessellationFactor;
     };
 
 #ifdef __cplusplus

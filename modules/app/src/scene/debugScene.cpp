@@ -59,10 +59,8 @@ bool DebugScene::render()
         this->state->camera->forwardVector[2]
     );
     ImGui::Text(
-        "Rotation: %.2f, %.2f, %.2f",
-        this->state->camera->rotation[0],
-        this->state->camera->rotation[1],
-        this->state->camera->rotation[2]
+        "Rotation: %.2f, %.2f, %.2f", this->state->camera->rotation[0],
+        this->state->camera->rotation[1], this->state->camera->rotation[2]
     );
     ImGui::Checkbox("Wireframe Enabled?", this->state->isWireframeEnabled);
     ImGui::Checkbox(
@@ -106,7 +104,7 @@ bool DebugScene::render()
             );
             ImGui::SliderFloat3(
                 ("World Position#Point#" + iString).c_str(),
-                pointLight->worldPosition.data(), -2000.f, 2000.f
+                pointLight->worldPosition.data(), -5000.f, 5000.f
             );
             ImGui::SliderFloat(
                 ("Attenuation Coefficient C0#Point#" + iString).c_str(),
@@ -164,7 +162,7 @@ bool DebugScene::render()
             );
             ImGui::SliderFloat3(
                 ("World Position#Spot#" + iString).c_str(),
-                spotLight->worldPosition.data(), -2000.f, 2000.f
+                spotLight->worldPosition.data(), -5000.f, 5000.f
             );
             ImGui::SliderFloat(
                 ("Cone Angle#Spot#" + iString).c_str(), &spotLight->coneAngle,
@@ -303,7 +301,7 @@ bool DebugScene::render()
             &this->state->crtSettings->brightnessMultiplier.x, 0.1f, 3.0f
         );
         ImGui::SliderFloat(
-            "Grain Strength", &this->state->crtSettings->grainStrength.x, 0.1f,
+            "Grain Strength", &this->state->crtSettings->grainStrength.x, 0.01f,
             1.0f
         );
         ImGui::SliderFloat(
@@ -338,6 +336,16 @@ bool DebugScene::render()
     if (ImGui::CollapsingHeader("Tessellation settings"))
     {
         ImGui::SliderFloat(
+            "Min Tessellation Factor",
+            &this->state->tessellationSettings->minTessellationFactor.x, 1.f,
+            4.f
+        );
+        ImGui::SliderFloat(
+            "Max Tessellation Factor",
+            &this->state->tessellationSettings->maxTessellationFactor.x, 8.f,
+            16.f
+        );
+        ImGui::SliderFloat(
             "Min Distance for Maximum Tessellation Factor",
             &this->state->tessellationSettings->minTessellationDistanceThreshold
                  .x,
@@ -347,7 +355,7 @@ bool DebugScene::render()
             "Max Distance for Minimum Tessellation Factor",
             &this->state->tessellationSettings->maxTessellationDistanceThreshold
                  .x,
-            80.f, 5000.f
+            3000.f, 5000.f
         );
     }
 

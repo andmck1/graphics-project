@@ -26,7 +26,9 @@ QuadTessellationConstantOutputType PatchConstantFunction(
     float tessellationFactor, distanceToCamera;
     float3 centre;
     float4 centreWorldPosition;
-
+    
+    const float minTessellationFactor = settingsData.minTessellationFactor.x;
+    const float maxTessellationFactor = settingsData.maxTessellationFactor.x;
     const float maxTessellationDistanceThreshold = settingsData.minTessellationDistanceThreshold.x;
     const float minTessellationDistanceThreshold = settingsData.maxTessellationDistanceThreshold.x;
 
@@ -45,13 +47,13 @@ QuadTessellationConstantOutputType PatchConstantFunction(
     // Decreasing distance to Camera increases the tessellation factor up to maximum
     // Altered Frank Luna's example so it doesn't just clip things that are too far away
     // (tessellation factor = 0)
-    tessellationFactor = 64.f * (
+    tessellationFactor = maxTessellationFactor * (
         saturate(
             (minTessellationDistanceThreshold - distanceToCamera ) / 
             (minTessellationDistanceThreshold - maxTessellationDistanceThreshold)
         )
     );
-    tessellationFactor = max(1.f, tessellationFactor);
+    tessellationFactor = max(minTessellationFactor, tessellationFactor);
 
 	output.edges[0] = tessellationFactor;
 	output.edges[1] = tessellationFactor;

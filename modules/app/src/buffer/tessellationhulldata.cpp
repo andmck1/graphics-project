@@ -50,6 +50,8 @@ bool TessellationHullDataBuffer::setShader(
         this->settings->minTessellationDistanceThreshold;
     bufferData->maxTessellationDistanceThreshold =
         this->settings->maxTessellationDistanceThreshold;
+    bufferData->minTessellationFactor = this->settings->minTessellationFactor;
+    bufferData->maxTessellationFactor = this->settings->maxTessellationFactor;
 
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->HSSetConstantBuffers(
