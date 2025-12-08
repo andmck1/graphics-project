@@ -27,9 +27,7 @@ bool Scene::updateAndDraw()
         spotLightPtr->shadowMap.set();
         XMMATRIX lightViewMatrix = spotLightPtr->calculateViewMatrix();
         XMMATRIX lightProjectionMatrix =
-            spotLightPtr->calculateOrthographicProjectionMatrix(
-                100000, 100000, .1f, 50000.f
-            );
+            spotLightPtr->calculateProjectionMatrix(1000.f, 50000.f);
         for (int i = 0; i < this->state->actors.size(); i++)
         {
             SceneActor *actor = this->state->actors[i].get();
@@ -125,17 +123,15 @@ bool Scene::updateAndDraw()
             XMMATRIX spotLightViewMatrix0 =
                 this->state->spotLights[0]->calculateViewMatrix();
             XMMATRIX spotLightProjectionMatrix0 =
-                this->state->spotLights[0]
-                    ->calculateOrthographicProjectionMatrix(
-                        100000, 100000, 0.1, 50000.f
-                    );
+                this->state->spotLights[0]->calculateProjectionMatrix(
+                    1000.f, 50000.f
+                );
             XMMATRIX spotLightViewMatrix1 =
                 this->state->spotLights[1]->calculateViewMatrix();
             XMMATRIX spotLightProjectionMatrix1 =
-                this->state->spotLights[1]
-                    ->calculateOrthographicProjectionMatrix(
-                        100000, 100000, .1, 50000.f
-                    );
+                this->state->spotLights[1]->calculateProjectionMatrix(
+                    1000.f, 50000.f
+                );
             XMMATRIX directionalLightViewMatrix0 =
                 this->state->directionalLights[0]->calculateViewMatrix();
             XMMATRIX directionalLightProjectionMatrix0 =

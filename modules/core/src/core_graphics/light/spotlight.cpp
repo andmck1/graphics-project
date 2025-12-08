@@ -37,7 +37,7 @@ XMMATRIX SpotLight::calculateViewMatrix()
 // Some copilot help here
 XMMATRIX SpotLight::calculateProjectionMatrix(float nearPlane, float farPlane)
 {
-    return XMMatrixPerspectiveFovLH(XM_PI, 1.f, nearPlane, farPlane);
+    return XMMatrixPerspectiveFovLH(XM_PIDIV2, 1.f, nearPlane, farPlane);
 }
 
 // Some lab code here
