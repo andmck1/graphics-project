@@ -618,8 +618,8 @@ void State::initSceneStateDirectionalLight(
 
     directionalLightPtr->shadowMap.graphicsManager =
         this->sceneState.graphicsManager;
-    directionalLightPtr->shadowMap.width = 1024;
-    directionalLightPtr->shadowMap.height = 1024;
+    directionalLightPtr->shadowMap.width = 2048;
+    directionalLightPtr->shadowMap.height = 2048;
     directionalLightPtr->shadowMap.init();
 }
 
@@ -816,9 +816,9 @@ void State::initSceneStateTessellationSettings()
     this->sceneState.tessellationHullDataSettings.maxTessellationFactor =
         XMFLOAT4(16.f, 0.f, 0.f, 0.f);
     this->sceneState.tessellationHullDataSettings
-        .minTessellationDistanceThreshold = XMFLOAT4(28.f, 0.f, 0.f, 0.f);
+        .minTessellationDistanceThreshold = XMFLOAT4(15.f, 0.f, 0.f, 0.f);
     this->sceneState.tessellationHullDataSettings
-        .maxTessellationDistanceThreshold = XMFLOAT4(4345.f, 0.f, 0.f, 0.f);
+        .maxTessellationDistanceThreshold = XMFLOAT4(3000.f, 0.f, 0.f, 0.f);
 }
 
 void State::initSceneState(
