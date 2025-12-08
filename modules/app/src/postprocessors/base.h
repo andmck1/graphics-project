@@ -10,5 +10,5 @@ struct BasePostProcessor
 {
     std::vector<std::unique_ptr<RenderTexture>> renderTextures;
     std::vector<std::unique_ptr<RenderStage>> renderStages;
-    bool isEnabled = false;
+    bool isEnabled = true;
 };
