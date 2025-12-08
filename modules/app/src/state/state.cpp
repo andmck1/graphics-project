@@ -580,6 +580,12 @@ void State::initSceneStateDirectionalLight(
 
     directionalLightPtr->isUpdateEnabled = false;
     directionalLightPtr->isDrawEnabled = false;
+
+    directionalLightPtr->shadowMap.graphicsManager =
+        this->sceneState.graphicsManager;
+    directionalLightPtr->shadowMap.width = 1024;
+    directionalLightPtr->shadowMap.height = 1024;
+    directionalLightPtr->shadowMap.init();
 }
 
 void State::initSceneStateDirectionalLights()
@@ -753,6 +759,15 @@ void State::initSceneStateActorShadowMaps()
              this->sceneState.actors)
         {
             sceneActor->shadowMaps.push_back(&spotLight->shadowMap);
+        }
+    }
+    for (DirectionalLight *directionalLight :
+         this->sceneState.directionalLights)
+    {
+        for (const std::unique_ptr<SceneActor> &sceneActor :
+             this->sceneState.actors)
+        {
+            sceneActor->shadowMaps.push_back(&directionalLight->shadowMap);
         }
     }
 }

@@ -52,6 +52,41 @@ bool Scene::updateAndDraw()
         this->state->graphicsManager->setDefaultViewport();
     }
 
+    for (int directionalLightIndex = 0;
+         directionalLightIndex < this->state->directionalLights.size();
+         directionalLightIndex++)
+    {
+        DirectionalLight *directionalLightPtr =
+            this->state->directionalLights[directionalLightIndex];
+
+        directionalLightPtr->shadowMap.set();
+        XMMATRIX lightViewMatrix = directionalLightPtr->calculateViewMatrix();
+        XMMATRIX lightProjectionMatrix =
+            directionalLightPtr->calculateOrthographicProjectionMatrix(
+                100000, 100000, .1f, 50000.f
+            );
+        for (int i = 0; i < this->state->actors.size(); i++)
+        {
+            SceneActor *actor = this->state->actors[i].get();
+            if ((actor->isDrawEnabled) && (actor->depthShaderStack != nullptr))
+            {
+                actor->currentShaderStack = actor->depthShaderStack;
+                this->state->shaderManagerState->matrixVertexBuffer.setData(
+                    actor->getWorldMatrix(), lightViewMatrix,
+                    lightProjectionMatrix
+                );
+                this->state->shaderManagerState->matrixDomainBuffer.setData(
+                    actor->getWorldMatrix(), lightViewMatrix,
+                    lightProjectionMatrix
+                );
+                if (!actor->drawMesh(this->state->graphicsManager, false))
+                    return false;
+            }
+        }
+        this->state->graphicsManager->setRenderTargetViewToBackBuffer();
+        this->state->graphicsManager->setDefaultViewport();
+    }
+
     // Set to render to texture if needed
     if ((this->state->crtPostProcessor.renderStages.size() > 0) &&
         (this->state->crtPostProcessor.isEnabled))
@@ -101,12 +136,28 @@ bool Scene::updateAndDraw()
                     ->calculateOrthographicProjectionMatrix(
                         100000, 100000, .1, 50000.f
                     );
+            XMMATRIX directionalLightViewMatrix0 =
+                this->state->directionalLights[0]->calculateViewMatrix();
+            XMMATRIX directionalLightProjectionMatrix0 =
+                this->state->directionalLights[0]
+                    ->calculateOrthographicProjectionMatrix(
+                        100000, 100000, 0.1, 50000.f
+                    );
+            XMMATRIX directionalLightViewMatrix1 =
+                this->state->directionalLights[1]->calculateViewMatrix();
+            XMMATRIX directionalLightProjectionMatrix1 =
+                this->state->directionalLights[1]
+                    ->calculateOrthographicProjectionMatrix(
+                        100000, 100000, .1, 50000.f
+                    );
             actor->currentShaderStack = actor->defaultShaderStack;
             this->state->shaderManagerState->matrixVertexBuffer.setData(
                 actor->getWorldMatrix(), this->state->camera->viewMatrix,
                 this->state->graphicsManager->projectionMatrix,
                 spotLightViewMatrix0, spotLightProjectionMatrix0,
-                spotLightViewMatrix1, spotLightProjectionMatrix1
+                spotLightViewMatrix1, spotLightProjectionMatrix1,
+                directionalLightViewMatrix0, directionalLightProjectionMatrix0,
+                directionalLightViewMatrix1, directionalLightProjectionMatrix1
 
             );
             this->state->shaderManagerState->matrixHullBuffer.setData(
@@ -117,7 +168,9 @@ bool Scene::updateAndDraw()
                 actor->getWorldMatrix(), this->state->camera->viewMatrix,
                 this->state->graphicsManager->projectionMatrix,
                 spotLightViewMatrix0, spotLightProjectionMatrix0,
-                spotLightViewMatrix1, spotLightProjectionMatrix1
+                spotLightViewMatrix1, spotLightProjectionMatrix1,
+                directionalLightViewMatrix0, directionalLightProjectionMatrix0,
+                directionalLightViewMatrix1, directionalLightProjectionMatrix1
             );
             if (!actor->drawMesh(this->state->graphicsManager))
                 return false;

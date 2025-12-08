@@ -31,10 +31,11 @@ struct VertexOutputType
     float3 normal : NORMAL;
     float3 worldPosition : TEXCOORD1;
     float3 viewVector : TEXCOORD2;
-    float4 spotLightViewPos1 : TEXCOORD3;
-    float4 spotLightViewPos2 : TEXCOORD4;
+    float4 spotLightViewPos0 : TEXCOORD3;
+    float4 spotLightViewPos1 : TEXCOORD4;
+    float4 directionalLightViewPos0 : TEXCOORD5;
+    float4 directionalLightViewPos1 : TEXCOORD6;
 };
-
 
 struct DepthVertexOutputType
 {
@@ -64,7 +65,6 @@ struct QuadTessellationHullInputType
     float3 normal : NORMAL;
 };
 
-
 struct QuadTessellationHullOutputType
 {
     float3 position : POSITION;
@@ -79,8 +79,10 @@ struct QuadTessellationDomainOutputType
     float3 normal : NORMAL;
     float3 worldPosition : TEXCOORD1;
     float3 viewVector : TEXCOORD2;
-    float4 spotLightViewPos1 : TEXCOORD3;
-    float4 spotLightViewPos2 : TEXCOORD4;
+    float4 spotLightViewPos0 : TEXCOORD3;
+    float4 spotLightViewPos1 : TEXCOORD4;
+    float4 directionalLightViewPos0 : TEXCOORD5;
+    float4 directionalLightViewPos1 : TEXCOORD6;
 };
 
 struct DepthQuadTessellationDomainOutputType
@@ -103,8 +105,10 @@ struct PixelInputType
     float3 normal : NORMAL;
     float3 worldPosition : TEXCOORD1;
     float3 viewVector : TEXCOORD2;
-    float4 spotLightViewPos1 : TEXCOORD3;
-    float4 spotLightViewPos2 : TEXCOORD4;
+    float4 spotLightViewPos0 : TEXCOORD3;
+    float4 spotLightViewPos1 : TEXCOORD4;
+    float4 directionalLightViewPos0 : TEXCOORD5;
+    float4 directionalLightViewPos1 : TEXCOORD6;
 };
 
 struct DepthPixelInputType
@@ -135,10 +139,14 @@ struct MatrixBufferType
         matrix worldMatrix;
         matrix viewMatrix;
         matrix projectionMatrix;
+        matrix spotLightViewMatrix0;
+        matrix spotLightProjectionMatrix0;
         matrix spotLightViewMatrix1;
         matrix spotLightProjectionMatrix1;
-        matrix spotLightViewMatrix2;
-        matrix spotLightProjectionMatrix2;
+        matrix directionalLightViewMatrix0;
+        matrix directionalLightProjectionMatrix0;
+        matrix directionalLightViewMatrix1;
+        matrix directionalLightProjectionMatrix1;
     };
 
 #ifdef __cplusplus
@@ -161,10 +169,14 @@ struct MatrixDomainBufferType
         matrix worldMatrix;
         matrix viewMatrix;
         matrix projectionMatrix;
+        matrix spotLightViewMatrix0;
+        matrix spotLightProjectionMatrix0;
         matrix spotLightViewMatrix1;
         matrix spotLightProjectionMatrix1;
-        matrix spotLightViewMatrix2;
-        matrix spotLightProjectionMatrix2;
+        matrix directionalLightViewMatrix0;
+        matrix directionalLightProjectionMatrix0;
+        matrix directionalLightViewMatrix1;
+        matrix directionalLightProjectionMatrix1;
     };
 
 #ifdef __cplusplus
@@ -314,7 +326,6 @@ struct LightSettingsBufferType
     {
         int4 isNormalsAsColourEnabled;
     };
-
 
 #ifdef __cplusplus
 }

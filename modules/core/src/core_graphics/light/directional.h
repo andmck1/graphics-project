@@ -15,4 +15,10 @@ class DirectionalLight : public SceneActor
     std::array<float, 3> directionVector = {0.f, 0.f, 0.f};
     bool isDiffuseEnabled;
     bool isSpecularEnabled;
+    ShadowMap shadowMap = ShadowMap();
+
+    XMMATRIX calculateViewMatrix();
+    XMMATRIX calculateOrthographicProjectionMatrix(
+        float screenWidth, float screenHeight, float nearPlane, float farPlane
+    );
 };

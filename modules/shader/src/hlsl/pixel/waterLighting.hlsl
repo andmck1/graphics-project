@@ -2,8 +2,10 @@
 
 Texture2D objectTexture: register(t0);
 SamplerState textureSampler: register(s0);
-Texture2D shadowMapTexture1: register(t1);
-Texture2D shadowMapTexture2: register(t2);
+Texture2D spotLightShadowMapTexture0: register(t1);
+Texture2D spotLightShadowMapTexture1: register(t2);
+Texture2D directionalLightShadowMapTexture0: register(t3);
+Texture2D directionalLightShadowMapTexture1: register(t4);
 
 cbuffer AmbientLightBuffer: register(b0)
 {
@@ -15,9 +17,9 @@ cbuffer LightSettingsBuffer: register(b1)
 	LightSettingsBufferType lightSettings;
 }
 
-StructuredBuffer<DirectionalLightBufferType> DirectionalLightBuffer : register(t3);
-StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t4);
-StructuredBuffer<SpotLightBufferType> SpotLightBuffer : register(t5);
+StructuredBuffer<DirectionalLightBufferType> DirectionalLightBuffer : register(t5);
+StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t6);
+StructuredBuffer<SpotLightBufferType> SpotLightBuffer : register(t7);
 
 // Lab code
 bool hasDepthData(float2 uv)
@@ -142,7 +144,7 @@ float3 calculateDirectionalLighting(
 		diffuse = calculateDiffuseLighting(
 			directionalLightData.diffuseColour.rgb, 
 			fragmentNormal, 
-			directionalLightData.directionVector.xyz
+			-directionalLightData.directionVector.xyz
 		);
 	}
 	if ((bool) directionalLightData.isSpecularEnabled)
@@ -151,7 +153,7 @@ float3 calculateDirectionalLighting(
 			directionalLightData.specularColour.rgb,
 			directionalLightData.specularPower.r,
 			viewWorldPosition,
-			directionalLightData.directionVector.xyz,
+			-directionalLightData.directionVector.xyz,
 			fragmentNormal	
 		);
 	}
@@ -275,10 +277,14 @@ float3 calculateLighting(
 	float3 fragmentWorldPosition, 
 	float3 fragmentNormal,
 	float3 viewWorldPosition,
-	float4 spotLightviewPos1,
-	float4 spotLightviewPos2,
-	Texture2D _shadowMapTexture1,
-	Texture2D _shadowMapTexture2,
+	float4 spotLightViewPos0,
+	float4 spotLightViewPos1,
+	float4 directionalLightViewPos0,
+	float4 directionalLightViewPos1,
+	Texture2D _spotLightShadowMapTexture0,
+	Texture2D _spotLightShadowMapTexture1,
+	Texture2D _directionalLightShadowMapTexture0,
+	Texture2D _directionalLightShadowMapTexture1,
 	SamplerState _shadowSampler
 )
 {
@@ -317,14 +323,14 @@ float3 calculateLighting(
 		lightColourTotal += lightColourContribution;
 	}
 
-	projectedTextureCoordinate = getProjectiveCoords(spotLightviewPos1);
+	projectedTextureCoordinate = getProjectiveCoords(spotLightViewPos0);
 	if (hasDepthData(projectedTextureCoordinate))
 	{
 		if (!isInShadow(
-			_shadowMapTexture1,
+			_spotLightShadowMapTexture0,
 			_shadowSampler,
 			projectedTextureCoordinate,
-			spotLightviewPos1,
+			spotLightViewPos0,
 			shadowMapBias
 		))
 		{
@@ -340,14 +346,14 @@ float3 calculateLighting(
 		}
 	}
 
-	projectedTextureCoordinate = getProjectiveCoords(spotLightviewPos2);
+	projectedTextureCoordinate = getProjectiveCoords(spotLightViewPos1);
 	if (hasDepthData(projectedTextureCoordinate))
 	{
 		if (!isInShadow(
-			_shadowMapTexture2,
+			_spotLightShadowMapTexture1,
 			_shadowSampler,
 			projectedTextureCoordinate,
-			spotLightviewPos2,
+			spotLightViewPos1,
 			shadowMapBias
 		))
 		{
@@ -363,12 +369,19 @@ float3 calculateLighting(
 		}
 	}
 
-	DirectionalLightBufferType firstDirectionalLightData = DirectionalLightBuffer[0];
-	totalNDirectionalLights = firstDirectionalLightData.nLights.x;
-	for(i=0; i<totalNDirectionalLights; i++)
+	projectedTextureCoordinate = getProjectiveCoords(directionalLightViewPos0);
+	if (hasDepthData(projectedTextureCoordinate))
 	{
+		if (!isInShadow(
+			_directionalLightShadowMapTexture0,
+			_shadowSampler,
+			projectedTextureCoordinate,
+			directionalLightViewPos0,
+			shadowMapBias
+		))
+		{
 		float3 lightColourContribution;
-		DirectionalLightBufferType directionalLightData = DirectionalLightBuffer[i];
+		DirectionalLightBufferType directionalLightData = DirectionalLightBuffer[0];
 
 		lightColourContribution = calculateDirectionalLighting(
 			directionalLightData,
@@ -377,6 +390,31 @@ float3 calculateLighting(
 			viewWorldPosition
 		);
 		lightColourTotal += lightColourContribution;
+		}
+	}
+
+	projectedTextureCoordinate = getProjectiveCoords(directionalLightViewPos1);
+	if (hasDepthData(projectedTextureCoordinate))
+	{
+		if (!isInShadow(
+			_directionalLightShadowMapTexture1,
+			_shadowSampler,
+			projectedTextureCoordinate,
+			directionalLightViewPos1,
+			shadowMapBias
+		))
+		{
+		float3 lightColourContribution;
+		DirectionalLightBufferType directionalLightData = DirectionalLightBuffer[1];
+
+		lightColourContribution = calculateDirectionalLighting(
+			directionalLightData,
+			fragmentWorldPosition,
+			fragmentNormal,
+			viewWorldPosition
+		);
+		lightColourTotal += lightColourContribution;
+		}
 	}
 
 	return lightColourTotal;
@@ -399,8 +437,11 @@ float4 main(PixelInputType input) : SV_TARGET
 	}
 	lightColour += calculateLighting(
 		input.worldPosition.xyz, input.normal.xyz, input.viewVector.xyz,
-		input.spotLightViewPos1, input.spotLightViewPos2,
-		shadowMapTexture1, shadowMapTexture2, textureSampler
+		input.spotLightViewPos0, input.spotLightViewPos1,
+		input.directionalLightViewPos0, input.directionalLightViewPos1,
+		spotLightShadowMapTexture0, spotLightShadowMapTexture1, 
+		directionalLightShadowMapTexture0, directionalLightShadowMapTexture1,
+		textureSampler
 	).rgbb;
 	lightColour[3] = 1.f;
 	

@@ -33,6 +33,7 @@ add_library(
   src/core_graphics/actor/base.cpp
   src/core_graphics/actor/scene.cpp
   src/core_graphics/light/point.cpp
+  src/core_graphics/light/directional.cpp
   src/core_graphics/light/spotlight.cpp
   src/core_graphics/camera/camera.cpp
   )

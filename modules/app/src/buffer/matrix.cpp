@@ -23,17 +23,25 @@ bool MatrixVertexBuffer::init(D3D *graphicsManager)
 
 void MatrixVertexBuffer::setData(
     XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix,
+    XMMATRIX spotLightViewMatrix0, XMMATRIX spotLightProjectionMatrix0,
     XMMATRIX spotLightViewMatrix1, XMMATRIX spotLightProjectionMatrix1,
-    XMMATRIX spotLightViewMatrix2, XMMATRIX spotLightProjectionMatrix2
+    XMMATRIX directionalLightViewMatrix0,
+    XMMATRIX directionalLightProjectionMatrix0,
+    XMMATRIX directionalLightViewMatrix1,
+    XMMATRIX directionalLightProjectionMatrix1
 )
 {
     this->worldMatrix = worldMatrix;
     this->viewMatrix = viewMatrix;
     this->projectionMatrix = projectionMatrix;
+    this->spotLightViewMatrix0 = spotLightViewMatrix0;
     this->spotLightViewMatrix1 = spotLightViewMatrix1;
-    this->spotLightViewMatrix2 = spotLightViewMatrix2;
+    this->spotLightProjectionMatrix0 = spotLightProjectionMatrix0;
     this->spotLightProjectionMatrix1 = spotLightProjectionMatrix1;
-    this->spotLightProjectionMatrix2 = spotLightProjectionMatrix2;
+    this->directionalLightViewMatrix0 = spotLightViewMatrix0;
+    this->directionalLightViewMatrix1 = spotLightViewMatrix1;
+    this->directionalLightProjectionMatrix0 = spotLightProjectionMatrix0;
+    this->directionalLightProjectionMatrix1 = spotLightProjectionMatrix1;
 }
 
 bool MatrixVertexBuffer::setShader(
@@ -57,12 +65,20 @@ bool MatrixVertexBuffer::setShader(
     bufferData->viewMatrix = XMMatrixTranspose(this->viewMatrix);
     bufferData->spotLightViewMatrix1 =
         XMMatrixTranspose(this->spotLightViewMatrix1);
-    bufferData->spotLightViewMatrix2 =
-        XMMatrixTranspose(this->spotLightViewMatrix2);
+    bufferData->spotLightViewMatrix1 =
+        XMMatrixTranspose(this->spotLightViewMatrix1);
+    bufferData->spotLightProjectionMatrix0 =
+        XMMatrixTranspose(this->spotLightProjectionMatrix0);
     bufferData->spotLightProjectionMatrix1 =
         XMMatrixTranspose(this->spotLightProjectionMatrix1);
-    bufferData->spotLightProjectionMatrix2 =
-        XMMatrixTranspose(this->spotLightProjectionMatrix2);
+    bufferData->directionalLightViewMatrix0 =
+        XMMatrixTranspose(this->directionalLightViewMatrix0);
+    bufferData->directionalLightViewMatrix1 =
+        XMMatrixTranspose(this->directionalLightViewMatrix1);
+    bufferData->directionalLightProjectionMatrix0 =
+        XMMatrixTranspose(this->directionalLightProjectionMatrix0);
+    bufferData->directionalLightProjectionMatrix1 =
+        XMMatrixTranspose(this->directionalLightProjectionMatrix1);
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->VSSetConstantBuffers(
         bufferSlot, numberOfBuffers, this->buffer.GetAddressOf()
@@ -149,17 +165,25 @@ bool MatrixDomainBuffer::init(D3D *graphicsManager)
 
 void MatrixDomainBuffer::setData(
     XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix,
+    XMMATRIX spotLightViewMatrix0, XMMATRIX spotLightProjectionMatrix0,
     XMMATRIX spotLightViewMatrix1, XMMATRIX spotLightProjectionMatrix1,
-    XMMATRIX spotLightViewMatrix2, XMMATRIX spotLightProjectionMatrix2
+    XMMATRIX directionalLightViewMatrix0,
+    XMMATRIX directionalLightProjectionMatrix0,
+    XMMATRIX directionalLightViewMatrix1,
+    XMMATRIX directionalLightProjectionMatrix1
 )
 {
     this->worldMatrix = worldMatrix;
     this->viewMatrix = viewMatrix;
     this->projectionMatrix = projectionMatrix;
+    this->spotLightViewMatrix0 = spotLightViewMatrix0;
     this->spotLightViewMatrix1 = spotLightViewMatrix1;
-    this->spotLightViewMatrix2 = spotLightViewMatrix2;
+    this->spotLightProjectionMatrix0 = spotLightProjectionMatrix0;
     this->spotLightProjectionMatrix1 = spotLightProjectionMatrix1;
-    this->spotLightProjectionMatrix2 = spotLightProjectionMatrix2;
+    this->directionalLightViewMatrix0 = directionalLightViewMatrix0;
+    this->directionalLightViewMatrix1 = directionalLightViewMatrix1;
+    this->directionalLightProjectionMatrix0 = directionalLightProjectionMatrix0;
+    this->directionalLightProjectionMatrix1 = directionalLightProjectionMatrix1;
 }
 
 bool MatrixDomainBuffer::setShader(
@@ -181,14 +205,22 @@ bool MatrixDomainBuffer::setShader(
     bufferData->projectionMatrix = XMMatrixTranspose(this->projectionMatrix);
     bufferData->worldMatrix = XMMatrixTranspose(this->worldMatrix);
     bufferData->viewMatrix = XMMatrixTranspose(this->viewMatrix);
+    bufferData->spotLightViewMatrix0 =
+        XMMatrixTranspose(this->spotLightViewMatrix0);
     bufferData->spotLightViewMatrix1 =
         XMMatrixTranspose(this->spotLightViewMatrix1);
-    bufferData->spotLightViewMatrix2 =
-        XMMatrixTranspose(this->spotLightViewMatrix2);
+    bufferData->spotLightProjectionMatrix0 =
+        XMMatrixTranspose(this->spotLightProjectionMatrix0);
     bufferData->spotLightProjectionMatrix1 =
         XMMatrixTranspose(this->spotLightProjectionMatrix1);
-    bufferData->spotLightProjectionMatrix2 =
-        XMMatrixTranspose(this->spotLightProjectionMatrix2);
+    bufferData->directionalLightViewMatrix0 =
+        XMMatrixTranspose(this->directionalLightViewMatrix0);
+    bufferData->directionalLightViewMatrix1 =
+        XMMatrixTranspose(this->directionalLightViewMatrix1);
+    bufferData->directionalLightProjectionMatrix0 =
+        XMMatrixTranspose(this->directionalLightProjectionMatrix0);
+    bufferData->directionalLightProjectionMatrix1 =
+        XMMatrixTranspose(this->directionalLightProjectionMatrix1);
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->DSSetConstantBuffers(
         bufferSlot, numberOfBuffers, this->buffer.GetAddressOf()

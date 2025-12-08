@@ -13,19 +13,27 @@ class MatrixVertexBuffer : public BaseConstantBuffer
     bool setShader(BufferSlots *slotCounters, int numberOfBuffers) override;
     void setData(
         XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix,
+        XMMATRIX spotLightViewMatrix0 = XMMatrixIdentity(),
+        XMMATRIX spotLightProjectionMatrix0 = XMMatrixIdentity(),
         XMMATRIX spotLightViewMatrix1 = XMMatrixIdentity(),
         XMMATRIX spotLightProjectionMatrix1 = XMMatrixIdentity(),
-        XMMATRIX spotLightViewMatrix2 = XMMatrixIdentity(),
-        XMMATRIX spotLightProjectionMatrix2 = XMMatrixIdentity()
+        XMMATRIX directionalLightViewMatrix0 = XMMatrixIdentity(),
+        XMMATRIX directionalLightProjectionMatrix0 = XMMatrixIdentity(),
+        XMMATRIX directionalLightViewMatrix1 = XMMatrixIdentity(),
+        XMMATRIX directionalLightProjectionMatrix1 = XMMatrixIdentity()
     );
 
     XMMATRIX worldMatrix;
     XMMATRIX viewMatrix;
     XMMATRIX projectionMatrix;
+    XMMATRIX spotLightViewMatrix0;
+    XMMATRIX spotLightProjectionMatrix0;
     XMMATRIX spotLightViewMatrix1;
     XMMATRIX spotLightProjectionMatrix1;
-    XMMATRIX spotLightViewMatrix2;
-    XMMATRIX spotLightProjectionMatrix2;
+    XMMATRIX directionalLightViewMatrix0;
+    XMMATRIX directionalLightProjectionMatrix0;
+    XMMATRIX directionalLightViewMatrix1;
+    XMMATRIX directionalLightProjectionMatrix1;
 
     struct ShaderBuffer : SharedBufferTypes::MatrixBufferType
     {
@@ -57,19 +65,27 @@ class MatrixDomainBuffer : public BaseConstantBuffer
     bool setShader(BufferSlots *slotCounters, int numberOfBuffers) override;
     void setData(
         XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix,
+        XMMATRIX spotLightViewMatrix0 = XMMatrixIdentity(),
+        XMMATRIX spotLightProjectionMatrix0 = XMMatrixIdentity(),
         XMMATRIX spotLightViewMatrix1 = XMMatrixIdentity(),
         XMMATRIX spotLightProjectionMatrix1 = XMMatrixIdentity(),
-        XMMATRIX spotLightViewMatrix2 = XMMatrixIdentity(),
-        XMMATRIX spotLightProjectionMatrix2 = XMMatrixIdentity()
+        XMMATRIX directionalLightViewMatrix0 = XMMatrixIdentity(),
+        XMMATRIX directionalLightProjectionMatrix0 = XMMatrixIdentity(),
+        XMMATRIX directionalLightViewMatrix1 = XMMatrixIdentity(),
+        XMMATRIX directionalLightProjectionMatrix1 = XMMatrixIdentity()
     );
 
     XMMATRIX worldMatrix;
     XMMATRIX viewMatrix;
     XMMATRIX projectionMatrix;
+    XMMATRIX spotLightViewMatrix0;
+    XMMATRIX spotLightProjectionMatrix0;
     XMMATRIX spotLightViewMatrix1;
     XMMATRIX spotLightProjectionMatrix1;
-    XMMATRIX spotLightViewMatrix2;
-    XMMATRIX spotLightProjectionMatrix2;
+    XMMATRIX directionalLightViewMatrix0;
+    XMMATRIX directionalLightProjectionMatrix0;
+    XMMATRIX directionalLightViewMatrix1;
+    XMMATRIX directionalLightProjectionMatrix1;
 
     struct ShaderBuffer : SharedBufferTypes::MatrixDomainBufferType
     {
