@@ -5,7 +5,7 @@
         "commandLine": "",
         "environment": [
         ],
-        "executable": "C:\\Users\\alast\\dev\\uni-cgt\\cmp502-programming-for-games\\cmp502-graphics-project\\build\\bin\\GraphicsProject.exe",
+        "executable": "C:\\Users\\alast\\dev\\uni-cgt\\cmp502-programming-for-games\\coursework-andmck1\\build\\bin\\GraphicsProject.exe",
         "inject": false,
         "numQueuedFrames": 0,
         "options": {
@@ -23,6 +23,6 @@
             "verifyBufferAccess": false
         },
         "queuedFrameCap": 0,
-        "workingDir": "C:/Users/alast/dev/uni-cgt/cmp502-programming-for-games/cmp502-graphics-project"
+        "workingDir": "C:/Users/alast/dev/uni-cgt/cmp502-programming-for-games/coursework-andmck1"
     }
 }

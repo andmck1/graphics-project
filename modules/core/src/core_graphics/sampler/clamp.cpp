@@ -19,7 +19,9 @@ bool ClampSampler::init(D3D *graphicsManager)
     createSamplerStateHR = graphicsManager->device->CreateSamplerState(
         &samplerDescription, this->samplerState.GetAddressOf()
     );
-    return TryDXCall(createSamplerStateHR, "Failed to create sampler state");
+    return TryDXCall(
+        createSamplerStateHR, "Failed to create clamp sampler state"
+    );
 }
 
 bool ClampSampler::setVertexShader(

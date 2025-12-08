@@ -47,6 +47,23 @@ bool DebugScene::render()
 
     ImGui::Begin("Draggable Window");
     ImGui::Text("FPS: %.2f", *(this->state->fps));
+    ImGui::Text(
+        "Position: %.2f, %.2f, %.2f", this->state->camera->worldPosition[0],
+        this->state->camera->worldPosition[1],
+        this->state->camera->worldPosition[2]
+    );
+    ImGui::Text(
+        "Forward Vector: %.2f, %.2f, %.2f",
+        this->state->camera->forwardVector[0],
+        this->state->camera->forwardVector[1],
+        this->state->camera->forwardVector[2]
+    );
+    ImGui::Text(
+        "Rotation: %.2f, %.2f, %.2f",
+        this->state->camera->rotation[0],
+        this->state->camera->rotation[1],
+        this->state->camera->rotation[2]
+    );
     ImGui::Checkbox("Wireframe Enabled?", this->state->isWireframeEnabled);
     ImGui::Checkbox(
         "Normals As Colour Enabled?", this->state->isNormalsAsColourEnabled
@@ -103,8 +120,8 @@ bool DebugScene::render()
             );
             ImGui::SliderFloat(
                 ("Attenuation Coefficient C2#Point#" + iString).c_str(),
-                &pointLight->attenuationCoefficients[2], 1e-7, 1e-5f,
-                "%.8f", false
+                &pointLight->attenuationCoefficients[2], 1e-7, 1e-5f, "%.8f",
+                false
             );
             ImGui::Checkbox(
                 ("Diffuse Enabled?#Point#" + iString).c_str(),
@@ -159,18 +176,18 @@ bool DebugScene::render()
             );
             ImGui::SliderFloat(
                 ("Attenuation Coefficient C0#Point#" + iString).c_str(),
-                &spotLight->attenuationCoefficients[0], 0.00001f, .001f,
-                "%.8f", false
+                &spotLight->attenuationCoefficients[0], 0.00001f, .001f, "%.8f",
+                false
             );
             ImGui::SliderFloat(
                 ("Attenuation Coefficient C1#Point#" + iString).c_str(),
-                &spotLight->attenuationCoefficients[1], 0.00001f, .001f,
-                "%.8f", false
+                &spotLight->attenuationCoefficients[1], 0.00001f, .001f, "%.8f",
+                false
             );
             ImGui::SliderFloat(
                 ("Attenuation Coefficient C2#Point#" + iString).c_str(),
-                &spotLight->attenuationCoefficients[2], 1e-7f, 1e-5f,
-                "%.8f", false
+                &spotLight->attenuationCoefficients[2], 1e-7f, 1e-5f, "%.8f",
+                false
             );
 
             ImGui::Checkbox(
@@ -242,8 +259,7 @@ bool DebugScene::render()
             0.1f, 10.f
         );
         ImGui::SliderFloat(
-            "Water Steepness", &this->state->water->steepness,
-            0.1f, 10.f
+            "Water Steepness", &this->state->water->steepness, 0.1f, 10.f
         );
     }
 

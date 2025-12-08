@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core_graphics/camera/camera.h"
 #include "core_graphics/light/directional.h"
 #include "core_graphics/light/spotlight.h"
 #include "core_graphics/sampler/base.h"
@@ -45,7 +46,8 @@ class State
         std::vector<SpotLight *> *spotLights,
         std::vector<DirectionalLight *> *directionalLights, Water *water,
         SharedBufferTypes::CRTBufferType *crtSettings, bool *isCRTEnabled,
-        SharedBufferTypes::TessellationHullDataBufferType *tessellationSettings
+        SharedBufferTypes::TessellationHullDataBufferType *tessellationSettings,
+        Camera *camera
     );
 
     private:

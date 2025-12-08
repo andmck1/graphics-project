@@ -11,16 +11,15 @@ bool UpSampler::init(D3D *graphicsManager)
     samplerDescription.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
     samplerDescription.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
     samplerDescription.MipLODBias = 0.f;
+    samplerDescription.MaxAnisotropy = 16;
 
     createSamplerStateHR = graphicsManager->device->CreateSamplerState(
         &samplerDescription, this->samplerState.GetAddressOf()
     );
-    return TryDXCall(createSamplerStateHR, "Failed to create sampler state");
+    return TryDXCall(createSamplerStateHR, "Failed to create up sampler state");
 }
 
-bool UpSampler::setVertexShader(
-    D3D *graphicsManager, BufferSlots *slotCounters
-)
+bool UpSampler::setVertexShader(D3D *graphicsManager, BufferSlots *slotCounters)
 {
     int startSlot = slotCounters->vertexShaderCounters.samplerSlot;
     graphicsManager->deviceContext->VSSetSamplers(
@@ -30,9 +29,7 @@ bool UpSampler::setVertexShader(
     return true;
 }
 
-bool UpSampler::setDomainShader(
-    D3D *graphicsManager, BufferSlots *slotCounters
-)
+bool UpSampler::setDomainShader(D3D *graphicsManager, BufferSlots *slotCounters)
 {
     int startSlot = slotCounters->domainShaderCounters.samplerSlot;
     graphicsManager->deviceContext->DSSetSamplers(
@@ -42,10 +39,7 @@ bool UpSampler::setDomainShader(
     return true;
 }
 
-
-bool UpSampler::setPixelShader(
-    D3D *graphicsManager, BufferSlots *slotCounters
-)
+bool UpSampler::setPixelShader(D3D *graphicsManager, BufferSlots *slotCounters)
 {
     int startSlot = slotCounters->pixelShaderCounters.samplerSlot;
     graphicsManager->deviceContext->PSSetSamplers(

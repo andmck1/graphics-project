@@ -399,7 +399,7 @@ void State::initSceneStateActors()
         &this->sceneState.clampSampler,
         &this->textureManagerState.mountainsHeightMap,
         &this->sceneState.clampSampler, {50.f, 50.f, 50.f}, {0.f, 0.f, 0.f},
-        {-1000.f, 0.f, -1000.f}
+        {-1000.f, -1700.f, -1000.f}
     );
 }
 
@@ -605,6 +605,8 @@ void State::initSceneStateCamera()
         dynamic_cast<Camera *>(this->sceneState.actors.back().get());
     cameraPtr->isDrawEnabled = false;
     cameraPtr->isUpdateEnabled = true;
+    cameraPtr->worldPosition = {3309.90, 82.52, 3130.47};
+    cameraPtr->rotateTo(0.36, -1.84, 0.0);
     this->sceneState.camera = cameraPtr;
 }
 
@@ -623,10 +625,10 @@ void State::initSceneStateWater()
     this->sceneState.water = waterPtr;
 
     waterPtr->isDrawEnabled = true;
-    waterPtr->magnitude = 1.1f;
-    waterPtr->waveNumber = 1.0f;
-    waterPtr->angularVelocity = 1.87f;
-    waterPtr->steepness = 0.84f;
+    waterPtr->magnitude = 0.1f;
+    waterPtr->waveNumber = 0.342f;
+    waterPtr->angularVelocity = 0.883f;
+    waterPtr->steepness = 0.1f;
 }
 
 void State::createRenderTexture(
@@ -853,7 +855,8 @@ void State::initDebugSceneState(
     std::vector<SpotLight *> *spotLights,
     std::vector<DirectionalLight *> *directionalLights, Water *water,
     SharedBufferTypes::CRTBufferType *crtSettings, bool *isCRTEnabled,
-    SharedBufferTypes::TessellationHullDataBufferType *tessellationSettings
+    SharedBufferTypes::TessellationHullDataBufferType *tessellationSettings,
+    Camera *camera
 )
 {
     spdlog::debug("Initialising debug scene state");
@@ -870,4 +873,5 @@ void State::initDebugSceneState(
     this->debugSceneState.crtSettings = crtSettings;
     this->debugSceneState.isCRTEnabled = isCRTEnabled;
     this->debugSceneState.tessellationSettings = tessellationSettings;
+    this->debugSceneState.camera = camera;
 }

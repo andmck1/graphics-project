@@ -2,8 +2,10 @@
 
 Texture2D objectTexture: register(t0);
 SamplerState textureSampler: register(s0);
-Texture2D shadowMapTexture1: register(t1);
-Texture2D shadowMapTexture2: register(t2);
+Texture2D heightmapTexture: register(t1);
+SamplerState heightmapSampler: register(s1);
+Texture2D shadowMapTexture1: register(t2);
+Texture2D shadowMapTexture2: register(t3);
 
 cbuffer AmbientLightBuffer: register(b0)
 {
@@ -15,9 +17,9 @@ cbuffer LightSettingsBuffer: register(b1)
 	LightSettingsBufferType lightSettings;
 }
 
-StructuredBuffer<DirectionalLightBufferType> DirectionalLightBuffer : register(t3);
-StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t4);
-StructuredBuffer<SpotLightBufferType> SpotLightBuffer : register(t5);
+StructuredBuffer<DirectionalLightBufferType> DirectionalLightBuffer : register(t4);
+StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t5);
+StructuredBuffer<SpotLightBufferType> SpotLightBuffer : register(t6);
 
 // Lab code
 bool hasDepthData(float2 uv)
@@ -58,7 +60,7 @@ float2 getProjectiveCoords(float4 lightViewPosition)
 
 float GetHeight(float2 uv)
 {
-    float4 textureColour = objectTexture.SampleLevel(textureSampler, uv, 0);
+    float4 textureColour = heightmapTexture.SampleLevel(heightmapSampler, uv, 0);
     return textureColour.r * 500;
 }
 

@@ -41,7 +41,7 @@ add_library(
   )
 
 # TODO - make not hardcoded
-set(DIRECTX_ARCH x86)
+set(DIRECTX_ARCH x32)
 include(FetchContent)
 FetchContent_Declare(
     dxtk

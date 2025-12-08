@@ -63,7 +63,7 @@ int main()
         &state.sceneState.directionalLights, state.sceneState.water,
         &state.sceneState.crtSettings,
         &state.sceneState.crtPostProcessor.isEnabled,
-        &state.sceneState.tessellationHullDataSettings
+        &state.sceneState.tessellationHullDataSettings, state.sceneState.camera
     );
     DebugScene debugScene = DebugScene(&state.debugSceneState);
 

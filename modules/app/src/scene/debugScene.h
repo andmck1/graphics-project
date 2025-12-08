@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core_graphics/camera/camera.h"
 #include "core_graphics/light/ambient.h"
 #include "core_graphics/light/point.h"
 #include "core_graphics/light/directional.h"
@@ -24,6 +25,7 @@ struct DebugSceneState
     SharedBufferTypes::CRTBufferType *crtSettings;
     SharedBufferTypes::TessellationHullDataBufferType *tessellationSettings;
     bool *isCRTEnabled;
+    Camera *camera;
 };
 
 class DebugScene

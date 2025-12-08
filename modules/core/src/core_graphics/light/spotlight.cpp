@@ -1,7 +1,7 @@
 #include "spotlight.h"
 #include <directxmath.h>
 
-// Some lab code here
+// Some lab code here and AI help
 XMMATRIX SpotLight::calculateViewMatrix()
 {
     XMVECTOR worldPositionVector =
