@@ -1,6 +1,7 @@
 #include "debugScene.h"
 #include "core_graphics/light/point.h"
 
+#include <directxmath.h>
 #include <imgui.h>
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
@@ -45,7 +46,8 @@ bool DebugScene::render()
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Begin("Draggable Window");
+    ImGui::Begin("Alastair Hamilton 2503450 Graphics Coursework");
+    ImGui::TextWrapped("Use WASDQE to move and RMB and mouse to look around");
     ImGui::Text("FPS: %.2f", *(this->state->fps));
     ImGui::Text(
         "Position: %.2f, %.2f, %.2f", this->state->camera->worldPosition[0],
@@ -240,6 +242,43 @@ bool DebugScene::render()
             ImGui::Checkbox(
                 ("Specular Enabled?#Directional#" + iString).c_str(),
                 &directionalLight->isSpecularEnabled
+            );
+        }
+    }
+    if (ImGui::CollapsingHeader("Shadow settings"))
+    {
+        ImGui::SliderFloat(
+            "Shadow Bias", this->state->shadowBias, 0.0001f, 0.1f
+        );
+        ImGui::SliderFloat(
+            "Spotlight Near Plane", this->state->spotlightNearPlane, 100.f,
+            2000.f
+        );
+        ImGui::SliderFloat(
+            "Spotlight Far Plane", this->state->spotlightFarPlane, 100.f,
+            10000.f
+        );
+        ImGui::SliderFloat(
+            "Directional Light Near Plane",
+            this->state->directionalLightNearPlane, .1f, 2000.f
+        );
+        ImGui::SliderFloat(
+            "Directional Light Far Plane",
+            this->state->directionalLightFarPlane, 100.f, 10000.f
+        );
+        ImGui::SliderFloat(
+            "Directional Light Ortho Side Length",
+            this->state->directionalLightOrthoSideLength, 100.f, 50000.f
+        );
+        for (int i = 0; i < nDirectionalLights; i++)
+        {
+            std::string iString = std::to_string(i);
+            std::string cellText =
+                "Directional Light " + iString + " Ortho Distance";
+            ImGui::SliderFloat(
+                cellText.c_str(),
+                &this->state->directionalLights->at(i)->orthodistance, 1.f,
+                1000.f
             );
         }
     }

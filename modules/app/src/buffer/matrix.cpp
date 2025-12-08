@@ -38,10 +38,10 @@ void MatrixVertexBuffer::setData(
     this->spotLightViewMatrix1 = spotLightViewMatrix1;
     this->spotLightProjectionMatrix0 = spotLightProjectionMatrix0;
     this->spotLightProjectionMatrix1 = spotLightProjectionMatrix1;
-    this->directionalLightViewMatrix0 = spotLightViewMatrix0;
-    this->directionalLightViewMatrix1 = spotLightViewMatrix1;
-    this->directionalLightProjectionMatrix0 = spotLightProjectionMatrix0;
-    this->directionalLightProjectionMatrix1 = spotLightProjectionMatrix1;
+    this->directionalLightViewMatrix0 = directionalLightViewMatrix0;
+    this->directionalLightViewMatrix1 = directionalLightViewMatrix1;
+    this->directionalLightProjectionMatrix0 = directionalLightProjectionMatrix0;
+    this->directionalLightProjectionMatrix1 = directionalLightProjectionMatrix1;
 }
 
 bool MatrixVertexBuffer::setShader(

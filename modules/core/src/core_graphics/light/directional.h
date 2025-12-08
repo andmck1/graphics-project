@@ -16,6 +16,7 @@ class DirectionalLight : public SceneActor
     bool isDiffuseEnabled;
     bool isSpecularEnabled;
     ShadowMap shadowMap = ShadowMap();
+    float orthodistance = 100.f;
 
     XMMATRIX calculateViewMatrix();
     XMMATRIX calculateOrthographicProjectionMatrix(

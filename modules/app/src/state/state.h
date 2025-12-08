@@ -41,8 +41,8 @@ class State
     void initAppState();
     void initDebugSceneState(
         D3D *graphicsManager, float *fps, bool *isWireframeEnabled,
-        bool *isNormalsAsColourEnabled, AmbientLight *ambientLight,
-        std::vector<PointLight *> *pointLights,
+        bool *isNormalsAsColourEnabled, float *shadowBias,
+        AmbientLight *ambientLight, std::vector<PointLight *> *pointLights,
         std::vector<SpotLight *> *spotLights,
         std::vector<DirectionalLight *> *directionalLights, Water *water,
         SharedBufferTypes::CRTBufferType *crtSettings, bool *isCRTEnabled,

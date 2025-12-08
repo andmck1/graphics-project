@@ -58,10 +58,10 @@ int main()
     spdlog::info("Creating debug scene");
     state.initDebugSceneState(
         &graphicsManager, &app.timer.fps, &scene.state->isWireframeEnabled,
-        &scene.state->isNormalsAsColourEnabled, state.sceneState.ambientLight,
-        &state.sceneState.pointLights, &state.sceneState.spotLights,
-        &state.sceneState.directionalLights, state.sceneState.water,
-        &state.sceneState.crtSettings,
+        &scene.state->isNormalsAsColourEnabled, &scene.state->shadowBias,
+        state.sceneState.ambientLight, &state.sceneState.pointLights,
+        &state.sceneState.spotLights, &state.sceneState.directionalLights,
+        state.sceneState.water, &state.sceneState.crtSettings,
         &state.sceneState.crtPostProcessor.isEnabled,
         &state.sceneState.tessellationHullDataSettings, state.sceneState.camera
     );
@@ -92,7 +92,7 @@ int main()
             spotlight->worldPosition[1] = newWorldPosition[1];
             spotlight->worldPosition[2] = newWorldPosition[2];
             XMVECTOR newDirectionVector = XMVector3Normalize(
-                - newWorldPosition + XMVectorSet(1250.f, 0.f, 1250.f, 0.f)
+                -newWorldPosition + XMVectorSet(1250.f, 0.f, 1250.f, 0.f)
             );
             spotlight->directionVector[0] = newDirectionVector[0];
             spotlight->directionVector[1] = newDirectionVector[1];

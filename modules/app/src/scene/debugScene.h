@@ -26,6 +26,12 @@ struct DebugSceneState
     SharedBufferTypes::TessellationHullDataBufferType *tessellationSettings;
     bool *isCRTEnabled;
     Camera *camera;
+    float *spotlightNearPlane;
+    float *spotlightFarPlane;
+    float *directionalLightNearPlane;
+    float *directionalLightFarPlane;
+    float *directionalLightOrthoSideLength;
+    float *shadowBias;
 };
 
 class DebugScene

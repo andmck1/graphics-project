@@ -27,7 +27,9 @@ bool Scene::updateAndDraw()
         spotLightPtr->shadowMap.set();
         XMMATRIX lightViewMatrix = spotLightPtr->calculateViewMatrix();
         XMMATRIX lightProjectionMatrix =
-            spotLightPtr->calculateProjectionMatrix(1000.f, 50000.f);
+            spotLightPtr->calculateProjectionMatrix(
+                this->state->spotlightNearPlane, this->state->spotlightFarPlane
+            );
         for (int i = 0; i < this->state->actors.size(); i++)
         {
             SceneActor *actor = this->state->actors[i].get();
@@ -61,7 +63,10 @@ bool Scene::updateAndDraw()
         XMMATRIX lightViewMatrix = directionalLightPtr->calculateViewMatrix();
         XMMATRIX lightProjectionMatrix =
             directionalLightPtr->calculateOrthographicProjectionMatrix(
-                10000.f, 10000.f, 100.f, 50000.f
+                this->state->directionalLightOrthoSideLength,
+                this->state->directionalLightOrthoSideLength,
+                this->state->directionalLightNearPlane,
+                this->state->directionalLightFarPlane
             );
         for (int i = 0; i < this->state->actors.size(); i++)
         {
@@ -124,27 +129,35 @@ bool Scene::updateAndDraw()
                 this->state->spotLights[0]->calculateViewMatrix();
             XMMATRIX spotLightProjectionMatrix0 =
                 this->state->spotLights[0]->calculateProjectionMatrix(
-                    1000.f, 50000.f
+                    this->state->spotlightNearPlane,
+                    this->state->spotlightFarPlane
                 );
             XMMATRIX spotLightViewMatrix1 =
                 this->state->spotLights[1]->calculateViewMatrix();
             XMMATRIX spotLightProjectionMatrix1 =
                 this->state->spotLights[1]->calculateProjectionMatrix(
-                    1000.f, 50000.f
+                    this->state->spotlightNearPlane,
+                    this->state->spotlightFarPlane
                 );
             XMMATRIX directionalLightViewMatrix0 =
                 this->state->directionalLights[0]->calculateViewMatrix();
             XMMATRIX directionalLightProjectionMatrix0 =
                 this->state->directionalLights[0]
                     ->calculateOrthographicProjectionMatrix(
-                        10000.f, 10000.f, 100.f, 50000.f
+                        this->state->directionalLightOrthoSideLength,
+                        this->state->directionalLightOrthoSideLength,
+                        this->state->directionalLightNearPlane,
+                        this->state->directionalLightFarPlane
                     );
             XMMATRIX directionalLightViewMatrix1 =
                 this->state->directionalLights[1]->calculateViewMatrix();
             XMMATRIX directionalLightProjectionMatrix1 =
                 this->state->directionalLights[1]
                     ->calculateOrthographicProjectionMatrix(
-                        10000.f, 10000.f, 100.f, 50000.f
+                        this->state->directionalLightOrthoSideLength,
+                        this->state->directionalLightOrthoSideLength,
+                        this->state->directionalLightNearPlane,
+                        this->state->directionalLightFarPlane
                     );
             actor->currentShaderStack = actor->defaultShaderStack;
             this->state->shaderManagerState->matrixVertexBuffer.setData(

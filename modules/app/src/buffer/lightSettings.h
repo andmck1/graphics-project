@@ -11,9 +11,10 @@ class LightSettingsPixelBuffer : public BaseConstantBuffer
     public:
     bool init(D3D *graphicsManager) override;
     bool setShader(BufferSlots *slotCounters, int numberOfBuffers) override;
-    void setData(bool *isNormalsAsColourEnabled);
+    void setData(bool *isNormalsAsColourEnabled, float *shadowBias);
 
     bool *isNormalsAsColourEnabled;
+    float *shadowBias;
     struct ShaderBuffer : SharedBufferTypes::LightSettingsBufferType
     {
     };

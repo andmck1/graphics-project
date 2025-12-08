@@ -15,7 +15,7 @@ XMMATRIX DirectionalLight::calculateViewMatrix()
     _directionVector = XMVector3Normalize(_directionVector);
 
     // Set position to be far away from origin along direction
-    float distance = 10000.f;
+    float distance = this->orthodistance;
     worldPositionVector = XMVector3TransformCoord(
         worldPositionVector, XMMatrixTranslationFromVector(
                                  XMVectorScale(-_directionVector, distance)

@@ -37,7 +37,10 @@ XMMATRIX SpotLight::calculateViewMatrix()
 // Some copilot help here
 XMMATRIX SpotLight::calculateProjectionMatrix(float nearPlane, float farPlane)
 {
-    return XMMatrixPerspectiveFovLH(XM_PIDIV2, 1.f, nearPlane, farPlane);
+    // cone angle to radian divided by 4
+    return XMMatrixPerspectiveFovLH(
+        this->coneAngle / XM_PI / 8.f, 1.f, nearPlane, farPlane
+    );
 }
 
 // Some lab code here

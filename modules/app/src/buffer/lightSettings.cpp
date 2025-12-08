@@ -21,9 +21,12 @@ bool LightSettingsPixelBuffer::init(D3D *graphicsManager)
     return true;
 }
 
-void LightSettingsPixelBuffer::setData(bool *isNormalsAsColourEnabled)
+void LightSettingsPixelBuffer::setData(
+    bool *isNormalsAsColourEnabled, float *shadowBias
+)
 {
     this->isNormalsAsColourEnabled = isNormalsAsColourEnabled;
+    this->shadowBias = shadowBias;
 }
 
 bool LightSettingsPixelBuffer::setShader(
@@ -45,6 +48,7 @@ bool LightSettingsPixelBuffer::setShader(
         (LightSettingsPixelBuffer::ShaderBuffer *) mappedResource.pData;
     bufferData->isNormalsAsColourEnabled =
         XMINT4((int) *(this->isNormalsAsColourEnabled), 0, 0, 0);
+    bufferData->shadowBias = XMFLOAT4((float) *(this->shadowBias), 0, 0, 0);
 
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->PSSetConstantBuffers(

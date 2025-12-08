@@ -267,7 +267,7 @@ void State::setShaderManagerStateShaderBufferData()
         &this->sceneState.water->steepness
     );
     this->shaderManagerState.lightSettingsPixelBuffer.setData(
-        &this->sceneState.isNormalsAsColourEnabled
+        &this->sceneState.isNormalsAsColourEnabled, &this->sceneState.shadowBias
     );
     this->shaderManagerState.tessellationHullDataBuffer.setData(
         &this->sceneState.tessellationHullDataSettings
@@ -905,8 +905,8 @@ void State::initAppState()
 
 void State::initDebugSceneState(
     D3D *graphicsManager, float *fps, bool *isWireframeEnabled,
-    bool *isNormalsAsColourEnabled, AmbientLight *ambientLight,
-    std::vector<PointLight *> *pointLights,
+    bool *isNormalsAsColourEnabled, float *shadowBias,
+    AmbientLight *ambientLight, std::vector<PointLight *> *pointLights,
     std::vector<SpotLight *> *spotLights,
     std::vector<DirectionalLight *> *directionalLights, Water *water,
     SharedBufferTypes::CRTBufferType *crtSettings, bool *isCRTEnabled,
@@ -929,4 +929,15 @@ void State::initDebugSceneState(
     this->debugSceneState.isCRTEnabled = isCRTEnabled;
     this->debugSceneState.tessellationSettings = tessellationSettings;
     this->debugSceneState.camera = camera;
+    this->debugSceneState.spotlightNearPlane =
+        &this->sceneState.spotlightNearPlane;
+    this->debugSceneState.spotlightFarPlane =
+        &this->sceneState.spotlightFarPlane;
+    this->debugSceneState.directionalLightNearPlane =
+        &this->sceneState.directionalLightNearPlane;
+    this->debugSceneState.directionalLightFarPlane =
+        &this->sceneState.directionalLightFarPlane;
+    this->debugSceneState.directionalLightOrthoSideLength =
+        &this->sceneState.directionalLightOrthoSideLength;
+    this->debugSceneState.shadowBias = shadowBias;
 }

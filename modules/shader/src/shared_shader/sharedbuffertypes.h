@@ -327,6 +327,7 @@ struct LightSettingsBufferType
 #endif
     {
         int4 isNormalsAsColourEnabled;
+        float4 shadowBias;
     };
 
 #ifdef __cplusplus

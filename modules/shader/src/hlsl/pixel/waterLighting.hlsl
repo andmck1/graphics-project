@@ -290,7 +290,7 @@ float3 calculateLighting(
 {
 	float3 lightColourTotal = {0.f, 0.f, 0.f};
 	float3 ambientLighting = {0.f, 0.f, 0.f}; 
-	float shadowMapBias = 0.005f;
+	float shadowMapBias = lightSettings.shadowBias;
 	float3 lightVector;
 	float2 projectedTextureCoordinate;
 	int totalNPointLights = 0;

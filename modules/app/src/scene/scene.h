@@ -64,8 +64,14 @@ struct SceneState
     SharedBufferTypes::TessellationHullDataBufferType
         tessellationHullDataSettings =
             SharedBufferTypes::TessellationHullDataBufferType();
-    
+
     bool isNormalsAsColourEnabled = false;
+    float shadowBias = 0.005f;
+    float spotlightNearPlane = 500.f;
+    float spotlightFarPlane = 5000.f;
+    float directionalLightNearPlane = 700.f;
+    float directionalLightFarPlane = 8000.f;
+    float directionalLightOrthoSideLength = 5000.f;
 };
 
 class Scene
@@ -74,7 +80,5 @@ class Scene
     Scene(SceneState *state);
     SceneState *state;
 
-    bool firstPass();
-    bool finalPass();
     bool updateAndDraw();
 };
