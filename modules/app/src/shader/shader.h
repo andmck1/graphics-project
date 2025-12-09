@@ -7,15 +7,7 @@ class StandardVertexShader : public VertexShader
 {
 };
 
-class RadialHeightMapVertexShader : public VertexShader
-{
-};
-
 class WaveVertexShader : public VertexShader
-{
-};
-
-class DepthVertexShader : public VertexShader
 {
 };
 
@@ -32,13 +24,6 @@ class TessellatedTerrainDomainShader : public DomainShader
 {
 };
 
-class TessellatedDepthWaterDomainShader : public DomainShader
-{
-};
-
-class TessellatedDepthTerrainDomainShader : public DomainShader
-{
-};
 
 // Hull
 class TessellatedTriangleHullShader : public HullShader

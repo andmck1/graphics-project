@@ -17,65 +17,65 @@ cbuffer WaveBuffer : register(b2)
     WaveDataBufferType waveData;
 }
 
-// TODO - a lot of AI help here to shoe horn this in. Need to go back and understand it
-float3 getWaveDisplacement(float4 position, WaveDataBufferType w)
+// wave derivation depends on this so don't touch!
+static const int numWaves = 2;
+
+struct WaveResult
 {
-    float3 disp = float3(position.x, position.y, position.z);
-
-    float A[3] = { w.magnitude.x, w.magnitude.y, w.magnitude.z };
-    float k[3] = { w.waveNumber.x, w.waveNumber.y, w.waveNumber.z };
-    float wv[3] = { w.angularVelocity.x, w.angularVelocity.y, w.angularVelocity.z };
-    float2 D[3] = {
-        normalize(float2( 1.f,  0.f)),
-        normalize(float2( 0.6f, 0.8f)),
-        normalize(float2(-0.7f, 0.3f))
-    };
-
-    float Q = w.steepness.x;    // steepness
-    float t = w.totalTime.x;
-
-    for (int i = 0; i < 3; i++)
-    {
-        float theta = dot(D[i] * k[i], position.xz) + wv[i] * t;
-        disp.x += Q * A[i] * D[i].x * cos(theta);
-        disp.z += Q * A[i] * D[i].y * cos(theta);
-        disp.y +=       A[i]         * sin(theta);
-    }
-
-    return disp;
+    float3 position;
+    float3 normal;
+    float3 binormal;
+    float3 tangent;
+};
+ 
+struct Wave
+{
+    float3 direction;
+    float steepness;
+    float waveLength;
+    float amplitude;
+    float speed;
+};
+ 
+WaveResult CalculateWave(Wave wave, float3 wavePosition, float edgeDampen, float time)
+{
+    WaveResult result;
+ 
+    float frequency = 2.0 / wave.waveLength;
+    float phaseConstant = wave.speed * frequency;
+    float qi = wave.steepness / (wave.amplitude * frequency * numWaves);
+    float rad = frequency * dot(wave.direction.xz, wavePosition.xz) + time * phaseConstant;
+    float sinR = sin(rad);
+    float cosR = cos(rad);
+ 
+    result.position.x = wavePosition.x + qi * wave.amplitude * wave.direction.x * cosR * edgeDampen;
+    result.position.z = wavePosition.z + qi * wave.amplitude * wave.direction.z * cosR * edgeDampen;
+    result.position.y = wave.amplitude * sinR * edgeDampen;
+ 
+    float waFactor = frequency * wave.amplitude;
+    float radN = frequency * dot(wave.direction, result.position) + time * phaseConstant;
+    float sinN = sin(radN);
+    float cosN = cos(radN);
+ 
+    result.binormal.x = 1 - (qi * wave.direction.x * wave.direction.x * waFactor * sinN);
+    result.binormal.z = -1 * (qi * wave.direction.x * wave.direction.z * waFactor * sinN);
+    result.binormal.y = wave.direction.x * waFactor * cosN;
+ 
+    result.tangent.x = -1 * (qi * wave.direction.x * wave.direction.z * waFactor * sinN);
+    result.tangent.z = 1 - (qi * wave.direction.z * wave.direction.z * waFactor * sinN);
+    result.tangent.y = wave.direction.z * waFactor * cosN;
+ 
+    result.normal.x = -1 * (wave.direction.x * waFactor * cosN);
+    result.normal.z = -1 * (wave.direction.z * waFactor * cosN);
+    result.normal.y = 1 - (qi * waFactor * sinN);
+ 
+    result.binormal = normalize(result.binormal);
+    result.tangent = normalize(result.tangent);
+    result.normal = normalize(result.normal);
+ 
+    return result;
 }
 
-float3 getWaveNormal(float4 position, WaveDataBufferType w)
-{
-    float3 n = float3(0.f, 1.f, 0.f);
-
-    float A[3] = { w.magnitude.x, w.magnitude.y, w.magnitude.z };
-    float k[3] = { w.waveNumber.x, w.waveNumber.y, w.waveNumber.z };
-    float wv[3] = { w.angularVelocity.x, w.angularVelocity.y, w.angularVelocity.z };
-    float2 D[3] = {
-        normalize(float2( 1.f,  0.f)),
-        normalize(float2( 0.6f, 0.8f)),
-        normalize(float2(-0.7f, 0.3f))
-    };
-
-    float Q = w.steepness.x;
-    float t = w.totalTime.x;
-
-    float3 accum = float3(0, 0, 0);
-
-    for (int i = 0; i < 3; i++)
-    {
-        float theta = dot(D[i] * k[i], position.xz) + wv[i] * t;
-        float costheta = cos(theta);
-        float sintheta = sin(theta);
-
-        accum.x += -D[i].x * k[i] * A[i] * costheta;
-        accum.z += -D[i].y * k[i] * A[i] * costheta;
-        accum.y += 1.0 - Q * k[i] * A[i] * sintheta;
-    }
-
-    return normalize(accum);
-}
 
 [domain("quad")]
 QuadTessellationDomainOutputType main(
@@ -85,34 +85,61 @@ QuadTessellationDomainOutputType main(
 )
 {
     QuadTessellationDomainOutputType output;
-    float3 v1, v2, vertexPosition3f, n1, n2, normal;
     float2 uv1, uv2, uv;
-    float4 vertexPosition4f;
-    float waveDisplacement;
-    float3 waveNormal;
+    float3 v1, v2, n1, n2, normal;
+    float4 vertexPosition;
 
     // Frank Luna uses a bilinear interpolation here, and was told to use it in lecture for quad
     v1 = lerp(patch[0].position, patch[1].position, uvPatch.x);
     v2 = lerp(patch[3].position, patch[2].position, uvPatch.x);
-    vertexPosition3f = lerp(v1, v2, uvPatch.y);
-    vertexPosition4f = float4(vertexPosition3f, 1.f);
-
-    // n1 = lerp(patch[0].normal, patch[1].normal, uvPatch.x);
-    // n2 = lerp(patch[3].normal, patch[2].normal, uvPatch.x);
-    // normal = normalize(lerp(n1, n2, uvPatch.y));
+    vertexPosition =float4( lerp(v1, v2, uvPatch.y), 1.f);
 
     uv1 = lerp(patch[0].tex, patch[1].tex, uvPatch.x);
     uv2 = lerp(patch[3].tex, patch[2].tex, uvPatch.x);
     uv = lerp(uv1, uv2, uvPatch.y); 
     
 	// WAVE
-    float3 displacedVertex = getWaveDisplacement(vertexPosition4f, waveData);
-    waveNormal = getWaveNormal(vertexPosition4f, waveData);
-    vertexPosition4f.xyz = displacedVertex;
-    normal = normalize(waveNormal);
-    // vertexPosition4f.xyz += normal.xyz;	
+    float dampeningFactor = 5.f;
+    Wave waves[numWaves];
+    waves[0].direction = float3(0.3, 0, -0.7);
+    waves[0].steepness = 1.79;
+    waves[0].waveLength = 3.75;
+    waves[0].amplitude = 0.85;
+    waves[0].speed = 1.21;
+ 
+    waves[1].direction = float3(0.5, 0, -0.2);
+    waves[1].steepness = 1.79;
+    waves[1].waveLength = 4.1;
+    waves[1].amplitude = 0.52;
+    waves[1].speed = 1.03;
+ 
+    float dampening = 1.0 - pow(saturate(abs(uv.x - 0.5) / 0.5), dampeningFactor);
+    dampening *= 1.0 - pow(saturate(abs(uv.y - 0.5) / 0.5), dampeningFactor);
+ 
+    WaveResult finalWaveResult;
+    finalWaveResult.position = float3(0,0,0);
+    finalWaveResult.normal = float3(0,0,0);
+    finalWaveResult.tangent = float3(0,0,0);
+    finalWaveResult.binormal = float3(0,0,0);
+ 
+    for(int waveId = 0; waveId < numWaves; waveId++)
+    {
+        WaveResult waveResult = CalculateWave(waves[waveId], vertexPosition.xyz, dampening, waveData.totalTime.x);
+        finalWaveResult.position += waveResult.position;
+        finalWaveResult.normal += waveResult.normal;
+        finalWaveResult.tangent += waveResult.tangent;
+        finalWaveResult.binormal += waveResult.binormal;
+    }
+ 
+    finalWaveResult.position -= vertexPosition.xyz * (numWaves - 1);
+    finalWaveResult.normal = normalize(finalWaveResult.normal);
+    finalWaveResult.tangent = normalize(finalWaveResult.tangent);
+    finalWaveResult.binormal = normalize(finalWaveResult.binormal);
 
-    output.position = mul(vertexPosition4f, matrixData.worldMatrix);
+    vertexPosition = float4(finalWaveResult.position, 1.f);
+    normal = normalize(mul(finalWaveResult.normal, (float3x3)matrixData.worldMatrix));
+
+    output.position = mul(vertexPosition, matrixData.worldMatrix);
     output.position = mul(output.position, matrixData.viewMatrix);
     output.position = mul(output.position, matrixData.projectionMatrix);
 
@@ -120,22 +147,24 @@ QuadTessellationDomainOutputType main(
 
     output.normal = normal;
 
-    float4 worldPosition = mul(vertexPosition4f, matrixData.worldMatrix);
+    float4 worldPosition = mul(vertexPosition, matrixData.worldMatrix);
     output.worldPosition = worldPosition.xyz;
     output.viewVector = normalize(cameraData.worldPosition.xyz - worldPosition.xyz);
 
-    output.spotLightViewPos0 = mul(vertexPosition4f, matrixData.worldMatrix);
+    output.spotLightViewPos0 = mul(vertexPosition, matrixData.worldMatrix);
     output.spotLightViewPos0 = mul(output.spotLightViewPos0, matrixData.spotLightViewMatrix0);
     output.spotLightViewPos0 = mul(output.spotLightViewPos0, matrixData.spotLightProjectionMatrix0);
-    output.spotLightViewPos1 = mul(vertexPosition4f, matrixData.worldMatrix);
+    output.spotLightViewPos1 = mul(vertexPosition, matrixData.worldMatrix);
     output.spotLightViewPos1 = mul(output.spotLightViewPos1, matrixData.spotLightViewMatrix1);
     output.spotLightViewPos1 = mul(output.spotLightViewPos1, matrixData.spotLightProjectionMatrix1);
-    output.directionalLightViewPos0 = mul(vertexPosition4f, matrixData.worldMatrix);
+    output.directionalLightViewPos0 = mul(vertexPosition, matrixData.worldMatrix);
     output.directionalLightViewPos0 = mul(output.directionalLightViewPos0, matrixData.directionalLightViewMatrix0);
     output.directionalLightViewPos0 = mul(output.directionalLightViewPos0, matrixData.directionalLightProjectionMatrix0);
-    output.directionalLightViewPos1 = mul(vertexPosition4f, matrixData.worldMatrix);
+    output.directionalLightViewPos1 = mul(vertexPosition, matrixData.worldMatrix);
     output.directionalLightViewPos1 = mul(output.directionalLightViewPos1, matrixData.directionalLightViewMatrix1);
     output.directionalLightViewPos1 = mul(output.directionalLightViewPos1, matrixData.directionalLightProjectionMatrix1);
+
+    output.depthPosition = output.position;
  
     return output;
 }

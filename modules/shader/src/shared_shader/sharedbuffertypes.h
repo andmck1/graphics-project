@@ -35,12 +35,7 @@ struct VertexOutputType
     float4 spotLightViewPos1 : TEXCOORD4;
     float4 directionalLightViewPos0 : TEXCOORD5;
     float4 directionalLightViewPos1 : TEXCOORD6;
-};
-
-struct DepthVertexOutputType
-{
-    float4 position : SV_POSITION;
-    float4 depthPosition : TEXCOORD0;
+    float4 depthPosition : TEXCOORD7;
 };
 
 struct TessellationVertexInputType
@@ -83,12 +78,7 @@ struct QuadTessellationDomainOutputType
     float4 spotLightViewPos1 : TEXCOORD4;
     float4 directionalLightViewPos0 : TEXCOORD5;
     float4 directionalLightViewPos1 : TEXCOORD6;
-};
-
-struct DepthQuadTessellationDomainOutputType
-{
-    float4 position : SV_POSITION;
-    float4 depthPosition : TEXCOORD0;
+    float4 depthPosition : TEXCOORD7;
 };
 
 struct QuadTessellationConstantOutputType

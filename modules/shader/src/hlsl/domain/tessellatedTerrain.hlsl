@@ -77,6 +77,7 @@ QuadTessellationDomainOutputType main(
     output.directionalLightViewPos1 = mul(vertexPosition4f, matrixData.worldMatrix);
     output.directionalLightViewPos1 = mul(output.directionalLightViewPos1, matrixData.directionalLightViewMatrix1);
     output.directionalLightViewPos1 = mul(output.directionalLightViewPos1, matrixData.directionalLightProjectionMatrix1);
+    output.depthPosition = output.position;
  
     return output;
 }

@@ -20,7 +20,6 @@ class ShaderManagerState : public BaseShaderManagerState
     public:
     ShaderStack defaultShaderStack;
     ShaderStack textureOnlyShaderStack;
-    ShaderStack heightMappedObjectShaderStack;
     ShaderStack depthShaderStack;
     ShaderStack tessellatedWaterShaderStack;
     ShaderStack tessellatedTerrainShaderStack;
@@ -29,8 +28,6 @@ class ShaderManagerState : public BaseShaderManagerState
 
     // Vertex
     StandardVertexShader standardVertexShader;
-    DepthVertexShader depthVertexShader;
-    RadialHeightMapVertexShader radialHeightMapVertexShader;
     TessellationPassThroughVertexShader tessellationPassThroughVertexShader;
 
     // Hull
@@ -39,8 +36,6 @@ class ShaderManagerState : public BaseShaderManagerState
     // Domain
     TessellatedWaterDomainShader tessellatedWaterDomainShader;
     TessellatedTerrainDomainShader tessellatedTerrainDomainShader;
-    TessellatedDepthWaterDomainShader tessellatedDepthWaterDomainShader;
-    TessellatedDepthTerrainDomainShader tessellatedDepthTerrainDomainShader; 
 
     // Pixel
     LightingPixelShader lightingPixelShader;

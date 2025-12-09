@@ -43,5 +43,8 @@ VertexOutputType main(VertexInputType input)
     output.directionalLightViewPos1 = mul(output.directionalLightViewPos1, matrixData.directionalLightViewMatrix1);
     output.directionalLightViewPos1 = mul(output.directionalLightViewPos1, matrixData.directionalLightProjectionMatrix1);
 
+    // Store the position value in a second input value for depth value calculations.
+    output.depthPosition = output.position;
+
 	return output;
 }

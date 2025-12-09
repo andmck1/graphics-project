@@ -57,14 +57,6 @@ void State::initShaderManagerStateShaders()
         this->initShaderManagerStateShader<StandardVertexShader>(
             "./build/hlsl/vertex/standard.cso", inputElementDescription
         );
-    this->shaderManagerState.radialHeightMapVertexShader =
-        this->initShaderManagerStateShader<RadialHeightMapVertexShader>(
-            "./build/hlsl/vertex/radialHeightMap.cso", inputElementDescription
-        );
-    this->shaderManagerState.depthVertexShader =
-        this->initShaderManagerStateShader<DepthVertexShader>(
-            "./build/hlsl/vertex/depth.cso", inputElementDescription
-        );
     this->shaderManagerState.tessellationPassThroughVertexShader =
         this->initShaderManagerStateShader<TessellationPassThroughVertexShader>(
             "./build/hlsl/vertex/tessellationPassThrough.cso",
@@ -85,14 +77,6 @@ void State::initShaderManagerStateShaders()
     this->shaderManagerState.tessellatedTerrainDomainShader =
         this->initShaderManagerStateShader<TessellatedTerrainDomainShader>(
             "./build/hlsl/domain/tessellatedTerrain.cso"
-        );
-    this->shaderManagerState.tessellatedDepthWaterDomainShader =
-        this->initShaderManagerStateShader<TessellatedDepthWaterDomainShader>(
-            "./build/hlsl/domain/tessellatedDepthWater.cso"
-        );
-    this->shaderManagerState.tessellatedDepthTerrainDomainShader =
-        this->initShaderManagerStateShader<TessellatedDepthTerrainDomainShader>(
-            "./build/hlsl/domain/tessellatedDepthTerrain.cso"
         );
 
     // Pixel
@@ -133,14 +117,9 @@ void State::initShaderManagerStateShaderStacks()
             {&this->shaderManagerState.standardVertexShader,
              &this->shaderManagerState.textureOnlyPixelShader}
         );
-    this->shaderManagerState.heightMappedObjectShaderStack.shaders =
-        std::vector<BaseShader *>(
-            {&this->shaderManagerState.radialHeightMapVertexShader,
-             &this->shaderManagerState.lightingPixelShader}
-        );
     this->shaderManagerState.depthShaderStack.shaders =
         std::vector<BaseShader *>(
-            {&this->shaderManagerState.depthVertexShader,
+            {&this->shaderManagerState.standardVertexShader,
              &this->shaderManagerState.depthPixelShader}
         );
     this->shaderManagerState.tessellatedWaterShaderStack.shaders =
@@ -161,14 +140,14 @@ void State::initShaderManagerStateShaderStacks()
         std::vector<BaseShader *>(
             {&this->shaderManagerState.tessellationPassThroughVertexShader,
              &this->shaderManagerState.tessellatedQuadHullShader,
-             &this->shaderManagerState.tessellatedDepthWaterDomainShader,
+             &this->shaderManagerState.tessellatedWaterDomainShader,
              &this->shaderManagerState.depthPixelShader}
         );
     this->shaderManagerState.tessellatedDepthTerrainShaderStack.shaders =
         std::vector<BaseShader *>(
             {&this->shaderManagerState.tessellationPassThroughVertexShader,
              &this->shaderManagerState.tessellatedQuadHullShader,
-             &this->shaderManagerState.tessellatedDepthTerrainDomainShader,
+             &this->shaderManagerState.tessellatedTerrainDomainShader,
              &this->shaderManagerState.depthPixelShader}
         );
 }
@@ -179,13 +158,6 @@ void State::initShaderManagerStateShaderBuffers()
     this->shaderManagerState.standardVertexShader.bufferStack = {
         &this->shaderManagerState.matrixVertexBuffer,
         &this->shaderManagerState.cameraVertexBuffer
-    };
-    this->shaderManagerState.radialHeightMapVertexShader.bufferStack = {
-        &this->shaderManagerState.matrixVertexBuffer,
-        &this->shaderManagerState.cameraVertexBuffer
-    };
-    this->shaderManagerState.depthVertexShader.bufferStack = {
-        &this->shaderManagerState.matrixVertexBuffer,
     };
     this->shaderManagerState.tessellationPassThroughVertexShader
         .bufferStack = {};
@@ -206,13 +178,6 @@ void State::initShaderManagerStateShaderBuffers()
     this->shaderManagerState.tessellatedTerrainDomainShader.bufferStack = {
         &this->shaderManagerState.matrixDomainBuffer,
         &this->shaderManagerState.cameraDomainBuffer,
-    };
-    this->shaderManagerState.tessellatedDepthWaterDomainShader.bufferStack = {
-        &this->shaderManagerState.matrixDomainBuffer,
-        &this->shaderManagerState.waveDataDomainBuffer
-    };
-    this->shaderManagerState.tessellatedDepthTerrainDomainShader.bufferStack = {
-        &this->shaderManagerState.matrixDomainBuffer,
     };
 
     // Pixel
@@ -653,7 +618,7 @@ void State::initSceneStateWater()
         &this->shaderManagerState.tessellatedDepthWaterShaderStack,
         &this->textureManagerState.waterTexture, &this->sceneState.wrapSampler,
         nullptr, nullptr, {50.f, 50.f, 50.f}, {0.f, 0.f, 0.f},
-        {-1000.f, -750.f, -1000.f}
+        {-1000.f, -850.f, -1000.f}
     );
     Water *waterPtr =
         dynamic_cast<Water *>(this->sceneState.actors.back().get());
