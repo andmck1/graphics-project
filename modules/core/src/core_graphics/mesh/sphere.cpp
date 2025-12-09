@@ -8,7 +8,7 @@ SphereMesh::SphereMesh(D3D *graphicsManager)
     // this->vertexIndices.clear();
 }
 
-// Copilot help
+// (Microsoft Copilot, 2025)
 void SphereMesh::init()
 {
     this->vertices.clear();

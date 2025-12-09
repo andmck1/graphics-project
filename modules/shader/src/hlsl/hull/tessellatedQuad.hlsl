@@ -1,5 +1,3 @@
-// Tessellation Hull Shader
-// Prepares control points for tessellation
 #include "sharedbuffertypes.h"
 
 cbuffer MatrixBuffer : register(b0)
@@ -17,6 +15,7 @@ cbuffer SettingsBuffer : register(b2)
     TessellationHullDataBufferType settingsData;
 }
 
+// (Luna, 2012)
 QuadTessellationConstantOutputType PatchConstantFunction(
     InputPatch<QuadTessellationHullInputType, 4> inputPatch, 
     uint patchId : SV_PrimitiveID
@@ -27,13 +26,13 @@ QuadTessellationConstantOutputType PatchConstantFunction(
     float3 centre;
     float4 centreWorldPosition;
     
+    // collect values
     const float minTessellationFactor = settingsData.minTessellationFactor.x;
     const float maxTessellationFactor = settingsData.maxTessellationFactor.x;
     const float maxTessellationDistanceThreshold = settingsData.minTessellationDistanceThreshold.x;
     const float minTessellationDistanceThreshold = settingsData.maxTessellationDistanceThreshold.x;
 
     // Tessellate based on distance from camera
-    // Frank Luna help
     // Centre is average of all positions
     centre = 0.25f * (
         inputPatch[0].position + 
@@ -54,12 +53,12 @@ QuadTessellationConstantOutputType PatchConstantFunction(
         )
     );
     tessellationFactor = max(minTessellationFactor, tessellationFactor);
-
+    
+    // output
 	output.edges[0] = tessellationFactor;
 	output.edges[1] = tessellationFactor;
 	output.edges[2] = tessellationFactor;
 	output.edges[3] = tessellationFactor;
-
 	output.inside[0] = tessellationFactor;
 	output.inside[1] = tessellationFactor;
 
@@ -67,6 +66,7 @@ QuadTessellationConstantOutputType PatchConstantFunction(
 }
 
 
+// (Luna, 2012)
 [domain("quad")]
 [partitioning("integer")]
 [outputtopology("triangle_ccw")]

@@ -6,7 +6,8 @@ bool UpSampler::init(D3D *graphicsManager)
     HRESULT createSamplerStateHR;
     D3D11_SAMPLER_DESC samplerDescription;
 
-    samplerDescription.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    // (Microsoft Copilot, 2025)
+    samplerDescription.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
     samplerDescription.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
     samplerDescription.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
     samplerDescription.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;

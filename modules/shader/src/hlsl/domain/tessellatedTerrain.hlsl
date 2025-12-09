@@ -12,6 +12,7 @@ cbuffer CameraBuffer : register(b1)
 	CameraDomainBufferType cameraData;
 };
 
+// TODO - copied code
 float GetHeight(float2 _uv, Texture2D _heightMap, SamplerState _heightMapSampler)
 {
     float4 textureColour;
@@ -22,6 +23,7 @@ float GetHeight(float2 _uv, Texture2D _heightMap, SamplerState _heightMapSampler
     return (textureColour.r * 2 - 1) * height + (height*offsetFactor);
 }
 
+// (Luna, 2012)
 [domain("quad")]
 QuadTessellationDomainOutputType main(
     QuadTessellationConstantOutputType input, 
@@ -35,7 +37,8 @@ QuadTessellationDomainOutputType main(
     float4 vertexPosition4f;
     float heightDisplacement;
 
-    // Frank Luna uses a bilinear interpolation here, and was told to use it in lecture for quad
+    // bilinear interpolation for vertices, normals and tex values
+    // TODO - create functions for these and reuse across shaders
     v1 = lerp(patch[0].position, patch[1].position, uvPatch.x);
     v2 = lerp(patch[3].position, patch[2].position, uvPatch.x);
     vertexPosition3f = lerp(v1, v2, uvPatch.y);
@@ -49,22 +52,20 @@ QuadTessellationDomainOutputType main(
     uv2 = lerp(patch[3].tex, patch[2].tex, uvPatch.x);
     uv = lerp(uv1, uv2, uvPatch.y); 
 
+    // displace height
     heightDisplacement = GetHeight(uv, heightMap, heightSampler);
     vertexPosition3f.y += heightDisplacement;
     vertexPosition4f.y += heightDisplacement;
 
+    // output
     output.position = mul(vertexPosition4f, matrixData.worldMatrix);
     output.position = mul(output.position, matrixData.viewMatrix);
     output.position = mul(output.position, matrixData.projectionMatrix);
-
-    output.tex = uv;
-
-    output.normal = normal;
-
     float4 worldPosition = mul(vertexPosition4f, matrixData.worldMatrix);
     output.worldPosition = worldPosition.xyz;
+    output.tex = uv;
+    output.normal = normal;
     output.viewVector = normalize(cameraData.worldPosition.xyz - worldPosition.xyz);
-
     output.spotLightViewPos0 = mul(vertexPosition4f, matrixData.worldMatrix);
     output.spotLightViewPos0 = mul(output.spotLightViewPos0, matrixData.spotLightViewMatrix0);
     output.spotLightViewPos0 = mul(output.spotLightViewPos0, matrixData.spotLightProjectionMatrix0);

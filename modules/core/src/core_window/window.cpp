@@ -1,3 +1,7 @@
+// Bits of help from:
+// (ImGui Contributors, 2025)
+// (Microsoft Copilot, 2025)
+
 #include "window.h"
 
 #include <algorithm>

@@ -10,7 +10,7 @@ bool DirectionalLightsBuffer::init(D3D *graphicsManager)
 
     this->graphicsManager = graphicsManager;
 
-    // Copilot help
+    // (Microsoft Copilot, 2025)
     this->bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
     this->bufferDesc.ByteWidth =
         sizeof(DirectionalLightsBuffer::ShaderBuffer) *
@@ -56,7 +56,7 @@ void DirectionalLightsBuffer::setData(
     this->directionalLights = directionalLights;
 }
 
-// Copilot help here
+// (Microsoft Copilot, 2025)
 bool DirectionalLightsBuffer::setShader(
     BufferSlots *slotCounters, int numberOfBuffers
 )

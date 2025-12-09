@@ -3,6 +3,7 @@
 #include <optional>
 #include <unordered_map>
 
+// (Microsoft Copilot, 2025)
 template <typename umapKeyType, typename umapValueType>
 std::optional<std::reference_wrapper<const umapValueType>>
 getValueFromUnorderedMap(

@@ -1,7 +1,9 @@
 #include "spotlight.h"
 #include <directxmath.h>
 
-// Some lab code here and AI help
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 XMMATRIX SpotLight::calculateViewMatrix()
 {
     XMVECTOR worldPositionVector =
@@ -34,7 +36,7 @@ XMMATRIX SpotLight::calculateViewMatrix()
     );
 }
 
-// Some copilot help here
+// (Microsoft Copilot, 2025)
 XMMATRIX SpotLight::calculateProjectionMatrix(float nearPlane, float farPlane)
 {
     // cone angle to radian divided by 4
@@ -43,7 +45,9 @@ XMMATRIX SpotLight::calculateProjectionMatrix(float nearPlane, float farPlane)
     );
 }
 
-// Some lab code here
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 XMMATRIX SpotLight::calculateOrthographicProjectionMatrix(
     float screenWidth, float screenHeight, float nearPlane, float farPlane
 )

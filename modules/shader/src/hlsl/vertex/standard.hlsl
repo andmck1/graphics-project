@@ -1,6 +1,8 @@
 #include "sharedbuffertypes.h"
 
-// Note, code provided from lab examples
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 cbuffer MatrixBuffer : register(b0)
 {
     MatrixBufferType matrixData;
@@ -13,6 +15,7 @@ cbuffer CameraBuffer : register(b1)
 
 VertexOutputType main(VertexInputType input)
 {
+    // simple WVP calculations
 	VertexOutputType output;
 
 	output.position = mul(input.position, matrixData.worldMatrix);
@@ -29,7 +32,7 @@ VertexOutputType main(VertexInputType input)
 	
     output.viewVector = normalize(cameraData.worldPosition.xyz - worldPosition.xyz);
 
-    // Lab code
+    // (Robertson, n.d.)
     output.spotLightViewPos0 = mul(input.position, matrixData.worldMatrix);
     output.spotLightViewPos0 = mul(output.spotLightViewPos0, matrixData.spotLightViewMatrix0);
     output.spotLightViewPos0 = mul(output.spotLightViewPos0, matrixData.spotLightProjectionMatrix0);

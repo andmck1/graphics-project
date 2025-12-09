@@ -15,8 +15,11 @@ int main()
     spdlog::set_level(spdlog::level::debug);
 
     spdlog::info("Starting app");
-    State state = State();
 
+    // hardcoding state initialisation here for now
+    // so I can easily access it during development
+    State state = State();
+    
     // App
     spdlog::info("Creating app");
     state.initAppState();
@@ -72,9 +75,11 @@ int main()
     app.timer.start();
     while (window.frame())
     {
+        // start frame
         app.timer.frame();
         appInput.handleInputs();
-
+        
+        // hardcoding spotlight updates for scene here for now
         for (SpotLight *spotlight : scene.state->spotLights)
         {
             XMMATRIX spotlightRotation =
@@ -98,9 +103,14 @@ int main()
             spotlight->directionVector[1] = newDirectionVector[1];
             spotlight->directionVector[2] = newDirectionVector[2];
         }
-
+        
+        // update scene
         scene.updateAndDraw();
+
+        // update debug layer
         debugScene.render();
+
+        // present
         graphicsManager.presentScreen();
     }
 

@@ -36,7 +36,8 @@ float2 distort(float2 _uv, float curvePower)
 	return saturate(uvDistorted);
 }
 
-// Help from Copilot for these random functions
+// (Microsoft Copilot, 2025)
+// random number generators
 float random(float2 seed)
 {
 	float2 randomNumber;
@@ -50,11 +51,14 @@ float randomPeriodic( float2 seed, float _totalTime)
 	return random(seed + float2(_totalTime, _totalTime * 0.21));
 }
 
+// sample function
 float4 getTextureColour(Texture2D _objectTexture, SamplerState _textureSampler, float2 uv)
 {
 	return _objectTexture.Sample(_textureSampler, uv);
 }
 
+// (Art-Michel, 2025)
+// want a periodic wiggle across the screen to mimic VHS playback
 float vhsWiggleOffset(float2 _uv, float _totalTime, float wiggleAmount)
 {
 	float wiggleOffset;
@@ -65,6 +69,8 @@ float vhsWiggleOffset(float2 _uv, float _totalTime, float wiggleAmount)
 	return wiggleOffset;
 }
 
+// (Art-Michel, 2025)
+// offset RGB values separately by sampling to the left and right of the pixel
 float4 textureWithChromaticAberration(
 	Texture2D _texture, SamplerState _sampler, float2 _uv, float _uResolution,
 	float chromaticAbberrationStrength
@@ -89,6 +95,8 @@ float4 textureWithChromaticAberration(
 
 }
 
+// (Art-Michel, 2025)
+// Add some noise to the screen
 float4 colourWithFilmGrainNoise(float _totalTime, float2 _uv, float4 _colour, float _strength)
 {
 	float noiseR, noiseG, noiseB;
@@ -106,10 +114,10 @@ float4 colourWithFilmGrainNoise(float _totalTime, float2 _uv, float4 _colour, fl
 	return saturate(newColour);
 }
 
+// Want to make the first pixel more red, the second more green and the third more blue
+// cyclically across the screen in rows
 float4 getRGBGrideMask(float4 _screenSpacePosition) 
 {
-	// Want to make the first pixel more red, the second more green and the third more blue
-	// cyclically across the screen in rows
 	float4 rgbMask = float4(0.f, 0.f, 0.f, 1.f);
 	uint gridIndex = uint(_screenSpacePosition.x) % 3;
 	if (gridIndex == 0) rgbMask.r = 1.f;
@@ -118,6 +126,7 @@ float4 getRGBGrideMask(float4 _screenSpacePosition)
 	return rgbMask;
 }
 
+// Add scanlines
 float calculateScanlineColourModulation(
 	float4 _screenSpacePosition, int _scanlineInterval,
 	int _scanlineThickness, float _scanlineOpacity
@@ -136,7 +145,7 @@ float calculateScanlineColourModulation(
 	return scanlineModulation;	
 }
 
-// Falloff function from copilot, works well
+// (Microsoft Copilot, 2025)
 float calculateVingetteModulation(
 	float2 _uv, 
 	float _vingetteStrength

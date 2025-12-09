@@ -2,18 +2,19 @@
 
 #include "core_utils/graphics.h"
 
-// Some code from lab here
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 void RenderTexture::init()
 {
-    D3D11_TEXTURE2D_DESC textureDesc;
+    D3D11_TEXTURE2D_DESC textureDesc {};
     HRESULT result;
-    D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-    D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
-    D3D11_TEXTURE2D_DESC depthBufferDesc;
-    D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+    D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {};
+    D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
+    D3D11_TEXTURE2D_DESC depthBufferDesc = {};
+    D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
 
     // Setup the render target texture description.
-    ZeroMemory(&textureDesc, sizeof(textureDesc));
     textureDesc.Width = this->textureWidth;
     textureDesc.Height = this->textureHeight;
     textureDesc.MipLevels = 1;
@@ -56,7 +57,6 @@ void RenderTexture::init()
     TryDXCall(result, "Failed to shader resource view");
 
     // Set up the description of the depth buffer.
-    ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
     depthBufferDesc.Width = this->textureWidth;
     depthBufferDesc.Height = this->textureHeight;
     depthBufferDesc.MipLevels = 1;
@@ -75,8 +75,6 @@ void RenderTexture::init()
     );
     TryDXCall(result, "Failed to create depth stencil buffer.");
 
-    // Set up the depth stencil view description.
-    ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
     // Set up the depth stencil view description.
     depthStencilViewDesc.Format = depthBufferDesc.Format;
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;

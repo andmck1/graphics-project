@@ -1,6 +1,8 @@
 #include "sharedbuffertypes.h"
 
-// Code provided from lab example
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 float4 main(DepthPixelInputType input) : SV_TARGET
 {
 	float depthValue;

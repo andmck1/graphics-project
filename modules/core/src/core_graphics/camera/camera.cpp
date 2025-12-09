@@ -13,6 +13,10 @@ Camera::Camera()
 
 void Camera::update()
 {
+    // TODO - prevent gimball lock? Think base actor has a function for this
+    // could also use quaternions
+    // Should change these from arrays to native DX11 types? or custom types
+    // for cross engine use?
     XMMATRIX cameraRotation = this->getRotationMatrix();
     XMVECTOR eyePosition = {
         this->worldPosition[0], this->worldPosition[1], this->worldPosition[2],

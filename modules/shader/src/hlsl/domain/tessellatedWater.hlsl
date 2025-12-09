@@ -17,7 +17,7 @@ cbuffer WaveBuffer : register(b2)
     WaveDataBufferType waveData;
 }
 
-// wave derivation depends on this so don't touch!
+// Don't touch!
 static const int numWaves = 2;
 
 struct WaveResult
@@ -27,18 +27,20 @@ struct WaveResult
     float3 binormal;
     float3 tangent;
 };
-  
+
+// (Tardif, n.d.)
 WaveResult CalculateWave(WaveDataBufferType waveData, int waveIndex, float3 wavePosition, float edgeDampen, float time)
 {
     WaveResult result;
     
-    // Some nice waves from https://alextardif.com/Water.html
+    // get data
     float3 direction = waveData.direction[waveIndex].xyz;
     float magnitude = waveData.magnitude[waveIndex].x;
     float angularVelocity = waveData.angularVelocity[waveIndex].x;
     float waveNumber = waveData.waveNumber[waveIndex].x;
     float steepness = waveData.steepness[waveIndex].x;
     
+    // calculate useful values
     float wavelength = 1.f / waveNumber;
     float frequency = 2.f / wavelength;
     float speed = angularVelocity / (2.f * 3.142);
@@ -47,16 +49,21 @@ WaveResult CalculateWave(WaveDataBufferType waveData, int waveIndex, float3 wave
     float rad = frequency * dot(direction.xz, wavePosition.xz) + time * phaseVelocity;
     float sinR = sin(rad);
     float cosR = cos(rad);
- 
+    float waFactor = frequency * magnitude;
+    
+    // derivations from (Mark Finch, 2004)
+    // position is as a gertsner wave, with dampening so the edges don't
+    // move around
     result.position.x = wavePosition.x + qi * magnitude * direction.x * cosR * edgeDampen;
     result.position.z = wavePosition.z + qi * magnitude * direction.z * cosR * edgeDampen;
     result.position.y = magnitude * sinR * edgeDampen;
- 
-    float waFactor = frequency * magnitude;
+
+    // calculate useful values from new wave position
     float radN = frequency * dot(direction.xyz, result.position) + time * phaseVelocity;
     float sinN = sin(radN);
     float cosN = cos(radN);
- 
+    
+    // binormal calculation
     result.binormal.x = 1 - (qi * direction.x * direction.x * waFactor * sinN);
     result.binormal.z = -1 * (qi * direction.x * direction.z * waFactor * sinN);
     result.binormal.y = direction.x * waFactor * cosN;
@@ -98,17 +105,21 @@ QuadTessellationDomainOutputType main(
     uv2 = lerp(patch[3].tex, patch[2].tex, uvPatch.x);
     uv = lerp(uv1, uv2, uvPatch.y); 
     
-	// WAVE
+    // (Tardif, n.d.)
+    // TODO - parameterise
     float dampeningFactor = 5.f;
     float dampening = 1.0 - pow(saturate(abs(uv.x - 0.5) / 0.5), dampeningFactor);
     dampening *= 1.0 - pow(saturate(abs(uv.y - 0.5) / 0.5), dampeningFactor);
- 
+    
+    // Create waves
+    // (Tardif, n.d.)
     WaveResult finalWaveResult;
     finalWaveResult.position = float3(0.f, 0.f, 0.f);
     finalWaveResult.normal = float3(0.f, 0.f, 0.f);
     finalWaveResult.tangent = float3(0.f, 0.f, 0.f);
     finalWaveResult.binormal = float3(0.f, 0.f, 0.f);
  
+    // (Tardif, n.d.)
     for(int waveIndex = 0; waveIndex < numWaves; waveIndex++)
     {
         WaveResult waveResult = CalculateWave(waveData, waveIndex, vertexPosition.xyz, dampening, waveData.totalTime.x);
@@ -125,19 +136,18 @@ QuadTessellationDomainOutputType main(
 
     vertexPosition = float4(finalWaveResult.position, 1.f);
     normal = normalize(mul(finalWaveResult.normal, (float3x3)matrixData.worldMatrix));
-
+    
+    // Output
     output.position = mul(vertexPosition, matrixData.worldMatrix);
     output.position = mul(output.position, matrixData.viewMatrix);
     output.position = mul(output.position, matrixData.projectionMatrix);
-
-    output.tex = uv * 10.f;
-
-    output.normal = normal;
-
     float4 worldPosition = mul(vertexPosition, matrixData.worldMatrix);
+    // TODO - based off of plane values to scale texture nicely
+    // need to parameterise
+    output.tex = uv * 10.f;
+    output.normal = normal;
     output.worldPosition = worldPosition.xyz;
     output.viewVector = normalize(cameraData.worldPosition.xyz - worldPosition.xyz);
-
     output.spotLightViewPos0 = mul(vertexPosition, matrixData.worldMatrix);
     output.spotLightViewPos0 = mul(output.spotLightViewPos0, matrixData.spotLightViewMatrix0);
     output.spotLightViewPos0 = mul(output.spotLightViewPos0, matrixData.spotLightProjectionMatrix0);

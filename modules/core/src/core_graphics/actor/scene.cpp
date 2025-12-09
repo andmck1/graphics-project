@@ -21,7 +21,9 @@ bool SceneActor::drawMesh(D3D *graphicsManager, bool isTextureSet)
     graphicsManager->deviceContext->DSSetShader(nullptr, nullptr, 0);
 
     this->mesh->get()->sendMeshData(graphicsManager);
-
+    
+    // Set conditional buffers
+    // TODO - textures are just buffers, use buffer stacks!
     if (isTextureSet)
     {
         if (!this->texture->setPixelShader(&slotCounters, 1))
@@ -60,7 +62,8 @@ bool SceneActor::drawMesh(D3D *graphicsManager, bool isTextureSet)
                 return false;
         }
     }
-
+    
+    // Set shaders
     BufferSlots loopSlotCounters = slotCounters;
     for (int shaderIndex = 0;
          shaderIndex < this->currentShaderStack->shaders.size(); shaderIndex++)
@@ -83,11 +86,13 @@ bool SceneActor::drawMesh(D3D *graphicsManager, bool isTextureSet)
         shader->set(graphicsManager);
         loopSlotCounters = slotCounters;
     }
-
+    
+    // Draw vertices
     graphicsManager->deviceContext->DrawIndexed(
         this->mesh->get()->getVertexIndexCount(), 0, 0
     );
-
+    
+    // Unset hull and domain
     graphicsManager->deviceContext->HSSetShader(nullptr, nullptr, 0);
     graphicsManager->deviceContext->DSSetShader(nullptr, nullptr, 0);
     return true;

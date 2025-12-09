@@ -23,9 +23,13 @@ StructuredBuffer<DirectionalLightBufferType> DirectionalLightBuffer : register(t
 StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t7);
 StructuredBuffer<SpotLightBufferType> SpotLightBuffer : register(t8);
 
-// Lab code
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 bool hasDepthData(float2 uv)
 {
+    // depth check - if within uv bounds of shadow map then depth data
+    // available
     if (uv.x < 0.f || uv.x > 1.f || uv.y < 0.f || uv.y > 1.f)
     {
         return false;
@@ -33,7 +37,9 @@ bool hasDepthData(float2 uv)
     return true;
 }
 
-// Lab code
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 bool isInShadow(
 	Texture2D _shadowMapTexture, SamplerState _sampler, 
 	float2 _uv, float4 lightViewPosition, float bias
@@ -50,7 +56,9 @@ bool isInShadow(
     return true;
 }
 
-// Lab code
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 float2 getProjectiveCoords(float4 lightViewPosition)
 {
     float2 projTex = lightViewPosition.xy / lightViewPosition.w;
@@ -59,14 +67,16 @@ float2 getProjectiveCoords(float4 lightViewPosition)
     return projTex;
 }
 
-
+// TODO - copied code, put in shared file
 float GetHeight(float2 uv)
 {
     float4 textureColour = heightmapTexture.SampleLevel(heightmapSampler, uv, 0);
     return textureColour.r * 500;
 }
 
-// Lab 5 code
+// A lot of copied code here that would be useful to share across lighting
+// files
+
 // Use neighbouring texels to calculate surface normals
 float3 calculateNormalUsingNeighbouringTexels(float2 uv, float3 posCentre)
 {
@@ -106,6 +116,7 @@ float3 calculateNormalUsingNeighbouringTexels(float2 uv, float3 posCentre)
     return -normal * 0.25;
 }
 
+// Blinn-Phong lighting
 float3 calculateSpecularLighting(
 	float3 specularColour, 
 	float specularPower,
@@ -139,7 +150,6 @@ float3 calculateDirectionalLighting(
 	float3 diffuse = {0.f, 0.f, 0.f};
 	float3 specular = {0.f, 0.f, 0.f};
 	float distance;
-	float attenuation = 1.f;
 
 	if ((bool) directionalLightData.isDiffuseEnabled.r)
 	{
@@ -161,7 +171,6 @@ float3 calculateDirectionalLighting(
 	}
 
 	directionalLighting = diffuse + specular;
-	directionalLighting *= attenuation;
 	return directionalLighting;
 }
 
@@ -260,6 +269,8 @@ float3 calculateSpotLighting(
 	spotLighting = diffuse + specular;
 	spotLighting *= attenuation;
 
+    // Simple cutoff cone. would be nicer having an inner and outer cone
+    // and attenuating across those distance but this is enough for now
 	directionalAttenuation = dot(lightVector, -normalize(spotLightData.directionVector.xyz));
 	if (directionalAttenuation < cos(spotLightData.coneAngle.x * (3.14159f / 180.f)))
 	{
@@ -290,6 +301,7 @@ float3 calculateLighting(
 	SamplerState _shadowSampler
 )
 {
+    // Initialise
 	float3 lightColourTotal = {0.f, 0.f, 0.f};
 	float3 ambientLighting = {0.f, 0.f, 0.f}; 
 	float shadowMapBias = lightSettings.shadowBias;
@@ -299,14 +311,15 @@ float3 calculateLighting(
 	int totalNSpotLights = 0;
 	int totalNDirectionalLights = 0;
 	int i;
-
-
+    
+    // Ambient
 	if ((bool) ambientLightData.isEnabled)
 	{
 		ambientLighting = calculateAmbientLighting(ambientLightData.colour.rgb);
 	}
 	lightColourTotal += ambientLighting;
-
+    
+    // point, loop through each and add
 	PointLightBufferType firstPointLightData = PointLightBuffer[0];
 	totalNPointLights = firstPointLightData.nLights.x;
 	for(i=0; i<totalNPointLights; i++)
@@ -324,7 +337,8 @@ float3 calculateLighting(
 		);
 		lightColourTotal += lightColourContribution;
 	}
-
+    
+    // spot. hard coded as two for now due to shadow implementation
 	projectedTextureCoordinate = getProjectiveCoords(spotLightViewPos0);
 	if (hasDepthData(projectedTextureCoordinate))
 	{
@@ -371,6 +385,7 @@ float3 calculateLighting(
 		}
 	}
 
+    // directional. hard coded as two for now due to shadow implementation
 	projectedTextureCoordinate = getProjectiveCoords(directionalLightViewPos0);
 	if (hasDepthData(projectedTextureCoordinate))
 	{
@@ -428,18 +443,22 @@ float4 getTextureColour(Texture2D _objectTexture, SamplerState _textureSampler, 
 
 float4 main(PixelInputType input) : SV_TARGET
 {
+    // initialise values
 	float4 textureColour;
-	float4 lightColour = {0.f, 0.f, 0.f, 0.f};
+	float4 lightColour;
 	float3 newNormal;
 	float2 projectedTextureCoordinate;
 	textureColour = getTextureColour(objectTexture, textureSampler, input.tex);
 	newNormal = calculateNormalUsingNeighbouringTexels(input.tex, input.position.xyz);
-
+    
+    // normals enabled check
 	if ((bool) lightSettings.isNormalsAsColourEnabled.x)
 	{
 		return float4((newNormal + 1.f) / 2.f, 1.f);
 	}
-	lightColour += calculateLighting(
+
+    // calculate lighting
+	lightColour = calculateLighting(
 		input.worldPosition.xyz, newNormal.xyz, input.viewVector.xyz,
 		input.spotLightViewPos0, input.spotLightViewPos1,
 		input.directionalLightViewPos0, input.directionalLightViewPos1,

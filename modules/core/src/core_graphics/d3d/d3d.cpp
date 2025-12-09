@@ -60,7 +60,7 @@ bool D3D::initProjectionMatrix()
 
     this->orthographicProjectionMatrix = XMMatrixOrthographicLH(
         (float) this->state->window->state->width,
-        (float) this->state->window->state->height,nearPlane, farPlane 
+        (float) this->state->window->state->height, nearPlane, farPlane
     );
     return true;
 }
@@ -300,13 +300,11 @@ bool D3D::createMatrixBuffer()
     );
 }
 
-// TODO Lab code
 bool D3D::setDepthBuffer()
 {
     HRESULT createDepthBufferHR;
-    D3D11_TEXTURE2D_DESC depthBufferDesc;
+    D3D11_TEXTURE2D_DESC depthBufferDesc = {};
     // Initialize the description of the depth buffer.
-    ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
     depthBufferDesc.Width = this->state->window->state->width;
     depthBufferDesc.Height = this->state->window->state->height;
     depthBufferDesc.MipLevels = 1;
@@ -406,14 +404,12 @@ void D3D::setDepthStencilState(bool isEnabled)
     );
 }
 
-// TODO Lab code
 bool D3D::setStencilBuffer()
 {
     HRESULT createDepthStencilViewHR;
 
     // Initialise the depth stencil view.
-    D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-    ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
+    D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc{};
     depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     depthStencilViewDesc.Texture2D.MipSlice = 0;

@@ -1,5 +1,6 @@
 #include "directional.h"
 
+// (Microsoft Copilot, 2025)
 XMMATRIX DirectionalLight::calculateViewMatrix()
 {
     XMVECTOR worldPositionVector = XMVectorSet(0.f, 0.f, 0.f, 1.f);
@@ -37,7 +38,7 @@ XMMATRIX DirectionalLight::calculateViewMatrix()
     return XMMatrixLookAtLH(worldPositionVector, XMVectorZero(), upVector);
 }
 
-// Some lab code here
+// (Robertson, n.d.)
 XMMATRIX DirectionalLight::calculateOrthographicProjectionMatrix(
     float screenWidth, float screenHeight, float nearPlane, float farPlane
 )

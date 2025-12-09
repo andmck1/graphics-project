@@ -4,7 +4,9 @@
 #include <spdlog/spdlog.h>
 #include "WICTextureLoader.h"
 
-// Some help from lab here
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 bool FileTexture::loadAndCreateTextureResource()
 {
     HRESULT createTexture2DHR;

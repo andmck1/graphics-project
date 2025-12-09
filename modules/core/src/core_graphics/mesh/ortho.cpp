@@ -15,7 +15,9 @@ OrthoMesh::OrthoMesh(
 
 void OrthoMesh::init()
 {
-    // Lab code
+    // (Robertson, n.d.)
+    // (Hughes, n.d.)
+    // (Falconer, n.d.)
     float left, right, top, bottom;
     left = ((float) this->width) / -2.f + ((float) this->xPosition);
     right = left + (float) this->width;

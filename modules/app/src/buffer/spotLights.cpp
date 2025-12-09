@@ -9,7 +9,7 @@ bool SpotLightsBuffer::init(D3D *graphicsManager)
 
     this->graphicsManager = graphicsManager;
 
-    // Copilot help
+    // (Microsoft Copilot, 2025)
     this->bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
     this->bufferDesc.ByteWidth = sizeof(SpotLightsBuffer::ShaderBuffer) *
                                  static_cast<UINT>(this->spotLights->size());
@@ -49,7 +49,7 @@ void SpotLightsBuffer::setData(std::vector<SpotLight *> *spotLights)
     this->spotLights = spotLights;
 }
 
-// Copilot help here
+// (Microsoft Copilot, 2025)
 bool SpotLightsBuffer::setShader(BufferSlots *slotCounters, int numberOfBuffers)
 {
     D3D11_MAPPED_SUBRESOURCE mappedResource;

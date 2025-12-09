@@ -1,9 +1,11 @@
 #include "shadowmap.h"
 
-// Lab code here
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 void ShadowMap::init()
 {
-    D3D11_TEXTURE2D_DESC texDesc;
+    D3D11_TEXTURE2D_DESC texDesc = {};
     texDesc.Width = this->width;
     texDesc.Height = this->height;
     texDesc.MipLevels = 1;
@@ -20,7 +22,7 @@ void ShadowMap::init()
         &texDesc, 0, this->depthTexture.GetAddressOf()
     );
 
-    D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+    D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
     dsvDesc.Flags = 0;
     dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
@@ -30,7 +32,7 @@ void ShadowMap::init()
         this->depthStencilView.GetAddressOf()
     );
 
-    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
     srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Texture2D.MipLevels = texDesc.MipLevels;
@@ -52,7 +54,7 @@ void ShadowMap::init()
 
 bool ShadowMap::set()
 {
-    // Copilot help
+    // (Microsoft Copilot, 2025)
     ComPtr<ID3D11ShaderResourceView>
         nullSRVs[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT];
     this->graphicsManager->deviceContext->PSSetShaderResources(

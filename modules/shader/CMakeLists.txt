@@ -8,8 +8,8 @@ add_library(shared_shader STATIC src/shared_shader/sharedbuffertypes.h
 target_link_libraries(shared_shader d3d11 D3DCompiler)
 target_include_directories(shared_shader PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-# Help from copilot here and
-# https://stackoverflow.com/questions/71299716/how-to-compile-hlsl-shaders-during-build-with-cmake
+# (Microsoft Copilot, 2025)
+# (Walbourn, 2022)
 set(VERTEX_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/standard.hlsl"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/hlsl/vertex/tessellationPassThrough.hlsl")

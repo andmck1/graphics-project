@@ -3,7 +3,9 @@
 #include "core_graphics/buffer/base.h"
 #include "d3d.h"
 
-// Some lab code here
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 class ShadowMap
 {
     public:

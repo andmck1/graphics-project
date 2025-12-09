@@ -1,7 +1,7 @@
 #include "point.h"
 #include <DirectXMath.h>
 
-// Some copilot help here 
+// (Microsoft Copilot, 2025)
 XMMATRIX
 PointLight::calculateViewMatrix(XMVECTOR directionVector, XMVECTOR upVector)
 {
@@ -12,13 +12,15 @@ PointLight::calculateViewMatrix(XMVECTOR directionVector, XMVECTOR upVector)
     );
 }
 
-// Some copilot help here
+// (Microsoft Copilot, 2025)
 XMMATRIX PointLight::calculateProjectionMatrix(float nearPlane, float farPlane)
 {
     return XMMatrixPerspectiveFovLH(XM_PIDIV2, 1.f, nearPlane, farPlane);
 }
 
-// Some lab code here
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 XMMATRIX PointLight::calculateOrthographicProjectionMatrix(
     float screenWidth, float screenHeight, float nearPlane, float farPlane
 )

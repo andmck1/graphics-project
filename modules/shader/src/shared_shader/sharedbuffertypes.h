@@ -5,6 +5,7 @@
 #define SEMANTIC(sem) : sem
 #endif
 
+// (berwyn, 2016)
 #ifdef __cplusplus
 #include <directxmath.h>
 using namespace DirectX;

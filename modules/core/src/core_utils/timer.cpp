@@ -1,7 +1,9 @@
 #include "timer.h"
 #include <profileapi.h>
 
-// Some lab code here
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 Timer::Timer()
 {
     QueryPerformanceFrequency((LARGE_INTEGER *) &this->tickFrequency);

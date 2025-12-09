@@ -8,7 +8,9 @@ PlaneMesh::PlaneMesh(D3D *graphicsManager)
 
 void PlaneMesh::init()
 {
-    // Lab code
+    // (Robertson, n.d.)
+    // (Hughes, n.d.)
+    // (Falconer, n.d.)
     int vertexCount, indexCount, index, i, j;
     float positionX, positionZ, u, v, increment;
     int resolution = 100;

@@ -1,7 +1,9 @@
 #pragma once
 #include <windows.h>
 
-// Some lab code here
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 class Timer
 {
     public:

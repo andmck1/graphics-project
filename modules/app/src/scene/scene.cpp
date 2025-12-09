@@ -19,6 +19,7 @@ bool Scene::updateAndDraw()
     );
 
     // Depth pass
+    // Rendering scene from spotlights POV for shadow maps
     for (int spotLightIndex = 0;
          spotLightIndex < this->state->spotLights.size(); spotLightIndex++)
     {
@@ -51,7 +52,8 @@ bool Scene::updateAndDraw()
         this->state->graphicsManager->setRenderTargetViewToBackBuffer();
         this->state->graphicsManager->setDefaultViewport();
     }
-
+    
+    // Rendering scene from directional lights POV for shadow maps
     for (int directionalLightIndex = 0;
          directionalLightIndex < this->state->directionalLights.size();
          directionalLightIndex++)
@@ -111,6 +113,7 @@ bool Scene::updateAndDraw()
     }
 
     // Draw scene
+    // Loop round each actor and draw, setting additional buffer data as needed
     this->state->graphicsManager->setDepthStencilState(true);
     for (int i = 0; i < this->state->actors.size(); i++)
     {
@@ -189,6 +192,8 @@ bool Scene::updateAndDraw()
     this->state->graphicsManager->setRenderTargetViewToBackBuffer();
 
     // Post processing
+    // Loop round each render stage and run pixel shader, rendering onto
+    // render texture
     if ((this->state->crtPostProcessor.renderStages.size() > 0) &&
         (this->state->crtPostProcessor.isEnabled))
     {

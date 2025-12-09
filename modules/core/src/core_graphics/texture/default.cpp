@@ -2,7 +2,9 @@
 #include "core_utils/graphics.h"
 #include <spdlog/spdlog.h>
 
-// Some help from lab here
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 bool DefaultTexture::loadTexture()
 {
     HRESULT createTexture2DHR;
@@ -27,7 +29,9 @@ bool DefaultTexture::loadTexture()
     return TryDXCall(createTexture2DHR, "Failed to create texture");
 }
 
-// Some help from lab here
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 bool DefaultTexture::createResource()
 {
     HRESULT createShaderResourceViewHR;

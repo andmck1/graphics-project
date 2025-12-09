@@ -605,8 +605,8 @@ void State::initSceneStateCamera()
         dynamic_cast<Camera *>(this->sceneState.actors.back().get());
     cameraPtr->isDrawEnabled = false;
     cameraPtr->isUpdateEnabled = true;
-    cameraPtr->worldPosition = {-496.f, 337.f, 766.f};
-    cameraPtr->rotateTo(.24f, .95f, 0.f);
+    cameraPtr->worldPosition = {-664.39f, 428.95f, 417.53f};
+    cameraPtr->rotateTo(0.34f, 1.08f, 0.f);
     this->sceneState.camera = cameraPtr;
 }
 

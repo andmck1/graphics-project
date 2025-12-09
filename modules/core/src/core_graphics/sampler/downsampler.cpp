@@ -6,6 +6,7 @@ bool DownSampler::init(D3D *graphicsManager)
     HRESULT createSamplerStateHR;
     D3D11_SAMPLER_DESC samplerDescription;
 
+    // (Microsoft Copilot, 2025)
     samplerDescription.Filter = D3D11_FILTER_ANISOTROPIC;
     samplerDescription.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
     samplerDescription.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;

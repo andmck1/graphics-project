@@ -1,3 +1,6 @@
+// mostly copied from lighting.hlsl but not using the texel calculation
+// for normals. need to create a shared file for shader code
+
 #include "sharedbuffertypes.h"
 
 Texture2D objectTexture: register(t0);
@@ -21,7 +24,9 @@ StructuredBuffer<DirectionalLightBufferType> DirectionalLightBuffer : register(t
 StructuredBuffer<PointLightBufferType> PointLightBuffer : register(t6);
 StructuredBuffer<SpotLightBufferType> SpotLightBuffer : register(t7);
 
-// Lab code
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 bool hasDepthData(float2 uv)
 {
     if (uv.x < 0.f || uv.x > 1.f || uv.y < 0.f || uv.y > 1.f)
@@ -31,7 +36,9 @@ bool hasDepthData(float2 uv)
     return true;
 }
 
-// Lab code
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 bool isInShadow(
 	Texture2D _shadowMapTexture, SamplerState _sampler, 
 	float2 _uv, float4 lightViewPosition, float bias
@@ -48,7 +55,9 @@ bool isInShadow(
     return true;
 }
 
-// Lab code
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 float2 getProjectiveCoords(float4 lightViewPosition)
 {
     float2 projTex = lightViewPosition.xy / lightViewPosition.w;
@@ -64,7 +73,9 @@ float GetHeight(float2 uv)
     return textureColour.r * 500;
 }
 
-// Lab 5 code
+// (Robertson, n.d.)
+// (Hughes, n.d.)
+// (Falconer, n.d.)
 // Use neighbouring texels to calculate surface normals
 float3 calculateNormalUsingNeighbouringTexels(float2 uv, float3 posCentre)
 {

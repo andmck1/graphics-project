@@ -9,7 +9,7 @@ bool PointLightsBuffer::init(D3D *graphicsManager)
 
     this->graphicsManager = graphicsManager;
 
-    // Copilot help
+    // (Microsoft Copilot, 2025)
     this->bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
     this->bufferDesc.ByteWidth = sizeof(PointLightsBuffer::ShaderBuffer) *
                                  static_cast<UINT>(this->pointLights->size());
@@ -49,7 +49,7 @@ void PointLightsBuffer::setData(std::vector<PointLight *> *pointLights)
     this->pointLights = pointLights;
 }
 
-// Copilot help here
+// (Microsoft Copilot, 2025)
 bool PointLightsBuffer::setShader(BufferSlots *slotCounters, int numberOfBuffers)
 {
     D3D11_MAPPED_SUBRESOURCE mappedResource;
