@@ -2,6 +2,7 @@
 #include "core_graphics/light/point.h"
 
 #include <directxmath.h>
+#include <format>
 #include <imgui.h>
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
@@ -283,21 +284,34 @@ bool DebugScene::render()
         }
     }
 
-    if (ImGui::CollapsingHeader("Water settings"))
+    for (int waveIndex = 0; waveIndex < 2; waveIndex++)
     {
-        ImGui::SliderFloat(
-            "Water Wave Magnitude", &this->state->water->magnitude, 0.1f, 2.f
-        );
-        ImGui::SliderFloat(
-            "Water Wave Number", &this->state->water->waveNumber, 0.1f, 10.f
-        );
-        ImGui::SliderFloat(
-            "Water Wave Angular Velocity", &this->state->water->angularVelocity,
-            0.1f, 10.f
-        );
-        ImGui::SliderFloat(
-            "Water Steepness", &this->state->water->steepness, 0.1f, 10.f
-        );
+        if (ImGui::CollapsingHeader(
+                std::format("Water Wave {} Settings", waveIndex).c_str()
+            ))
+        {
+            ImGui::SliderFloat3(
+                std::format("Water Wave # {} Direction", waveIndex).c_str(),
+                this->state->water->direction[waveIndex].data(), -1.f, 1.f 
+            );
+            ImGui::SliderFloat(
+                std::format("Water Wave # {} Magnitude", waveIndex).c_str(),
+                &this->state->water->magnitude[waveIndex], 0.1f, 2.f
+            );
+            ImGui::SliderFloat(
+                std::format("Water Wave # {} Wave Number", waveIndex).c_str(),
+                &this->state->water->waveNumber[waveIndex], 0.1f, 1.f
+            );
+            ImGui::SliderFloat(
+                std::format("Water Wave # {} Angular Velocity", waveIndex)
+                    .c_str(),
+                &this->state->water->angularVelocity[waveIndex], 0.1f, 10.f
+            );
+            ImGui::SliderFloat(
+                std::format("Water Wave # {} Steepness", waveIndex).c_str(),
+                &this->state->water->steepness[waveIndex], 0.1f, 10.f
+            );
+        }
     }
 
     if (ImGui::CollapsingHeader("Postprocessor settings"))

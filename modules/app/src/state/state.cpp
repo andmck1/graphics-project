@@ -226,8 +226,8 @@ void State::setShaderManagerStateShaderBufferData()
         &this->sceneState.spotLights
     );
     this->shaderManagerState.waveDataDomainBuffer.setData(
-        &this->appState.timer->totalTime, &this->sceneState.water->magnitude,
-        &this->sceneState.water->waveNumber,
+        &this->appState.timer->totalTime, &this->sceneState.water->direction,
+        &this->sceneState.water->magnitude, &this->sceneState.water->waveNumber,
         &this->sceneState.water->angularVelocity,
         &this->sceneState.water->steepness
     );
@@ -625,10 +625,18 @@ void State::initSceneStateWater()
     this->sceneState.water = waterPtr;
 
     waterPtr->isDrawEnabled = true;
-    waterPtr->magnitude = 0.1f;
-    waterPtr->waveNumber = 0.342f;
-    waterPtr->angularVelocity = 0.883f;
-    waterPtr->steepness = 0.1f;
+
+    waterPtr->direction[0] = {.3f, 0.f, .217f};
+    waterPtr->magnitude[0] = 0.588f;
+    waterPtr->waveNumber[0] = .314f;
+    waterPtr->angularVelocity[0] = 6.16f;
+    waterPtr->steepness[0] = 1.6f;
+
+    waterPtr->direction[1] = {.032f, 0.f, .258f};
+    waterPtr->magnitude[1] = 0.513f;
+    waterPtr->waveNumber[1] = .256f;
+    waterPtr->angularVelocity[1] = 5.168f;
+    waterPtr->steepness[1] = .736f;
 }
 
 void State::createRenderTexture(

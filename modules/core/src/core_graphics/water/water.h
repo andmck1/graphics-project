@@ -5,8 +5,9 @@
 class Water : public SceneActor
 {
     public:
-    float magnitude;
-    float waveNumber;
-    float angularVelocity;
-    float steepness;
+    std::array<std::array<float, 3>, 2> direction;
+    std::array<float, 2> magnitude;
+    std::array<float, 2> waveNumber;
+    std::array<float, 2> angularVelocity;
+    std::array<float, 2> steepness;
 };

@@ -27,46 +27,46 @@ struct WaveResult
     float3 binormal;
     float3 tangent;
 };
- 
-struct Wave
-{
-    float3 direction;
-    float steepness;
-    float waveLength;
-    float amplitude;
-    float speed;
-};
- 
-WaveResult CalculateWave(Wave wave, float3 wavePosition, float edgeDampen, float time)
+  
+WaveResult CalculateWave(WaveDataBufferType waveData, int waveIndex, float3 wavePosition, float edgeDampen, float time)
 {
     WaveResult result;
- 
-    float frequency = 2.0 / wave.waveLength;
-    float phaseConstant = wave.speed * frequency;
-    float qi = wave.steepness / (wave.amplitude * frequency * numWaves);
-    float rad = frequency * dot(wave.direction.xz, wavePosition.xz) + time * phaseConstant;
+    
+    // Some nice waves from https://alextardif.com/Water.html
+    float3 direction = waveData.direction[waveIndex].xyz;
+    float magnitude = waveData.magnitude[waveIndex].x;
+    float angularVelocity = waveData.angularVelocity[waveIndex].x;
+    float waveNumber = waveData.waveNumber[waveIndex].x;
+    float steepness = waveData.steepness[waveIndex].x;
+    
+    float wavelength = 1.f / waveNumber;
+    float frequency = 2.f / wavelength;
+    float speed = angularVelocity / (2.f * 3.142);
+    float phaseVelocity = speed * frequency;
+    float qi = steepness / (magnitude * frequency * numWaves);
+    float rad = frequency * dot(direction.xz, wavePosition.xz) + time * phaseVelocity;
     float sinR = sin(rad);
     float cosR = cos(rad);
  
-    result.position.x = wavePosition.x + qi * wave.amplitude * wave.direction.x * cosR * edgeDampen;
-    result.position.z = wavePosition.z + qi * wave.amplitude * wave.direction.z * cosR * edgeDampen;
-    result.position.y = wave.amplitude * sinR * edgeDampen;
+    result.position.x = wavePosition.x + qi * magnitude * direction.x * cosR * edgeDampen;
+    result.position.z = wavePosition.z + qi * magnitude * direction.z * cosR * edgeDampen;
+    result.position.y = magnitude * sinR * edgeDampen;
  
-    float waFactor = frequency * wave.amplitude;
-    float radN = frequency * dot(wave.direction, result.position) + time * phaseConstant;
+    float waFactor = frequency * magnitude;
+    float radN = frequency * dot(direction.xyz, result.position) + time * phaseVelocity;
     float sinN = sin(radN);
     float cosN = cos(radN);
  
-    result.binormal.x = 1 - (qi * wave.direction.x * wave.direction.x * waFactor * sinN);
-    result.binormal.z = -1 * (qi * wave.direction.x * wave.direction.z * waFactor * sinN);
-    result.binormal.y = wave.direction.x * waFactor * cosN;
+    result.binormal.x = 1 - (qi * direction.x * direction.x * waFactor * sinN);
+    result.binormal.z = -1 * (qi * direction.x * direction.z * waFactor * sinN);
+    result.binormal.y = direction.x * waFactor * cosN;
  
-    result.tangent.x = -1 * (qi * wave.direction.x * wave.direction.z * waFactor * sinN);
-    result.tangent.z = 1 - (qi * wave.direction.z * wave.direction.z * waFactor * sinN);
-    result.tangent.y = wave.direction.z * waFactor * cosN;
+    result.tangent.x = -1 * (qi * direction.x * direction.z * waFactor * sinN);
+    result.tangent.z = 1 - (qi * direction.z * direction.z * waFactor * sinN);
+    result.tangent.y = direction.z * waFactor * cosN;
  
-    result.normal.x = -1 * (wave.direction.x * waFactor * cosN);
-    result.normal.z = -1 * (wave.direction.z * waFactor * cosN);
+    result.normal.x = -1 * (direction.x * waFactor * cosN);
+    result.normal.z = -1 * (direction.z * waFactor * cosN);
     result.normal.y = 1 - (qi * waFactor * sinN);
  
     result.binormal = normalize(result.binormal);
@@ -100,31 +100,18 @@ QuadTessellationDomainOutputType main(
     
 	// WAVE
     float dampeningFactor = 5.f;
-    Wave waves[numWaves];
-    waves[0].direction = float3(0.3, 0, -0.7);
-    waves[0].steepness = 1.79;
-    waves[0].waveLength = 3.75;
-    waves[0].amplitude = 0.85;
-    waves[0].speed = 1.21;
- 
-    waves[1].direction = float3(0.5, 0, -0.2);
-    waves[1].steepness = 1.79;
-    waves[1].waveLength = 4.1;
-    waves[1].amplitude = 0.52;
-    waves[1].speed = 1.03;
- 
     float dampening = 1.0 - pow(saturate(abs(uv.x - 0.5) / 0.5), dampeningFactor);
     dampening *= 1.0 - pow(saturate(abs(uv.y - 0.5) / 0.5), dampeningFactor);
  
     WaveResult finalWaveResult;
-    finalWaveResult.position = float3(0,0,0);
-    finalWaveResult.normal = float3(0,0,0);
-    finalWaveResult.tangent = float3(0,0,0);
-    finalWaveResult.binormal = float3(0,0,0);
+    finalWaveResult.position = float3(0.f, 0.f, 0.f);
+    finalWaveResult.normal = float3(0.f, 0.f, 0.f);
+    finalWaveResult.tangent = float3(0.f, 0.f, 0.f);
+    finalWaveResult.binormal = float3(0.f, 0.f, 0.f);
  
-    for(int waveId = 0; waveId < numWaves; waveId++)
+    for(int waveIndex = 0; waveIndex < numWaves; waveIndex++)
     {
-        WaveResult waveResult = CalculateWave(waves[waveId], vertexPosition.xyz, dampening, waveData.totalTime.x);
+        WaveResult waveResult = CalculateWave(waveData, waveIndex, vertexPosition.xyz, dampening, waveData.totalTime.x);
         finalWaveResult.position += waveResult.position;
         finalWaveResult.normal += waveResult.normal;
         finalWaveResult.tangent += waveResult.tangent;

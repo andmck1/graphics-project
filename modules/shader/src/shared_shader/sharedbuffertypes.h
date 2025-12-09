@@ -265,10 +265,15 @@ struct WaveDataBufferType
 #endif
     {
         float4 totalTime;
-        float4 magnitude;
-        float4 waveNumber;
-        float4 angularVelocity;
-        float4 steepness;
+        
+        // TODO - would be nicer using texture buffer here
+        // but the shader hard codes in 2 waves anyway
+        float4 direction[2];
+        float4 magnitude[2];
+        float4 waveNumber[2];
+        float4 angularVelocity[2];
+        float4 steepness[2];
+        
     };
 
 #ifdef __cplusplus

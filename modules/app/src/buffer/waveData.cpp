@@ -22,11 +22,13 @@ bool WaveDataVertexBuffer::init(D3D *graphicsManager)
 }
 
 void WaveDataVertexBuffer::setData(
-    float *totalTime, float *magnitude, float *waveNumber,
-    float *angularVelocity, float *steepness
+    float *totalTime, std::array<std::array<float, 3>, 2> *direction,
+    std::array<float, 2> *magnitude, std::array<float, 2> *waveNumber,
+    std::array<float, 2> *angularVelocity, std::array<float, 2> *steepness
 )
 {
     this->totalTime = totalTime;
+    this->direction = direction;
     this->magnitude = magnitude;
     this->waveNumber = waveNumber;
     this->angularVelocity = angularVelocity;
@@ -50,11 +52,23 @@ bool WaveDataVertexBuffer::setShader(
         return false;
     bufferData = (WaveDataVertexBuffer::ShaderBuffer *) mappedResource.pData;
     bufferData->totalTime = XMFLOAT4(*this->totalTime, 0.f, 0.f, 0.f);
-    bufferData->magnitude = XMFLOAT4(*this->magnitude, 0.f, 0.f, 0.f);
-    bufferData->waveNumber = XMFLOAT4(*this->waveNumber, 0.f, 0.f, 0.f);
-    bufferData->angularVelocity =
-        XMFLOAT4(*this->angularVelocity, 0.f, 0.f, 0.f);
-    bufferData->steepness = XMFLOAT4(*this->steepness, 0.f, 0.f, 0.f);
+
+    for (int waveIndex = 0; waveIndex < 2; waveIndex++)
+    {
+        bufferData->direction[waveIndex] = XMFLOAT4(
+            this->direction->at(waveIndex)[0],
+            this->direction->at(waveIndex)[1],
+            this->direction->at(waveIndex)[2], 0.f
+        );
+        bufferData->magnitude[waveIndex] =
+            XMFLOAT4(this->magnitude->at(waveIndex), 0.f, 0.f, 0.f);
+        bufferData->waveNumber[waveIndex] =
+            XMFLOAT4(this->waveNumber->at(waveIndex), 0.f, 0.f, 0.f);
+        bufferData->angularVelocity[waveIndex] =
+            XMFLOAT4(this->angularVelocity->at(waveIndex), 0.f, 0.f, 0.f);
+        bufferData->steepness[waveIndex] =
+            XMFLOAT4(this->steepness->at(waveIndex), 0.f, 0.f, 0.f);
+    }
 
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->VSSetConstantBuffers(
@@ -86,11 +100,13 @@ bool WaveDataDomainBuffer::init(D3D *graphicsManager)
 }
 
 void WaveDataDomainBuffer::setData(
-    float *totalTime, float *magnitude, float *waveNumber,
-    float *angularVelocity, float *steepness
+    float *totalTime, std::array<std::array<float, 3>, 2> *direction,
+    std::array<float, 2> *magnitude, std::array<float, 2> *waveNumber,
+    std::array<float, 2> *angularVelocity, std::array<float, 2> *steepness
 )
 {
     this->totalTime = totalTime;
+    this->direction = direction;
     this->magnitude = magnitude;
     this->waveNumber = waveNumber;
     this->angularVelocity = angularVelocity;
@@ -112,13 +128,25 @@ bool WaveDataDomainBuffer::setShader(
     );
     if (!TryDXCall(mapHR, "Wave domain shader map failed.\n"))
         return false;
+
     bufferData = (WaveDataDomainBuffer::ShaderBuffer *) mappedResource.pData;
     bufferData->totalTime = XMFLOAT4(*this->totalTime, 0.f, 0.f, 0.f);
-    bufferData->magnitude = XMFLOAT4(*this->magnitude, 0.f, 0.f, 0.f);
-    bufferData->waveNumber = XMFLOAT4(*this->waveNumber, 0.f, 0.f, 0.f);
-    bufferData->angularVelocity =
-        XMFLOAT4(*this->angularVelocity, 0.f, 0.f, 0.f);
-    bufferData->steepness = XMFLOAT4(*this->steepness, 0.f, 0.f, 0.f);
+    for (int waveIndex = 0; waveIndex < 2; waveIndex++)
+    {
+        bufferData->direction[waveIndex] = XMFLOAT4(
+            this->direction->at(waveIndex)[0],
+            this->direction->at(waveIndex)[1],
+            this->direction->at(waveIndex)[2], 0.f
+        );
+        bufferData->magnitude[waveIndex] =
+            XMFLOAT4(this->magnitude->at(waveIndex), 0.f, 0.f, 0.f);
+        bufferData->waveNumber[waveIndex] =
+            XMFLOAT4(this->waveNumber->at(waveIndex), 0.f, 0.f, 0.f);
+        bufferData->angularVelocity[waveIndex] =
+            XMFLOAT4(this->angularVelocity->at(waveIndex), 0.f, 0.f, 0.f);
+        bufferData->steepness[waveIndex] =
+            XMFLOAT4(this->steepness->at(waveIndex), 0.f, 0.f, 0.f);
+    }
 
     graphicsManager->deviceContext->Unmap(this->buffer.Get(), 0);
     graphicsManager->deviceContext->DSSetConstantBuffers(
