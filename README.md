@@ -44,4 +44,4 @@ when code from these contributors has been used.
 * Motion Forge Pictures (2021) Motion Forge Pictures. Available at: https://www.motionforgepictures.com/height-maps/ (Accessed: November 2025).
 * Robertson, P. (n.d.) DXFramework. (Accessed: 2025).
 * Tardif, A. (n.d.) Alex Tardif. Available at: https://alextardif.com/Water.html (Accessed: 9 December 2025).
-* Walbourn, C. (2022) Stack Overflow. Available at: # https://stackoverflow.com/questions/71299716/how-to-compile-hlsl-shaders-during-build-with-cmake (Accessed: November 2025).
+* Walbourn, C. (2022) Stack Overflow. Available at: https://stackoverflow.com/questions/71299716/how-to-compile-hlsl-shaders-during-build-with-cmake (Accessed: November 2025).
