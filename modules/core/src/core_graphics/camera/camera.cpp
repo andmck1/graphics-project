@@ -29,11 +29,4 @@ void Camera::update()
     XMVECTOR at = XMVectorAdd(eyePosition, forward);
 
     this->viewMatrix = XMMatrixLookAtLH(eyePosition, at, up);
-
-    this->updatePreviousWorldPosition();
-    this->updatePreviousRotation();
-    this->movementDirectionVector.x =
-        this->previousForwardVector[0] - this->forwardVector[0];
-    this->movementDirectionVector.y =
-        this->previousForwardVector[1] - this->forwardVector[1];
 }

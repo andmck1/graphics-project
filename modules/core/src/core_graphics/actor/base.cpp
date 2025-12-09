@@ -60,39 +60,10 @@ void BaseActor::clampScaling()
     }
 }
 
-void BaseActor::updatePreviousWorldPosition()
-{
-    this->previousWorldPosition[0] = this->worldPosition[0];
-    this->previousWorldPosition[1] = this->worldPosition[1];
-    this->previousWorldPosition[2] = this->worldPosition[2];
-}
-
-void BaseActor::updatePreviousRotation()
-{
-    this->previousRotation[0] = this->rotation[0];
-    this->previousRotation[1] = this->rotation[1];
-    this->previousRotation[2] = this->rotation[2];
-}
-
-void BaseActor::updatePreviousScaling()
-{
-    this->previousScaling[0] = this->scaling[0];
-    this->previousScaling[1] = this->scaling[1];
-    this->previousScaling[2] = this->scaling[2];
-}
-
-void BaseActor::updatePreviousForwardVector()
-{
-    this->previousForwardVector[0] = this->forwardVector[0];
-    this->previousForwardVector[1] = this->forwardVector[1];
-    this->previousForwardVector[2] = this->forwardVector[2];
-}
-
 void BaseActor::moveTo(
     float xWorldPosition, float yWorldPosition, float zWorldPosition
 )
 {
-    this->updatePreviousWorldPosition();
     this->worldPosition[0] = xWorldPosition;
     this->worldPosition[1] = yWorldPosition;
     this->worldPosition[2] = zWorldPosition;
@@ -100,7 +71,6 @@ void BaseActor::moveTo(
 
 void BaseActor::moveBy(float xOffset, float yOffset, float zOffset)
 {
-    this->updatePreviousWorldPosition();
     this->worldPosition[0] += xOffset;
     this->worldPosition[1] += yOffset;
     this->worldPosition[2] += zOffset;
@@ -115,7 +85,6 @@ void BaseActor::moveRelativeToForwardVectorBy(
     XMVECTOR _newWorldPosition =
         XMVector3TransformNormal(_offsetVector, this->getRotationMatrix());
 
-    this->updatePreviousWorldPosition();
     this->worldPosition[0] += _newWorldPosition[0];
     this->worldPosition[1] += _newWorldPosition[1];
     this->worldPosition[2] += _newWorldPosition[2];
@@ -124,7 +93,6 @@ void BaseActor::moveRelativeToForwardVectorBy(
 void BaseActor::rotateTo(float pitch, float yaw, float roll)
 {
 
-    this->updatePreviousRotation();
     this->rotation[0] = pitch;
     this->rotation[1] = yaw;
     this->rotation[2] = roll;
@@ -135,7 +103,6 @@ void BaseActor::rotateTo(float pitch, float yaw, float roll)
         _initialForwardVector, XMMatrixRotationRollPitchYaw(pitch, yaw, roll)
     );
 
-    this->updatePreviousForwardVector();
     this->forwardVector[0] = _forwardVector[0];
     this->forwardVector[1] = _forwardVector[1];
     this->forwardVector[2] = _forwardVector[2];
@@ -143,7 +110,6 @@ void BaseActor::rotateTo(float pitch, float yaw, float roll)
 
 void BaseActor::rotateBy(float pitchOffset, float yawOffset, float rollOffset)
 {
-    this->updatePreviousRotation();
     this->rotation[0] += pitchOffset;
     this->rotation[1] += yawOffset;
     this->rotation[2] += rollOffset;
@@ -159,7 +125,6 @@ void BaseActor::rotateBy(float pitchOffset, float yawOffset, float rollOffset)
         )
     );
 
-    this->updatePreviousForwardVector();
     this->forwardVector[0] = _forwardVector[0];
     this->forwardVector[1] = _forwardVector[1];
     this->forwardVector[2] = _forwardVector[2];
@@ -167,7 +132,6 @@ void BaseActor::rotateBy(float pitchOffset, float yawOffset, float rollOffset)
 
 void BaseActor::scaleTo(float xFactor, float yFactor, float zFactor)
 {
-    this->updatePreviousScaling();
     this->scaling[0] = xFactor;
     this->scaling[1] = yFactor;
     this->scaling[2] = zFactor;
@@ -178,7 +142,6 @@ void BaseActor::scaleBy(
     float xFactorOffset, float yFactorOffset, float zFactorOffset
 )
 {
-    this->updatePreviousScaling();
     this->scaling[0] += xFactorOffset;
     this->scaling[1] += yFactorOffset;
     this->scaling[2] += zFactorOffset;

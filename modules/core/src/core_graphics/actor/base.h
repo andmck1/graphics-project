@@ -18,20 +18,10 @@ class BaseActor
     std::array<float, 3> scaling = {0.f, 0.f, 0.f};
     std::array<float, 3> forwardVector = {1.f, 0.f, 0.f};
 
-    std::array<float, 3> previousWorldPosition = {0.f, 0.f, 0.f};
-    std::array<float, 3> previousRotation = {0.f, 0.f, 0.f};
-    std::array<float, 3> previousScaling = {0.f, 0.f, 0.f};
-    std::array<float, 3> previousForwardVector = {1.f, 0.f, 0.f};
-
     XMMATRIX getWorldMatrix();
     XMMATRIX getTranslationMatrix();
     XMMATRIX getRotationMatrix();
     XMMATRIX getScalingMatrix();
-
-    void updatePreviousWorldPosition();
-    void updatePreviousRotation();
-    void updatePreviousScaling();
-    void updatePreviousForwardVector();
 
     void
     moveTo(float xWorldPosition, float yWorldPosition, float zWorldPosition);
