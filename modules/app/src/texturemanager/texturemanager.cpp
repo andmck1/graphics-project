@@ -13,8 +13,6 @@ bool TextureManager::loadAll()
     spdlog::info("Loading all textures");
     if (!this->state->defaultTexture.load())
         return false;
-    if (!this->state->moonTexture.load())
-        return false;
     if (!this->state->mountainsHeightMap.load())
         return false;
     if (!this->state->mountainsTexture.load())

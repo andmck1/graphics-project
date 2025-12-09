@@ -297,12 +297,6 @@ void State::initTextureManagerState(D3D *graphicsManager)
     this->textureManagerState.defaultTexture.texturePixelColour =
         texturePixelColour;
 
-    this->textureManagerState.moonTexture = FileTexture();
-    this->textureManagerState.moonTexture.graphicsManager = graphicsManager;
-    this->textureManagerState.moonTexture.filepath = std::filesystem::absolute(
-        std::filesystem::path("./textures/moon_heightmap.jpg")
-    );
-
     this->textureManagerState.mountainsHeightMap = FileTexture();
     this->textureManagerState.mountainsHeightMap.graphicsManager =
         graphicsManager;

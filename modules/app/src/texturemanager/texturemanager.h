@@ -6,7 +6,6 @@
 struct TextureManagerState
 {
     DefaultTexture defaultTexture;
-    FileTexture moonTexture;
     FileTexture mountainsHeightMap;
     FileTexture mountainsTexture;
     FileTexture lightDebugTexture;
