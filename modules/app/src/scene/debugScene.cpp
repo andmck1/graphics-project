@@ -47,7 +47,7 @@ bool DebugScene::render()
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Begin("Alastair Hamilton 2503450 Graphics Coursework");
+    ImGui::Begin("DX11 Research Project");
     ImGui::TextWrapped("Use WASDQE to move and RMB and mouse to look around");
     ImGui::Text("FPS: %.2f", *(this->state->fps));
     ImGui::Text(
@@ -292,7 +292,7 @@ bool DebugScene::render()
         {
             ImGui::SliderFloat3(
                 std::format("Water Wave # {} Direction", waveIndex).c_str(),
-                this->state->water->direction[waveIndex].data(), -1.f, 1.f 
+                this->state->water->direction[waveIndex].data(), -1.f, 1.f
             );
             ImGui::SliderFloat(
                 std::format("Water Wave # {} Magnitude", waveIndex).c_str(),

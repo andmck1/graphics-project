@@ -1,6 +1,8 @@
 # Graphics Project
-This repo contains all files for Alastair Hamilton's (2503450)
-graphics project for course CMP502.
+This is part of a graphics research project into using DirectX11 and graphics
+fundamentals.
+
+![Game demo](assets/showcase.gif)
 
 # Compiling
 ## Prerequisites
@@ -25,7 +27,7 @@ GraphicsProject.exe will now be available in `build/bin`:
 ```
 
 # Author
-Alastair Hamilton (2503450), 2503450@uad.ac.uk
+[Alastair Hamilton](alastair-hamilton.dev), alastair.amhamilton@icloud.com
 
 # References
 References are included below. Where applicable it has been mentioned
